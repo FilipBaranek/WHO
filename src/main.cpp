@@ -1,60 +1,17 @@
-﻿#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-#include <imgui.h>
-#include <backends/imgui_impl_glfw.h>
-#include <backends/imgui_impl_opengl3.h>
-#include <iostream>
+﻿#define _CRTDBG_MAP_ALLOC
+#include <crtdbg.h>
+#include <random>
+#include "./Headers/View/Application.h"
 
 int main()
 {
-    if (!glfwInit()) {
-        std::cerr << "Failed to init GLFW\n";
-        return -1;
+    _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+    srand(time(nullptr));
+
+    {
+        Application app;
+        app.run();
     }
 
-    GLFWwindow* window = glfwCreateWindow(800, 600, "ImGui + GLFW + GLAD", nullptr, nullptr);
-    if (!window) {
-        glfwTerminate();
-        std::cerr << "Failed to create window\n";
-        return -1;
-    }
-
-    glfwMakeContextCurrent(window);
-    gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
-    ImGui::StyleColorsDark();
-
-    ImGui_ImplGlfw_InitForOpenGL(window, true);
-    ImGui_ImplOpenGL3_Init("#version 130");
-
-    while (!glfwWindowShouldClose(window)) {
-        glfwPollEvents();
-
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-
-        ImGui::Begin("Hello");
-        ImGui::Text("This is an ImGui test window!");
-        ImGui::End();
-
-        ImGui::Render();
-        glViewport(0, 0, 800, 600);
-        glClearColor(0.1f, 0.1f, 0.2f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-        glfwSwapBuffers(window);
-    }
-
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
-    glfwDestroyWindow(window);
-    glfwTerminate();
-    
     return 0;
 }
