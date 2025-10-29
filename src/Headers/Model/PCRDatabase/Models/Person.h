@@ -25,7 +25,11 @@ public:
 	inline std::string toString()
 	{
 		m_oss.clear();
-		m_oss << "[" << m_birthNumber << "] " << m_firstName << " " << m_lastName << " born " << m_birthDay << "\n";
+		m_oss << "[" << m_birthNumber << "] " << m_firstName << " " << m_lastName
+			  << " born " << static_cast<int>(m_birthDay.year()) << "-"
+		      << std::setw(2) << std::setfill('0') << static_cast<unsigned>(m_birthDay.month()) << "-"
+			  << std::setw(2) << std::setfill('0') << static_cast<unsigned>(m_birthDay.day()) << "\n";
+		
 		return m_oss.str();
 	}
 

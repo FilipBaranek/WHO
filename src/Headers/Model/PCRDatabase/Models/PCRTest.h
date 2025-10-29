@@ -37,10 +37,13 @@ public:
 
 	inline std::string toString()
 	{
+		std::time_t time = std::chrono::system_clock::to_time_t(m_testDate);
+		std::tm tm = *std::localtime(&time);
+
 		m_oss.clear();
 		m_oss << "[" << m_testId << "] Birth number :" << m_birthNumber << ", Result: " << m_result
 			<< ", Test value: " << m_testValue << ", Workplace: " << m_workplaceId << ", District: "
-			<< m_districtId << ", Region: " << m_regionId << ", Date: " << m_testDate << ", Note: " << m_note << "\n";
+			<< m_districtId << ", Region: " << m_regionId << ", Date: " << std::put_time(&tm, "%Y-%m-%d %H:%M:%S") << ", Note: " << m_note << "\n";
 		return m_oss.str();
 	}
 

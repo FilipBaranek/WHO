@@ -4,6 +4,8 @@
 #include "./Headers/Model/Tests/SpeedTester.h"
 #include "./Headers/View/Application.h"
 
+#include "./Headers/Model/PCRDatabase/Database.h"
+
 
 void testSpeed()
 {
@@ -40,6 +42,10 @@ int main()
 
         //Application app;
         //app.run();
+
+        Database db;
+        db.generateRandomData(5);
+        db.printAllData();
     }
 
     return 0;

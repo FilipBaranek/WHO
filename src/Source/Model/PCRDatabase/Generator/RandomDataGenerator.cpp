@@ -71,7 +71,6 @@ void RandomDataGenerator::generateTests(std::vector<Person*>& input, std::vector
 
     std::string note(s_notes[rand() % NOTE_COUNT]);
 
-
     output.push_back(new PCRTest(
         rand() % MAX_TEST_CODE,
         rand() % MAX_WORKPLACE_CODE,
