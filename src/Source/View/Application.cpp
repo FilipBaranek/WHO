@@ -1,5 +1,6 @@
 #include "../../Headers/View/Application.h"
 #include "../../Headers/View/UI/FunctionalityTestWindow.h"
+#include "../../Headers/View/UI/SpeedTestWindow.h"
 
 Application::Application()
 {
@@ -18,6 +19,7 @@ Application::Application()
     ImGui_ImplOpenGL3_Init("#version 130");
 
     m_windows.push_back(new FunctionalityTestWindow());
+    m_windows.push_back(new SpeedTestWindow());
 }
 
 void Application::run()

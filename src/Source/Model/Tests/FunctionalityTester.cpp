@@ -190,10 +190,6 @@ void FunctionalityTester::runTests()
 				  << "BINARY TREE SIZE: " << m_bst.size() << "\n"
 				  << "AVL TREE SIZE: " << m_at.size() << "\n\n";
 
-			//std::cout << "OPERATION N." << i << "\n";
-			//std::cout << "BINARY TREE SIZE: " << m_bst.size() << "\n";
-			//std::cout << "AVL SIZE: " << m_at.size() << "\n";
-
 			if (m_data.size() == 0)
 			{
 				insert();
