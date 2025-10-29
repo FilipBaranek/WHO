@@ -1,10 +1,17 @@
 #include "../../../Headers/Model/Tests/FunctionalityTester.h"
 
 
-FunctionalityTester::FunctionalityTester()
+FunctionalityTester::FunctionalityTester(unsigned int pregeneratedDataCount)
 {
+	srand(time(nullptr));
+
 	m_minimalKey = 999999999;
 	m_maximalKey = -1;
+
+	while (m_bst.size() != pregeneratedDataCount || m_at.size() != pregeneratedDataCount)
+	{
+		insert();
+	}
 }
 
 void FunctionalityTester::insert()
@@ -43,6 +50,7 @@ void FunctionalityTester::insert()
 	if (duplicity)
 	{
 		delete number;
+		insert();
 	}
 }
 
@@ -170,22 +178,22 @@ void FunctionalityTester::testAVL()
 	m_at.testTree();
 }
 
-int FunctionalityTester::generateOperation()
-{
-	return rand() % 5;
-}
-
 void FunctionalityTester::runTests()
 {
-	int operation = INSERT;
+	m_oss.clear();
 
 	for (int i{}; i < REPLICATIONS; ++i)
 	{
 		if (i % CHECKPOINT_INDEX == 0)
 		{
-			std::cout << "OPERATION N." << i << "\n";
-			std::cout << "BINARY TREE SIZE: " << m_bst.size() << "\n";
-			std::cout << "AVL SIZE: " << m_at.size() << "\n";
+			m_oss << "OPERATION N." << (i + 1) << "\n"
+				  << "BINARY TREE SIZE: " << m_bst.size() << "\n"
+				  << "AVL TREE SIZE: " << m_at.size() << "\n\n";
+
+			//std::cout << "OPERATION N." << i << "\n";
+			//std::cout << "BINARY TREE SIZE: " << m_bst.size() << "\n";
+			//std::cout << "AVL SIZE: " << m_at.size() << "\n";
+
 			if (m_data.size() == 0)
 			{
 				insert();
@@ -195,41 +203,49 @@ void FunctionalityTester::runTests()
 		}
 		else
 		{
-			switch (operation)
+			int operation = rand() % 100;
+
+			if (operation < 20)
 			{
-			case INSERT:
 				insert();
-				break;
-			case REMOVE:
+			}
+			else if (operation < 40)
+			{
 				if (m_data.size() > 0)
 				{
 					remove();
 				}
-				break;
-			case FIND_POINT:
+			}
+			else if (operation < 60)
+			{
 				if (m_data.size() > 0)
 				{
 					find();
 				}
-				break;
-			case FIND_INTERVAL:
+			}
+			else if (operation < 80)
+			{
 				if (m_data.size() > 0)
 				{
 					findInterval();
 				}
-				break;
-			case TEST_AVL:
-			default:
+			}
+			else
+			{
 				if (m_data.size() > 0)
 				{
 					testAVL();
 				}
-				break;
 			}
 		}
-
-		operation = generateOperation();
 	}
+
+	m_oss << "\nTest ran successfuly\n";
+}
+
+std::string FunctionalityTester::outputToString()
+{
+	return m_oss.str();
 }
 
 FunctionalityTester::~FunctionalityTester()

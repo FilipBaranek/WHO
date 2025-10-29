@@ -1,38 +1,57 @@
 #include "../../../Headers/View/UI/FunctionalityTestWindow.h"
 
+
 void FunctionalityTestWindow::handleWindow()
 {
-    ImGui::SetNextWindowSize(ImVec2(400, 300), ImGuiCond_Always);
-    ImGui::Begin("Functionality test");
+    ImGui::SetNextWindowSize(ImVec2(400, 400), ImGuiCond_Always);
+    ImGui::Begin("Functionality Test");
 
-    ImVec2 regionMin = ImGui::GetWindowContentRegionMin();
-    ImVec2 regionMax = ImGui::GetWindowContentRegionMax();
-    ImVec2 contentSize = ImVec2(regionMax.x - regionMin.x, regionMax.y - regionMin.y);
+    ImVec2 contentSize = ImGui::GetContentRegionAvail();
 
-    float buttonAreaHeight = 60.0f;
     float margin = 10.0f;
-    ImVec2 buttonSize = ImVec2(150, 30);
+    float inputWidth = 100.0f;
+    float buttonWidth = 150.0f;
+    float buttonHeight = 30.0f;
 
-    ImVec2 childSize = ImVec2(contentSize.x, contentSize.y - buttonAreaHeight - margin);
+    ImVec2 childSize = ImVec2(contentSize.x, contentSize.y * 0.75f);
     ImGui::BeginChild("ScrollableTextRegion", childSize, true, ImGuiWindowFlags_HorizontalScrollbar);
 
-    ImVec2 textSize = ImGui::CalcTextSize(m_output);
+    ImVec2 textSize = ImGui::CalcTextSize(m_output.c_str());
     float textX = (childSize.x - textSize.x) * 0.5f;
     if (textX < 0.0f) textX = 0.0f;
     ImGui::SetCursorPosX(textX);
-
-    ImGui::TextUnformatted(m_output);
+    ImGui::TextUnformatted(m_output.c_str());
 
     ImGui::EndChild();
-
     ImGui::Dummy(ImVec2(0.0f, margin));
 
-    float buttonX = (contentSize.x - buttonSize.x) * 0.5f;
-    ImGui::SetCursorPosX(buttonX);
+    float centerX = (contentSize.x - inputWidth) * 0.5f;
+    ImGui::SetCursorPosX(centerX);
 
-    if (ImGui::Button("Start", buttonSize))
+    if (!m_isExecuting)
     {
-        m_output = "aaaa\naaaa\naaaa\naaaa\naaaa\naaaa\naaaa\naaaa\naaaa\naaaa\naaaa\naaaa\naaaa\naaaa\naaaa\naaaa\n";
+        ImGui::PushItemWidth(inputWidth);
+        ImGui::InputScalar("Pregen data size", ImGuiDataType_U32, &m_userInputDataCount, nullptr, nullptr, "%u");
+        ImGui::PopItemWidth();
+
+        ImGui::Dummy(ImVec2(0.0f, margin));
+
+        ImGui::SetCursorPosX((contentSize.x - buttonWidth) * 0.5f);
+        if (ImGui::Button("Start Test", ImVec2(buttonWidth, buttonHeight)))
+        {
+            m_isExecuting = true;
+
+            std::thread([this]() {
+                m_command.execute();
+                m_isExecuting = false;
+            }).detach();
+        }
+    }
+    else
+    {
+        ImVec2 textSize = ImGui::CalcTextSize("Testing...");
+        ImGui::SetCursorPosX((contentSize.x - textSize.x) * 0.5f);
+        ImGui::Text("Testing...");
     }
 
     ImGui::End();
