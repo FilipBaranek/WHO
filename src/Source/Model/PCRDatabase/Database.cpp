@@ -61,7 +61,8 @@ std::string Database::findTestResultByIdAndPatientId(const unsigned int testId, 
 		DEFAULT_NUM_VAL,
 		DEFAULT_STRING_VAL,
 		DEFAULT_TIME_POINT,
-		birthBumber
+		birthBumber,
+		nullptr
 	);
 
 	TestWrapper key(&test);

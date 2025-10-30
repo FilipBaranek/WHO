@@ -151,6 +151,7 @@ void RandomDataGenerator::generateTests(AVLTree<PersonWrapper*>& input, std::vec
         value(gen),
         note,
         generateTime(gen, randomPerson->birthDay()),
-        randomPerson->birthNumber()
+        randomPerson->birthNumber(),
+        randomPerson
     ));
 }

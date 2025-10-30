@@ -4,6 +4,9 @@
 #include <sstream>
 #include <iostream>
 
+//Forward deklaracia kvoli cyklickemu inlcudu
+class Person;
+
 class PCRTest
 {
 private:
@@ -17,12 +20,13 @@ private:
 	std::chrono::time_point<std::chrono::system_clock> m_testDate;
 	std::string m_birthNumber;
 	std::ostringstream m_oss;
+	Person* m_person;
 
 public:
-	PCRTest(unsigned int testId, unsigned int workplaceId, unsigned int districtId, unsigned int regionId, bool result,
-			double testValue, std::string note, std::chrono::time_point<std::chrono::system_clock> testDate, std::string birthNumber) :
+	PCRTest(unsigned int testId, unsigned int workplaceId, unsigned int districtId, unsigned int regionId, bool result, double testValue,
+			std::string note, std::chrono::time_point<std::chrono::system_clock> testDate, std::string birthNumber, Person* person) :
 			m_testId(testId), m_workplaceId(workplaceId), m_districtId(districtId), m_regionId(regionId), m_result(result),
-			m_testValue(testValue), m_note(note), m_testDate(testDate), m_birthNumber(birthNumber) 
+			m_testValue(testValue), m_note(note), m_testDate(testDate), m_birthNumber(birthNumber) , m_person(person)
 	{};
 
 	inline unsigned int testId() { return m_testId; }
