@@ -5,6 +5,8 @@
 #include <random>
 #include "../Models/PCRTest.h"
 #include "../Models/Person.h"
+#include "../ModelWrappers/PersonWrapper.h"
+#include "../../Structures/AVL/AVLTree.h"
 
 
 class RandomDataGenerator

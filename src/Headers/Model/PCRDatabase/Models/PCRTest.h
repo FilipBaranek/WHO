@@ -40,6 +40,7 @@ public:
 		std::time_t time = std::chrono::system_clock::to_time_t(m_testDate);
 		std::tm tm = *std::localtime(&time);
 
+		m_oss.str("");
 		m_oss.clear();
 		m_oss << "[" << m_testId << "]\nBirth number: " << m_birthNumber << "\nResult: " << m_result
 			<< "\nTest value: " << m_testValue << "\nWorkplace: " << m_workplaceId << "\nDistrict: "

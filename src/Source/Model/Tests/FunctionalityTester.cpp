@@ -185,6 +185,7 @@ void FunctionalityTester::testAVL()
 void FunctionalityTester::runTests()
 {
 	std::uniform_int_distribution<unsigned int> probability(0, 99);
+	m_oss.str("");
 	m_oss.clear();
 
 	int deletes = 0, inserts = 0;

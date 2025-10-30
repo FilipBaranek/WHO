@@ -24,6 +24,7 @@ public:
 
 	inline std::string toString()
 	{
+		m_oss.str("");
 		m_oss.clear();
 		m_oss << "[" << m_birthNumber << "] " << m_firstName << " " << m_lastName
 			  << " born " << static_cast<int>(m_birthDay.year()) << "-"

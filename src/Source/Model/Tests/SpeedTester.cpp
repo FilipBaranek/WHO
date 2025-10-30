@@ -2,6 +2,7 @@
 
 SpeedTester::SpeedTester(bool dataInOrder)
 {
+	m_oss.str("");
 	m_oss.clear();
 
 	for (int i = 1; i <= RANDOM_DATA_COUNT; ++i)

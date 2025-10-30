@@ -1,40 +1,42 @@
 #include "../../../Headers/Model/PCRDatabase/Database.h"
 
 
-void Database::generateRandomData(int dataCount)
+void Database::generateRandomPeople(int peopleCount)
 {
-	std::vector<Person*> people;
+	for (int i{}; i < peopleCount; ++i)
+	{
+		RandomDataGenerator::generatePeople(m_peopleList);
+	}
+
+	for (auto& person : m_peopleList)
+	{
+		m_people.insert(new PersonWrapper(person));
+	}
+}
+
+void Database::generateRandomTests(int testCount)
+{
 	std::vector<PCRTest*> tests;
 
-	for (int i{}; i < dataCount; ++i)
+	for (int i{}; i < testCount; ++i)
 	{
-		RandomDataGenerator::generatePeople(people);
+		RandomDataGenerator::generateTests(m_peopleList, tests);
 	}
 
-	for (int i{}; i < dataCount; ++i)
-	{
-		RandomDataGenerator::generateTests(people, tests);
-	}
-	
 	for (auto& test : tests)
 	{
 		m_tests.insert(new TestWrapper(test));
 	}
-
-	for (auto& person : people)
-	{
-		delete person;
-	}
 }
 
-void Database::insert()
+void Database::insert(Person* person)
 {
-
+	m_people.insert(new PersonWrapper(person));
 }
 
-void Database::clear()
+void Database::insert(PCRTest* pcrTest)
 {
-
+	m_tests.insert(new TestWrapper(pcrTest));
 }
 
 std::string Database::findTestResultByIdAndPatientId(const unsigned int testId, const std::string birthBumber)
@@ -53,38 +55,73 @@ std::string Database::findTestResultByIdAndPatientId(const unsigned int testId, 
 
 	TestWrapper key(&test);
 
-	return m_tests.find(&key)->getData()->toString();
+	auto output = m_tests.find(&key);
+	if (output != nullptr)
+	{
+		return output->getData()->toString();
+	}
+	return "";
 }
 
 void Database::printAllData()
 {
+	m_people.processPreOrder([this](PersonWrapper* person) {
+		std::cout << person->getData()->toString() << "\n";
+
+		std::vector<TestWrapper*> output;
+		PCRTest minKey(
+			MIN_TEST_ID,
+			DEFAULT_WORKPLACE,
+			DEFAULT_DISTRICT,
+			DEFAULT_REGION,
+			DEFAULT_TEST_RES,
+			DEFAULT_TEST_VAL,
+			DEFAULT_STRING_VAL,
+			DEFAULT_TIME_POINT,
+			person->getData()->birthNumber()
+		);
+		PCRTest maxKey(
+			MAX_TEST_ID,
+			DEFAULT_WORKPLACE,
+			DEFAULT_DISTRICT,
+			DEFAULT_REGION,
+			DEFAULT_TEST_RES,
+			DEFAULT_TEST_VAL,
+			DEFAULT_STRING_VAL,
+			DEFAULT_TIME_POINT,
+			person->getData()->birthNumber()
+		);
+		TestWrapper min(&minKey);
+		TestWrapper max(&maxKey);
+
+		m_tests.find(&min, &max, output);
+
+		for (auto& test : output)
+		{
+			std::cout << test->getData()->toString();
+		}
+		std::cout << "================================\n";
+	});
+
 	m_tests.processInOrder([](TestWrapper* test) {
 		std::cout << test->getData()->toString();
 	});
-
-	//m_people.processPreOrder([this](Person* person) {
-	//	std::cout << person->toString();
-
-	//	std::vector<TestWrapper*> output;
-	//	TestWrapper testMin(new PCRTest(-1, 0, 0, 0, 0, 0, "", std::chrono::system_clock::now(), "0"));
-	//	TestWrapper testMax(new PCRTest(999999999999999, 9, 9, 9, 9, 9, "", std::chrono::system_clock::now(), "zzzzzzzzzzzzzzzzzzzzzz"));
-
-	//	m_tests.find(&testMin, &testMax, output);
-
-	//	for (auto& test : output)
-	//	{
-	//		std::cout << test->getData()->toString();
-	//	}
-
-	//	delete testMin.getData();
-	//	delete testMax.getData();
-	//});
 }
 
-Database::~Database()
+void Database::clear()
 {
+	m_people.processPostOrder([](PersonWrapper* person) {
+		delete person->getData();
+		delete person;
+	});
+
 	m_tests.processPostOrder([](TestWrapper* test) {
 		delete test->getData();
 		delete test;
 	});
+}
+
+Database::~Database()
+{
+	clear();
 }

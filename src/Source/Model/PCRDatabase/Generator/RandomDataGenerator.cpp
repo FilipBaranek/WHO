@@ -44,7 +44,7 @@ std::string RandomDataGenerator::generateBirthNumber(std::mt19937& generator, st
     pn << std::setw(2) << std::setfill('0') << year
        << std::setw(2) << std::setfill('0') << month
        << std::setw(2) << std::setfill('0') << day
-       << "/" << std::to_string(birthNumberInterval(generator));
+       << "/" << std::setw(3) << std::setfill('0') << std::to_string(birthNumberInterval(generator));
 
     return pn.str();
 }
