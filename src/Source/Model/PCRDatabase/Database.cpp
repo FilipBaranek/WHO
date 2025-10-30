@@ -37,9 +37,23 @@ void Database::clear()
 
 }
 
-std::string Database::findTestResultByIdAndPatientId()
+std::string Database::findTestResultByIdAndPatientId(const unsigned int testId, const std::string birthBumber)
 {
-	return std::string();
+	PCRTest test(
+		testId,
+		DEFAULT_NUM_VAL,
+		DEFAULT_NUM_VAL,
+		DEFAULT_NUM_VAL,
+		DEFAULT_NUM_VAL,
+		DEFAULT_NUM_VAL,
+		DEFAULT_STRING_VAL,
+		DEFAULT_TIME_POINT,
+		birthBumber
+	);
+
+	TestWrapper key(&test);
+
+	return m_tests.find(&key)->getData()->toString();
 }
 
 void Database::printAllData()

@@ -61,6 +61,15 @@ void RandomDataGenerator::generatePeople(std::vector<Person*>& output)
     auto birthDay = generateRandomDate();
     std::string name(s_names[rand() % NAMES_COUNT]);
     std::string lastName(s_lastNames[rand() % NAMES_COUNT]);
+    std::string birthNumber = generateBirthNumber(birthDay);
+
+    while (std::find_if(output.begin(), output.end(), [&](Person* person) {
+        return birthNumber == person->birthNumber();
+    }) != output.end())
+    {
+        birthNumber = generateBirthNumber(birthDay);
+    }
+
 
 	output.push_back(new Person(generateBirthNumber(birthDay), name, lastName, birthDay));
 }
@@ -70,9 +79,17 @@ void RandomDataGenerator::generateTests(std::vector<Person*>& input, std::vector
     srand(time(nullptr));
 
     std::string note(s_notes[rand() % NOTE_COUNT]);
+    unsigned int testId = rand() % MAX_TEST_CODE;
+
+    while (std::find_if(output.begin(), output.end(), [&](PCRTest* test) {
+        return testId == test->testId();
+    }) != output.end())
+    {
+        testId = rand() % MAX_TEST_CODE;
+    }
 
     output.push_back(new PCRTest(
-        rand() % MAX_TEST_CODE,
+        testId,
         rand() % MAX_WORKPLACE_CODE,
         rand() % MAX_DISTRICT_CODE,
         rand() % MAX_REGION_CODE,

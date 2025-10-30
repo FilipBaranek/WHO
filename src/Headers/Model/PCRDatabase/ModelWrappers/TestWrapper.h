@@ -9,7 +9,7 @@ private:
 	PCRTest* m_pcrTest;
 
 public:
-	TestWrapper(PCRTest* person);
+	TestWrapper(PCRTest* pcrTest);
 	PCRTest* getData();
 	int compare(IComparable* other) const override;
 	~TestWrapper() = default;

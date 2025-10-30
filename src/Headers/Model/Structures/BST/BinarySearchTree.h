@@ -383,7 +383,7 @@ public:
 		return insertNode<BSTNode<T>>(data) != nullptr;
 	}
 
-	T find(T& key)
+	T find(T key)
 	{
 		if (key == nullptr)
 		{

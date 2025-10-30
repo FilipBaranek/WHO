@@ -21,7 +21,7 @@ private:
 public:
 	PCRTest(unsigned int testId, unsigned int workplaceId, unsigned int districtId, unsigned int regionId, bool result,
 			double testValue, std::string note, std::chrono::time_point<std::chrono::system_clock> testDate, std::string birthNumber) :
-			m_testId(testId), m_workplaceId(workplaceId), m_districtId(m_districtId), m_regionId(regionId), m_result(result),
+			m_testId(testId), m_workplaceId(workplaceId), m_districtId(districtId), m_regionId(regionId), m_result(result),
 			m_testValue(testValue), m_note(note), m_testDate(testDate), m_birthNumber(birthNumber) 
 	{};
 
@@ -41,9 +41,9 @@ public:
 		std::tm tm = *std::localtime(&time);
 
 		m_oss.clear();
-		m_oss << "[" << m_testId << "] Birth number :" << m_birthNumber << ", Result: " << m_result
-			<< ", Test value: " << m_testValue << ", Workplace: " << m_workplaceId << ", District: "
-			<< m_districtId << ", Region: " << m_regionId << ", Date: " << std::put_time(&tm, "%Y-%m-%d %H:%M:%S") << ", Note: " << m_note << "\n";
+		m_oss << "[" << m_testId << "]\nBirth number: " << m_birthNumber << "\nResult: " << m_result
+			<< "\nTest value: " << m_testValue << "\nWorkplace: " << m_workplaceId << "\nDistrict: "
+			<< m_districtId << "\nRegion: " << m_regionId << "\nDate: " << std::put_time(&tm, "%Y-%m-%d %H:%M:%S") << "\nNote: " << m_note << "\n\n";
 		return m_oss.str();
 	}
 

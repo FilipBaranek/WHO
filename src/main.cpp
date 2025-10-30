@@ -46,6 +46,8 @@ int main()
         Database db;
         db.generateRandomData(5);
         db.printAllData();
+
+        std::cout << db.findTestResultByIdAndPatientId(4567, "970211/4963") << "\n";
     }
 
     return 0;
