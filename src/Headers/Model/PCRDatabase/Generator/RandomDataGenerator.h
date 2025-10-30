@@ -24,9 +24,10 @@ private:
 	static constexpr const unsigned int NOTE_COUNT = 3;
 	static constexpr std::string_view s_notes[] = { "Pacient v karantene", "Vysledok zaslany elektronicky", "Opakovany test odporucany" };
 
-	static std::chrono::year_month_day generateRandomDate();
-	static std::chrono::time_point<std::chrono::system_clock> generateTime();
-	static std::string generateBirthNumber(std::chrono::year_month_day& birthDay);
+	static std::chrono::year_month_day generateRandomDate(std::mt19937& generator);
+	static std::chrono::time_point<std::chrono::system_clock> generateTime(std::mt19937& generator);
+	static std::string generateBirthNumber(std::mt19937& generator, std::chrono::year_month_day& birthDay);
+	static void generateLocation(std::mt19937& generator, unsigned int& workplace, unsigned int& district, unsigned int& region);
 
 public:
 	RandomDataGenerator() = delete;

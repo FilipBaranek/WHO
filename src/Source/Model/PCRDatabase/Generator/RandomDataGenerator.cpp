@@ -1,11 +1,8 @@
 #include "../../../../Headers/Model/PCRDatabase/Generator/RandomDataGenerator.h"
 
-std::chrono::year_month_day RandomDataGenerator::generateRandomDate()
+std::chrono::year_month_day RandomDataGenerator::generateRandomDate(std::mt19937& generator)
 {
     using namespace std::chrono;
-
-    static std::random_device rd;
-    static std::mt19937 gen(rd());
 
     year_month_day start{ year{1980}, month{1}, day{1} };
     year_month_day end{ year{2010}, month{12}, day{31} };
@@ -14,32 +11,30 @@ std::chrono::year_month_day RandomDataGenerator::generateRandomDate()
     sys_days end_days = sys_days(end);
 
     std::uniform_int_distribution<int> dist(0, (end_days - start_days).count());
-    sys_days random_day = start_days + days(dist(gen));
+    sys_days random_day = start_days + days(dist(generator));
 
     return year_month_day{ random_day };
 }
 
-std::chrono::time_point<std::chrono::system_clock> RandomDataGenerator::generateTime()
+std::chrono::time_point<std::chrono::system_clock> RandomDataGenerator::generateTime(std::mt19937& generator)
 {
-    auto ymd = generateRandomDate();
+    auto ymd = generateRandomDate(generator);
     auto random_day = std::chrono::sys_days(ymd);
 
-    static std::random_device rd;
-    static std::mt19937 gen(rd());
     std::uniform_int_distribution<int> hour_dist(0, 23);
     std::uniform_int_distribution<int> min_dist(0, 59);
     std::uniform_int_distribution<int> sec_dist(0, 59);
 
-    auto random_time = std::chrono::hours(hour_dist(gen))
-        + std::chrono::minutes(min_dist(gen))
-        + std::chrono::seconds(sec_dist(gen));
+    auto random_time = std::chrono::hours(hour_dist(generator)) + std::chrono::minutes(min_dist(generator)) + std::chrono::seconds(sec_dist(generator));
 
-    return std::chrono::time_point_cast<std::chrono::system_clock::duration>(random_day + random_time);
+    return random_day + random_time;
 }
 
-std::string RandomDataGenerator::generateBirthNumber(std::chrono::year_month_day& birthDay)
+std::string RandomDataGenerator::generateBirthNumber(std::mt19937& generator, std::chrono::year_month_day& birthDay)
 {
     using namespace std::chrono;
+
+    std::uniform_int_distribution<unsigned int> birthNumberInterval(0, MAX_BIRTH_NUMBER - 1);
 
     int year = static_cast<int>(birthDay.year()) % 100;
     int month = static_cast<unsigned>(birthDay.month());
@@ -47,56 +42,79 @@ std::string RandomDataGenerator::generateBirthNumber(std::chrono::year_month_day
 
     std::ostringstream pn;
     pn << std::setw(2) << std::setfill('0') << year
-        << std::setw(2) << std::setfill('0') << month
-        << std::setw(2) << std::setfill('0') << day
-        << "/" << std::to_string(rand() % MAX_BIRTH_NUMBER);
+       << std::setw(2) << std::setfill('0') << month
+       << std::setw(2) << std::setfill('0') << day
+       << "/" << std::to_string(birthNumberInterval(generator));
 
     return pn.str();
 }
 
+void RandomDataGenerator::generateLocation(std::mt19937& generator, unsigned int& workplace, unsigned int& district, unsigned int& region)
+{
+    std::uniform_int_distribution<unsigned int> workplaceInterval(0, MAX_WORKPLACE_CODE - 1);
+
+    workplace = workplaceInterval(generator);
+    district = (workplace * MAX_DISTRICT_CODE) / MAX_WORKPLACE_CODE;
+    region = (district * MAX_REGION_CODE) / MAX_DISTRICT_CODE;
+}
+
 void RandomDataGenerator::generatePeople(std::vector<Person*>& output)
 {
-    srand(time(nullptr));
+    std::random_device rd;
+    std::mt19937 gen(rd());
 
-    auto birthDay = generateRandomDate();
-    std::string name(s_names[rand() % NAMES_COUNT]);
-    std::string lastName(s_lastNames[rand() % NAMES_COUNT]);
-    std::string birthNumber = generateBirthNumber(birthDay);
+    std::uniform_int_distribution<unsigned int> names(0, NAMES_COUNT - 1);
+
+    auto birthDay = generateRandomDate(gen);
+    std::string name(s_names[names(gen)]);
+    std::string lastName(s_lastNames[names(gen)]);
+    std::string birthNumber = generateBirthNumber(gen, birthDay);
 
     while (std::find_if(output.begin(), output.end(), [&](Person* person) {
         return birthNumber == person->birthNumber();
     }) != output.end())
     {
-        birthNumber = generateBirthNumber(birthDay);
+        birthNumber = generateBirthNumber(gen, birthDay);
     }
 
 
-	output.push_back(new Person(generateBirthNumber(birthDay), name, lastName, birthDay));
+	output.push_back(new Person(birthNumber, name, lastName, birthDay));
 }
 
 void RandomDataGenerator::generateTests(std::vector<Person*>& input, std::vector<PCRTest*>& output)
 {
-    srand(time(nullptr));
+    std::random_device rd;
+    std::mt19937 gen(rd());
 
-    std::string note(s_notes[rand() % NOTE_COUNT]);
-    unsigned int testId = rand() % MAX_TEST_CODE;
+    std::uniform_int_distribution<unsigned int> noteInterval(0, NOTE_COUNT - 1);
+    std::uniform_int_distribution<unsigned int> test(0, MAX_TEST_CODE - 1);
+    std::uniform_int_distribution<unsigned int> result(0, 1);
+    std::uniform_int_distribution<unsigned int> value(10, 40);
+    std::uniform_int_distribution<unsigned int> birthNumber(0, input.size() - 1);
+
+
+    std::string note(s_notes[noteInterval(gen)]);
+    unsigned int testId = test(gen);
 
     while (std::find_if(output.begin(), output.end(), [&](PCRTest* test) {
         return testId == test->testId();
     }) != output.end())
     {
-        testId = rand() % MAX_TEST_CODE;
+        testId = test(gen);
     }
+
+    unsigned int workplace, district, region;
+    generateLocation(gen, workplace, district, region);
 
     output.push_back(new PCRTest(
         testId,
-        rand() % MAX_WORKPLACE_CODE,
-        rand() % MAX_DISTRICT_CODE,
-        rand() % MAX_REGION_CODE,
-        rand() % 2,
-        (rand() % 30) + 10,
+        workplace,
+        district,
+        region,
+        (bool)result(gen),
+        value(gen),
         note,
-        generateTime(),
-        input[rand() % input.size()]->birthNumber()
+        generateTime(gen),
+        input[birthNumber(gen)]->birthNumber()
     ));
 }

@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include <time.h>
+#include <random>
 #include <string>
 #include <sstream>
 #include "../Structures/BST/BinarySearchTree.h"
