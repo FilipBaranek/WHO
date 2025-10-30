@@ -10,9 +10,8 @@
 class FunctionalityTester
 {
 private:
-	static constexpr const unsigned int REPLICATIONS = 100000;
+	static constexpr const unsigned int REPLICATIONS = 500000;
 	static constexpr const unsigned int CHECKPOINT_INDEX = 10000;
-	static constexpr const unsigned int UPPER_BOUND_COUNT = 5000;
 	static constexpr const unsigned int VALUE_UPPER_BOUND = 500000;
 	static constexpr const unsigned int MAX_INTERVAL = 500;
 	int m_minimalKey;
@@ -21,6 +20,8 @@ private:
 	std::vector<Number*> m_data;
 	BinarySearchTree<Number*> m_bst;
 	AVLTree<Number*> m_at;
+	std::random_device m_rd;
+	std::mt19937 m_gen{ m_rd() };
 
 public:
 	FunctionalityTester(unsigned int pregeneratedDataCount = 0);

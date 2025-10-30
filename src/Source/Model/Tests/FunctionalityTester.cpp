@@ -3,8 +3,6 @@
 
 FunctionalityTester::FunctionalityTester(unsigned int pregeneratedDataCount)
 {
-	srand(time(nullptr));
-
 	m_minimalKey = 999999999;
 	m_maximalKey = -1;
 
@@ -16,7 +14,9 @@ FunctionalityTester::FunctionalityTester(unsigned int pregeneratedDataCount)
 
 void FunctionalityTester::insert()
 {
-	auto number = new Number(rand() % VALUE_UPPER_BOUND);
+	std::uniform_int_distribution<unsigned int> valueInterval(0, VALUE_UPPER_BOUND - 1);
+
+	auto number = new Number(valueInterval(m_gen));
 	bool duplicity = false;
 	if (std::find_if(m_data.begin(), m_data.end(), [number](Number* n) { return n->getData() == number->getData(); }) != m_data.end())
 	{
@@ -56,7 +56,9 @@ void FunctionalityTester::insert()
 
 void FunctionalityTester::remove()
 {
-	int index = rand() % m_data.size();
+	std::uniform_int_distribution<unsigned int> indexInterval(0, m_data.size() - 1);
+
+	int index = indexInterval(m_gen);
 	std::swap(m_data[index], m_data.back());
 	m_bst.remove(m_data.back());
 	m_at.remove(m_data.back());
@@ -89,7 +91,9 @@ void FunctionalityTester::remove()
 
 void FunctionalityTester::find()
 {
-	auto number = m_data[rand() % m_data.size()];
+	std::uniform_int_distribution<unsigned int> indexInterval(0, m_data.size() - 1);
+
+	auto number = m_data[indexInterval(m_gen)];
 	Number* bstKey = m_bst.find(number);
 	Number* atKey = m_at.find(number);
 
@@ -101,48 +105,48 @@ void FunctionalityTester::find()
 
 void FunctionalityTester::findInterval()
 {
-	int interval = (rand() % MAX_INTERVAL) + 1;
+	std::uniform_int_distribution<unsigned int> intervalSize(1, MAX_INTERVAL - 1);
+	std::uniform_int_distribution<unsigned int> valueInterval(0, VALUE_UPPER_BOUND - 1);
 
-	if (m_data.size() > 0)
+	int interval = intervalSize(m_gen);
+
+	int min, max;
+	min = valueInterval(m_gen);
+	max = min + interval;
+
+	std::vector<Number*> numbersInInterval;
+	for (auto n : m_data)
 	{
-		int min, max;
-		min = rand() % VALUE_UPPER_BOUND;
-		max = min + interval;
-
-		std::vector<Number*> numbersInInterval;
-		for (auto n : m_data)
+		if (n->getData() >= min && n->getData() <= max)
 		{
-			if (n->getData() >= min && n->getData() <= max)
-			{
-				numbersInInterval.push_back(n);
-			}
+			numbersInInterval.push_back(n);
 		}
-		std::sort(numbersInInterval.begin(), numbersInInterval.end(), [](Number* a, Number* b) {
-			return a->getData() < b->getData();
-			});
-
-		auto low = new Number(min);
-		auto high = new Number(max);
-		std::vector<Number*> btOutput;
-		std::vector<Number*> atOutput;
-		m_bst.find(low, high, btOutput);
-		m_at.find(low, high, atOutput);
-
-		if (numbersInInterval.size() != btOutput.size() || numbersInInterval.size() != atOutput.size())
-		{
-			throw std::runtime_error("Interval size doesn't match");
-		}
-
-		for (int i{}; i < numbersInInterval.size(); ++i)
-		{
-			if (numbersInInterval[i]->getData() != btOutput[i]->getData() || numbersInInterval[i]->getData() != atOutput[i]->getData())
-			{
-				throw std::runtime_error("Incorrect interval search");
-			}
-		}
-		delete low;
-		delete high;
 	}
+	std::sort(numbersInInterval.begin(), numbersInInterval.end(), [](Number* a, Number* b) {
+		return a->getData() < b->getData();
+		});
+
+	auto low = new Number(min);
+	auto high = new Number(max);
+	std::vector<Number*> btOutput;
+	std::vector<Number*> atOutput;
+	m_bst.find(low, high, btOutput);
+	m_at.find(low, high, atOutput);
+
+	if (numbersInInterval.size() != btOutput.size() || numbersInInterval.size() != atOutput.size())
+	{
+		throw std::runtime_error("Interval size doesn't match");
+	}
+
+	for (int i{}; i < numbersInInterval.size(); ++i)
+	{
+		if (numbersInInterval[i]->getData() != btOutput[i]->getData() || numbersInInterval[i]->getData() != atOutput[i]->getData())
+		{
+			throw std::runtime_error("Incorrect interval search");
+		}
+	}
+	delete low;
+	delete high;
 }
 
 void FunctionalityTester::findMinKey()
@@ -180,7 +184,10 @@ void FunctionalityTester::testAVL()
 
 void FunctionalityTester::runTests()
 {
+	std::uniform_int_distribution<unsigned int> probability(0, 99);
 	m_oss.clear();
+
+	int deletes = 0, inserts = 0;
 
 	for (int i{}; i < REPLICATIONS; ++i)
 	{
@@ -199,17 +206,19 @@ void FunctionalityTester::runTests()
 		}
 		else
 		{
-			int operation = rand() % 100;
+			int operation = probability(m_gen);
 
 			if (operation < 20)
 			{
 				insert();
+				++inserts;
 			}
 			else if (operation < 40)
 			{
 				if (m_data.size() > 0)
 				{
 					remove();
+					++deletes;
 				}
 			}
 			else if (operation < 60)
@@ -236,6 +245,7 @@ void FunctionalityTester::runTests()
 		}
 	}
 
+	m_oss << "Inserts: " << inserts << " Deletes: " << deletes << "\n";
 	m_oss << "\nTest ran successfuly\n";
 }
 

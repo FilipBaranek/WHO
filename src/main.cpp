@@ -43,9 +43,9 @@ int main()
         //Application app;
         //app.run();
 
-        //Database db;
-        //db.generateRandomData(5);
-        //db.printAllData();
+        Database db;
+        db.generateRandomData(5);
+        db.printAllData();
 
         //std::cout << db.findTestResultByIdAndPatientId(4567, "970211/4963") << "\n";
     }
