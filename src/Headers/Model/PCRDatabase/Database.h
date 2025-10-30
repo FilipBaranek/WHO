@@ -11,20 +11,16 @@
 class Database
 {
 private:
-	static constexpr const int MIN_TEST_ID = -1;
+	static constexpr const int MIN_TEST_ID = 0;
 	static constexpr const int MAX_TEST_ID = 99999999999999;
 	static constexpr const int DEFAULT_NUM_VAL = 0;
-	static constexpr const int DEFAULT_WORKPLACE = 0;
-	static constexpr const int DEFAULT_DISTRICT = 0;
-	static constexpr const int DEFAULT_REGION = 0;
-	static constexpr const bool DEFAULT_TEST_VAL = 0;
-	static constexpr const bool DEFAULT_TEST_RES = false;
+	static constexpr const bool DEFAULT_BOOL_VAL = false;
 	static constexpr const char* DEFAULT_STRING_VAL = "\0";
-	
 	static constexpr const std::chrono::time_point <std::chrono::system_clock> DEFAULT_TIME_POINT{};
-	std::ostringstream m_oss;
+	static constexpr const std::chrono::year_month_day DEFAULT_DATE{};
 	
-	std::vector<Person*> m_peopleList;
+	std::ostringstream m_oss;
+
 	AVLTree<PersonWrapper*> m_people;
 	AVLTree<TestWrapper*> m_tests;
 

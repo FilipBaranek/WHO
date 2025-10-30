@@ -584,9 +584,12 @@ public:
 
 	void clear()
 	{
-		postOrderTraversal([&](BSTNode<T>* node) {
-			delete node;
+		if (m_size > 0)
+		{
+			postOrderTraversal([&](BSTNode<T>* node) {
+				delete node;
 			});
+		}
 
 		m_root = nullptr;
 		m_size = 0;

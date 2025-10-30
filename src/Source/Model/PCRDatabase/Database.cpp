@@ -3,12 +3,14 @@
 
 void Database::generateRandomPeople(int peopleCount)
 {
+	std::vector<Person*> people;
+
 	for (int i{}; i < peopleCount; ++i)
 	{
-		RandomDataGenerator::generatePeople(m_peopleList);
+		RandomDataGenerator::generatePeople(people);
 	}
 
-	for (auto& person : m_peopleList)
+	for (auto& person : people)
 	{
 		m_people.insert(new PersonWrapper(person));
 	}
@@ -16,16 +18,24 @@ void Database::generateRandomPeople(int peopleCount)
 
 void Database::generateRandomTests(int testCount)
 {
-	std::vector<PCRTest*> tests;
-
-	for (int i{}; i < testCount; ++i)
+	if (m_people.size() > 0)
 	{
-		RandomDataGenerator::generateTests(m_peopleList, tests);
-	}
+		std::vector<PCRTest*> tests;
 
-	for (auto& test : tests)
-	{
-		m_tests.insert(new TestWrapper(test));
+		for (int i{}; i < testCount; ++i)
+		{
+			RandomDataGenerator::generateTests(m_people, tests);
+		}
+
+		for (auto& test : tests)
+		{
+			m_tests.insert(new TestWrapper(test));
+
+			Person person(test->birthNumber(), DEFAULT_STRING_VAL, DEFAULT_STRING_VAL, DEFAULT_DATE);
+			PersonWrapper key(&person);
+
+			m_people.find(&key)->getData()->tests().insert(new TestWrapper(test));
+		}
 	}
 }
 
@@ -41,6 +51,7 @@ void Database::insert(PCRTest* pcrTest)
 
 std::string Database::findTestResultByIdAndPatientId(const unsigned int testId, const std::string birthBumber)
 {
+	//DOROBIT ABY VRACALO OUTPUT PODLA ZADANIA
 	PCRTest test(
 		testId,
 		DEFAULT_NUM_VAL,
@@ -67,44 +78,13 @@ void Database::printAllData()
 {
 	m_people.processPreOrder([this](PersonWrapper* person) {
 		std::cout << person->getData()->toString() << "\n";
-
-		std::vector<TestWrapper*> output;
-		PCRTest minKey(
-			MIN_TEST_ID,
-			DEFAULT_WORKPLACE,
-			DEFAULT_DISTRICT,
-			DEFAULT_REGION,
-			DEFAULT_TEST_RES,
-			DEFAULT_TEST_VAL,
-			DEFAULT_STRING_VAL,
-			DEFAULT_TIME_POINT,
-			person->getData()->birthNumber()
-		);
-		PCRTest maxKey(
-			MAX_TEST_ID,
-			DEFAULT_WORKPLACE,
-			DEFAULT_DISTRICT,
-			DEFAULT_REGION,
-			DEFAULT_TEST_RES,
-			DEFAULT_TEST_VAL,
-			DEFAULT_STRING_VAL,
-			DEFAULT_TIME_POINT,
-			person->getData()->birthNumber()
-		);
-		TestWrapper min(&minKey);
-		TestWrapper max(&maxKey);
-
-		m_tests.find(&min, &max, output);
-
-		for (auto& test : output)
+		
+		if (person->getData()->tests().size() > 0)
 		{
-			std::cout << test->getData()->toString();
+			person->getData()->tests().processInOrder([](TestWrapper* test) {
+				std::cout << test->getData()->toString() << "\n";
+			});
 		}
-		std::cout << "================================\n";
-	});
-
-	m_tests.processInOrder([](TestWrapper* test) {
-		std::cout << test->getData()->toString();
 	});
 }
 

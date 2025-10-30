@@ -16,16 +16,33 @@ std::chrono::year_month_day RandomDataGenerator::generateRandomDate(std::mt19937
     return year_month_day{ random_day };
 }
 
-std::chrono::time_point<std::chrono::system_clock> RandomDataGenerator::generateTime(std::mt19937& generator)
+std::chrono::time_point<std::chrono::system_clock> RandomDataGenerator::generateTime(std::mt19937& generator, const std::chrono::year_month_day& birthDate)
 {
-    auto ymd = generateRandomDate(generator);
-    auto random_day = std::chrono::sys_days(ymd);
+    using namespace std::chrono;
+
+    const year_month_day start = birthDate + years{ 15 };
+
+    const auto now = std::chrono::system_clock::now();
+    const auto current_ymd = floor<days>(now);
+    const year_month_day end{ current_ymd };
+
+    if (end < start) {
+        return std::chrono::system_clock::now();
+    }
+
+    sys_days start_days = sys_days(start);
+    sys_days end_days = sys_days(end);
+
+    std::uniform_int_distribution<int> dist(0, (end_days - start_days).count());
+    sys_days random_day = start_days + days(dist(generator));
 
     std::uniform_int_distribution<int> hour_dist(0, 23);
     std::uniform_int_distribution<int> min_dist(0, 59);
     std::uniform_int_distribution<int> sec_dist(0, 59);
 
-    auto random_time = std::chrono::hours(hour_dist(generator)) + std::chrono::minutes(min_dist(generator)) + std::chrono::seconds(sec_dist(generator));
+    auto random_time = std::chrono::hours(hour_dist(generator)) +
+        std::chrono::minutes(min_dist(generator)) +
+        std::chrono::seconds(sec_dist(generator));
 
     return random_day + random_time;
 }
@@ -81,7 +98,7 @@ void RandomDataGenerator::generatePeople(std::vector<Person*>& output)
 	output.push_back(new Person(birthNumber, name, lastName, birthDay));
 }
 
-void RandomDataGenerator::generateTests(std::vector<Person*>& input, std::vector<PCRTest*>& output)
+void RandomDataGenerator::generateTests(AVLTree<PersonWrapper*>& input, std::vector<PCRTest*>& output)
 {
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -92,7 +109,6 @@ void RandomDataGenerator::generateTests(std::vector<Person*>& input, std::vector
     std::uniform_int_distribution<unsigned int> value(10, 40);
     std::uniform_int_distribution<unsigned int> birthNumber(0, input.size() - 1);
 
-
     std::string note(s_notes[noteInterval(gen)]);
     unsigned int testId = test(gen);
 
@@ -102,6 +118,26 @@ void RandomDataGenerator::generateTests(std::vector<Person*>& input, std::vector
     {
         testId = test(gen);
     }
+
+    Person* randomPerson;
+    bool stopExecuting = false;
+    int i = 0;
+    int randomPersonIndex = birthNumber(gen);
+
+    //Might be optimized needed later
+    input.processInOrder([&i, &randomPersonIndex, &randomPerson, &stopExecuting](PersonWrapper* person) {
+        if (stopExecuting)
+        {
+            return;
+        }
+        if (i == randomPersonIndex)
+        {
+            randomPerson = person->getData();
+            stopExecuting = true;
+            return;
+        }
+        ++i;
+    });
 
     unsigned int workplace, district, region;
     generateLocation(gen, workplace, district, region);
@@ -114,7 +150,7 @@ void RandomDataGenerator::generateTests(std::vector<Person*>& input, std::vector
         (bool)result(gen),
         value(gen),
         note,
-        generateTime(gen),
-        input[birthNumber(gen)]->birthNumber()
+        generateTime(gen, randomPerson->birthDay()),
+        randomPerson->birthNumber()
     ));
 }

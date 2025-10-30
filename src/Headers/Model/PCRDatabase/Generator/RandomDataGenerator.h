@@ -27,13 +27,13 @@ private:
 	static constexpr std::string_view s_notes[] = { "Pacient v karantene", "Vysledok zaslany elektronicky", "Opakovany test odporucany" };
 
 	static std::chrono::year_month_day generateRandomDate(std::mt19937& generator);
-	static std::chrono::time_point<std::chrono::system_clock> generateTime(std::mt19937& generator);
+	static std::chrono::time_point<std::chrono::system_clock> generateTime(std::mt19937& generator, const std::chrono::year_month_day& birthDate);
 	static std::string generateBirthNumber(std::mt19937& generator, std::chrono::year_month_day& birthDay);
 	static void generateLocation(std::mt19937& generator, unsigned int& workplace, unsigned int& district, unsigned int& region);
 
 public:
 	RandomDataGenerator() = delete;
 	static void generatePeople(std::vector<Person*>& output);
-	static void generateTests(std::vector<Person*>& input, std::vector<PCRTest*>& output);
+	static void generateTests(AVLTree<PersonWrapper*>& input, std::vector<PCRTest*>& output);
 	~RandomDataGenerator() = delete;
 };

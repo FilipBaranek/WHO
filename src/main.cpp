@@ -44,9 +44,12 @@ int main()
         //app.run();
 
         Database db;
-        db.generateRandomPeople(5);
-        db.generateRandomTests(7);
+        db.generateRandomPeople(8);
+        db.generateRandomTests(20);
         db.printAllData();
+
+
+
         //db.insert(new PCRTest(136502, 38, 30, 3, 1, 14, "", std::chrono::system_clock::now(), "850119/7714"));
         //db.insert(new PCRTest(254865, 38, 30, 3, 1, 14, "", std::chrono::system_clock::now(), "940318/8575"));
         //db.insert(new PCRTest(844101, 38, 30, 3, 1, 14, "", std::chrono::system_clock::now(), "940318/8575"));
