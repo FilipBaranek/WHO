@@ -3,8 +3,7 @@
 #include "./Headers/Model/Tests/FunctionalityTester.h"
 #include "./Headers/Model/Tests/SpeedTester.h"
 #include "./Headers/View/Application.h"
-
-#include "./Headers/Model/PCRDatabase/Database.h"
+#include "./Headers/Presenter/Presenter.h"
 
 
 void testSpeed()
@@ -42,19 +41,23 @@ int main()
 
         //Application app;
         //app.run();
+        
+        std::string output;
 
-        Database db;
-        db.generateRandomPeople(8);
-        db.generateRandomTests(20);
-        db.printAllData();
+        Presenter presenter(output);
+        presenter.insert("01", "a", "b", {});
+        presenter.insert("02", "a", "b", {});
+        presenter.insert("03", "a", "b", {});
+        presenter.insert("04", "a", "b", {});
+        presenter.insert("05", "a", "b", {});
 
+        presenter.insert(1, 0, 0, 0, 1, 0, "", std::chrono::system_clock::now(), "03");
+        presenter.insert(2, 0, 0, 0, 0, 0, "", std::chrono::system_clock::now(), "03");
+        presenter.insert(3, 0, 0, 0, 0, 0, "", std::chrono::system_clock::now(), "02");
 
+        presenter.findResultByPatientAndTestId(2, "03", true);
 
-        //db.insert(new PCRTest(136502, 38, 30, 3, 1, 14, "", std::chrono::system_clock::now(), "850119/7714"));
-        //db.insert(new PCRTest(254865, 38, 30, 3, 1, 14, "", std::chrono::system_clock::now(), "940318/8575"));
-        //db.insert(new PCRTest(844101, 38, 30, 3, 1, 14, "", std::chrono::system_clock::now(), "940318/8575"));
-        //db.insert(new PCRTest(629873, 38, 30, 3, 1, 14, "", std::chrono::system_clock::now(), "980518/1020"));
-        //db.insert(new PCRTest(840310, 38, 30, 3, 1, 14, "", std::chrono::system_clock::now(), "980518/1020"));
+        std::cout << output << "\n";
     }
 
     return 0;

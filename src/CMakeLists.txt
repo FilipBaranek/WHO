@@ -1,5 +1,42 @@
 ﻿
-add_executable (BST "main.cpp" "Headers/View/Application.h" "Source/View/Application.cpp" "Headers/Model/Interfaces/IComparable.h" "Headers/Model/PCRDatabase/Models/PCRTest.h" "Headers/Model/PCRDatabase/Models/Person.h" "Headers/Model/PCRDatabase/Database.h" "Headers/Model/Structures/AVL/AVLNode.h" "Headers/Model/Structures/BST/BSTNode.h" "Headers/Model/Structures/BST/BinarySearchTree.h" "Headers/Model/Structures/AVL/AVLTree.h" "Headers/Model/Tests/TestObjects/Number.h" "Headers/Model/Tests/FunctionalityTester.h" "Headers/Model/Tests/SpeedTester.h"   "Source/Model/Tests/TestObjects/Number.cpp" "Source/Model/Tests/FunctionalityTester.cpp" "Source/Model/Tests/SpeedTester.cpp" "Headers/View/UI/FunctionalityTestWindow.h" "Source/View/UI/FunctionalityTestWindow.cpp" "Headers/View/UI/Window.h" "Headers/Presenter/Commands/Command.h" "Headers/Presenter/Commands/Tests/FunctionalityTestCommand.h" "Source/Presenter/Commands/Tests/FunctionalityTestCommand.cpp" "Headers/View/UI/SpeedTestWindow.h" "Source/View/UI/SpeedTestWindow.cpp" "Headers/Presenter/Commands/Tests/SpeedTestCommand.h" "Source/Presenter/Commands/Tests/SpeedTestCommand.cpp" "Source/Model/PCRDatabase/Database.cpp" "Headers/Model/PCRDatabase/ModelWrappers/TestWrapper.h" "Headers/Model/PCRDatabase/ModelWrappers/TestInDateOrderWrapper.h" "Headers/Model/PCRDatabase/ModelWrappers/PositiveTestInDistrictOrderWrapper.h" "Headers/Model/PCRDatabase/ModelWrappers/NegativeTestInDistrictOrderWrapper.h" "Source/Model/PCRDatabase/ModelWrappers/TestWrapper.cpp" "Headers/Model/PCRDatabase/Generator/RandomDataGenerator.h" "Source/Model/PCRDatabase/Generator/RandomDataGenerator.cpp" "Headers/Model/PCRDatabase/ModelWrappers/PersonWrapper.h" "Source/Model/PCRDatabase/ModelWrappers/PersonWrapper.cpp")
+add_executable (
+    BST
+    "main.cpp"
+    "Headers/View/Application.h"
+    "Source/View/Application.cpp"
+    "Headers/Model/Interfaces/IComparable.h"
+    "Headers/Model/PCRDatabase/Models/PCRTest.h"
+    "Headers/Model/PCRDatabase/Models/Person.h"
+    "Headers/Model/PCRDatabase/Database.h" 
+    "Headers/Model/Structures/AVL/AVLNode.h" 
+    "Headers/Model/Structures/BST/BSTNode.h" 
+    "Headers/Model/Structures/BST/BinarySearchTree.h" 
+    "Headers/Model/Structures/AVL/AVLTree.h" 
+    "Headers/Model/Tests/TestObjects/Number.h"
+    "Headers/Model/Tests/FunctionalityTester.h" 
+    "Headers/Model/Tests/SpeedTester.h"   
+    "Source/Model/Tests/TestObjects/Number.cpp" 
+    "Source/Model/Tests/FunctionalityTester.cpp" 
+    "Source/Model/Tests/SpeedTester.cpp" 
+    "Source/View/UI/FunctionalityTestWindow.cpp"  
+    "Headers/Presenter/Commands/Command.h" 
+    "Source/View/UI/SpeedTestWindow.cpp"
+    "Source/Model/PCRDatabase/Database.cpp"
+    "Headers/Model/PCRDatabase/ModelWrappers/TestWrapper.h" 
+    "Headers/Model/PCRDatabase/ModelWrappers/TestInDateOrderWrapper.h"
+    "Headers/Model/PCRDatabase/ModelWrappers/PositiveTestInDistrictOrderWrapper.h"
+    "Headers/Model/PCRDatabase/ModelWrappers/NegativeTestInDistrictOrderWrapper.h"
+    "Source/Model/PCRDatabase/ModelWrappers/TestWrapper.cpp"
+    "Headers/Model/PCRDatabase/Generator/RandomDataGenerator.h" 
+    "Source/Model/PCRDatabase/Generator/RandomDataGenerator.cpp" 
+    "Headers/Model/PCRDatabase/ModelWrappers/PersonWrapper.h" 
+    "Source/Model/PCRDatabase/ModelWrappers/PersonWrapper.cpp"
+    "Source/Presenter/Presenter.cpp"
+    "Headers/Presenter/Presenter.h"
+    "Headers/Presenter/Commands/FindTestResultCommand.h"
+    "Source/Presenter/Commands/FindTestResultCommand.cpp"
+    "Headers/Presenter/Commands/InsertCommand.h"
+    "Source/Presenter/Commands/InsertCommand.cpp")
 
 target_include_directories(BST PRIVATE ${glm_SOURCE_DIR})
 

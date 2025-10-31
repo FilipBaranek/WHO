@@ -2,6 +2,7 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include <chrono>
 #include "./ModelWrappers/TestWrapper.h"
 #include "./ModelWrappers/PersonWrapper.h"
 #include "../Structures/AVL/AVLTree.h"
@@ -33,7 +34,8 @@ public:
 	void generateRandomTests(int testCount);
 	void insert(Person* person);
 	void insert(PCRTest* pcrTest);
-	std::string findTestResultByIdAndPatientId(const unsigned int testId, const std::string birthBumber);
+	Person* findPerson(std::string birthNumber);
+	std::string findTestResultByIdAndPatientId(const unsigned int testId, const std::string birthBumber, bool printPerson = true);
 	void printAllData();
 	void clear();
 	~Database();

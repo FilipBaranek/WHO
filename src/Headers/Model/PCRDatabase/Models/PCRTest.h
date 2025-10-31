@@ -39,6 +39,7 @@ public:
 	inline std::string note() { return m_note; }
 	inline std::chrono::time_point<std::chrono::system_clock> testDate() { return m_testDate; }
 	inline std::string birthNumber() { return m_birthNumber; }
+	inline Person* person() { return m_person; }
 
 	inline std::string toString()
 	{

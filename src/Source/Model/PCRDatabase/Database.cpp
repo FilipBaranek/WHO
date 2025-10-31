@@ -38,7 +38,20 @@ void Database::insert(PCRTest* pcrTest)
 	}
 }
 
-std::string Database::findTestResultByIdAndPatientId(const unsigned int testId, const std::string birthBumber)
+Person* Database::findPerson(std::string birthNumber)
+{
+	Person person(
+		birthNumber,
+		DEFAULT_STRING_VAL,
+		DEFAULT_STRING_VAL,
+		DEFAULT_DATE
+	);
+	PersonWrapper key(&person);
+
+	return m_people.find(&key)->getData();
+}
+
+std::string Database::findTestResultByIdAndPatientId(const unsigned int testId, const std::string birthBumber, bool printPerson)
 {
 	PCRTest test(
 		testId,
@@ -58,9 +71,15 @@ std::string Database::findTestResultByIdAndPatientId(const unsigned int testId, 
 	auto output = m_tests.find(&key);
 	if (output != nullptr)
 	{
-		return output->getData()->toString();
+		std::string result = output->getData()->result() ? "\nVysldedok: Pozitivny" : "\nVysledok: Negativny";
+
+		if (printPerson)
+		{
+			return output->getData()->person()->toString() + result;
+		}
+		return result;
 	}
-	return "";
+	return "Record han't been found\n";
 }
 
 void Database::printAllData()

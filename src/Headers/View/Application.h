@@ -5,12 +5,11 @@
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_opengl3.h>
 #include <vector>
-#include "../../Headers/View/UI/Window.h"
 
 class Application
 {
 private:
-	std::vector<Window*> m_windows;
+	//std::vector<Window*> m_windows;
 	GLFWwindow* m_mainWindow;
 
 public:
