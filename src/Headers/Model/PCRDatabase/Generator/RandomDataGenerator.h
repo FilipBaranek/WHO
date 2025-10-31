@@ -33,7 +33,7 @@ private:
 
 public:
 	RandomDataGenerator() = delete;
-	static void generatePeople(std::vector<Person*>& output);
-	static void generateTests(AVLTree<PersonWrapper*>& input, std::vector<PCRTest*>& output);
+	static void generatePeople(std::vector<Person*>& peopleDuplicityList, AVLTree<PersonWrapper*>& output);
+	static void generateTests(std::vector<Person*>& peopleList, std::vector<AVLTree<TestWrapper*>*>& outputStrucutres);
 	~RandomDataGenerator() = delete;
 };

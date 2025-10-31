@@ -1,18 +1,16 @@
 #include "../../../Headers/Model/PCRDatabase/Database.h"
 
 
+Database::Database()
+{
+	m_testStructuresList.push_back(&m_tests);
+}
+
 void Database::generateRandomPeople(int peopleCount)
 {
-	std::vector<Person*> people;
-
 	for (int i{}; i < peopleCount; ++i)
 	{
-		RandomDataGenerator::generatePeople(people);
-	}
-
-	for (auto& person : people)
-	{
-		m_people.insert(new PersonWrapper(person));
+		RandomDataGenerator::generatePeople(m_peopleList, m_people);
 	}
 }
 
@@ -20,21 +18,9 @@ void Database::generateRandomTests(int testCount)
 {
 	if (m_people.size() > 0)
 	{
-		std::vector<PCRTest*> tests;
-
 		for (int i{}; i < testCount; ++i)
 		{
-			RandomDataGenerator::generateTests(m_people, tests);
-		}
-
-		for (auto& test : tests)
-		{
-			m_tests.insert(new TestWrapper(test));
-
-			Person person(test->birthNumber(), DEFAULT_STRING_VAL, DEFAULT_STRING_VAL, DEFAULT_DATE);
-			PersonWrapper key(&person);
-
-			m_people.find(&key)->getData()->tests().insert(new TestWrapper(test));
+			RandomDataGenerator::generateTests(m_peopleList, m_testStructuresList);
 		}
 	}
 }
@@ -46,12 +32,14 @@ void Database::insert(Person* person)
 
 void Database::insert(PCRTest* pcrTest)
 {
-	m_tests.insert(new TestWrapper(pcrTest));
+	for (auto& testStructure : m_testStructuresList)
+	{
+		testStructure->insert(new TestWrapper(pcrTest));
+	}
 }
 
 std::string Database::findTestResultByIdAndPatientId(const unsigned int testId, const std::string birthBumber)
 {
-	//DOROBIT ABY VRACALO OUTPUT PODLA ZADANIA
 	PCRTest test(
 		testId,
 		DEFAULT_NUM_VAL,
@@ -96,10 +84,13 @@ void Database::clear()
 		delete person;
 	});
 
-	m_tests.processPostOrder([](TestWrapper* test) {
-		delete test->getData();
-		delete test;
-	});
+	for (auto& testStructure : m_testStructuresList)
+	{
+		m_tests.processPostOrder([](TestWrapper* test) {
+			delete test->getData();
+			delete test;
+		});
+	}
 }
 
 Database::~Database()

@@ -21,11 +21,14 @@ private:
 	
 	std::ostringstream m_oss;
 
+	std::vector<Person*> m_peopleList;
 	AVLTree<PersonWrapper*> m_people;
+
+	std::vector<AVLTree<TestWrapper*>*> m_testStructuresList;
 	AVLTree<TestWrapper*> m_tests;
 
 public:
-	Database() = default;
+	Database();
 	void generateRandomPeople(int peopleCount);
 	void generateRandomTests(int testCount);
 	void insert(Person* person);

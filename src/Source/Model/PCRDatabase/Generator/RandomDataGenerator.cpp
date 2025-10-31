@@ -75,7 +75,7 @@ void RandomDataGenerator::generateLocation(std::mt19937& generator, unsigned int
     region = (district * MAX_REGION_CODE) / MAX_DISTRICT_CODE;
 }
 
-void RandomDataGenerator::generatePeople(std::vector<Person*>& output)
+void RandomDataGenerator::generatePeople(std::vector<Person*>& peopleDuplicityList, AVLTree<PersonWrapper*>& output)
 {
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -87,71 +87,74 @@ void RandomDataGenerator::generatePeople(std::vector<Person*>& output)
     std::string lastName(s_lastNames[names(gen)]);
     std::string birthNumber = generateBirthNumber(gen, birthDay);
 
-    while (std::find_if(output.begin(), output.end(), [&](Person* person) {
-        return birthNumber == person->birthNumber();
-    }) != output.end())
+    Person duplicitPerson(birthNumber, name, lastName, birthDay);
+    PersonWrapper key(&duplicitPerson);
+
+    while (output.find(&key) != nullptr)
     {
-        birthNumber = generateBirthNumber(gen, birthDay);
+        duplicitPerson.setBirthNumber(generateBirthNumber(gen, birthDay));
     }
 
-
-	output.push_back(new Person(birthNumber, name, lastName, birthDay));
+    PersonWrapper* newPerson = new PersonWrapper(new Person(birthNumber, name, lastName, birthDay));
+	output.insert(newPerson);
+    peopleDuplicityList.push_back(newPerson->getData());
 }
 
-void RandomDataGenerator::generateTests(AVLTree<PersonWrapper*>& input, std::vector<PCRTest*>& output)
+void RandomDataGenerator::generateTests(std::vector<Person*>& peopleList, std::vector<AVLTree<TestWrapper*>*>& outputStrucutres)
 {
     std::random_device rd;
     std::mt19937 gen(rd());
 
     std::uniform_int_distribution<unsigned int> noteInterval(0, NOTE_COUNT - 1);
-    std::uniform_int_distribution<unsigned int> test(0, MAX_TEST_CODE - 1);
-    std::uniform_int_distribution<unsigned int> result(0, 1);
-    std::uniform_int_distribution<unsigned int> value(10, 40);
-    std::uniform_int_distribution<unsigned int> birthNumber(0, input.size() - 1);
-
-    std::string note(s_notes[noteInterval(gen)]);
-    unsigned int testId = test(gen);
-
-    while (std::find_if(output.begin(), output.end(), [&](PCRTest* test) {
-        return testId == test->testId();
-    }) != output.end())
-    {
-        testId = test(gen);
-    }
-
-    Person* randomPerson;
-    bool stopExecuting = false;
-    int i = 0;
-    int randomPersonIndex = birthNumber(gen);
-
-    //Might be optimized needed later
-    input.processInOrder([&i, &randomPersonIndex, &randomPerson, &stopExecuting](PersonWrapper* person) {
-        if (stopExecuting)
-        {
-            return;
-        }
-        if (i == randomPersonIndex)
-        {
-            randomPerson = person->getData();
-            stopExecuting = true;
-            return;
-        }
-        ++i;
-    });
+    std::uniform_int_distribution<unsigned int> testIdInterval(0, MAX_TEST_CODE - 1);
+    std::uniform_int_distribution<unsigned int> resultInterval(0, 1);
+    std::uniform_real_distribution<double> valueInterval(10.0, 40.0);
+    std::uniform_int_distribution<unsigned int> randomPersonInterval(0, peopleList.size() - 1);
 
     unsigned int workplace, district, region;
     generateLocation(gen, workplace, district, region);
+    std::string note(s_notes[noteInterval(gen)]);
+    Person* correspondingPerson = peopleList[randomPersonInterval(gen)];
+    bool result = (bool)resultInterval(gen);
+    double testValue = valueInterval(gen);
+    auto date = generateTime(gen, correspondingPerson->birthDay());
+    unsigned int testId = testIdInterval(gen);
 
-    output.push_back(new PCRTest(
+    PCRTest duplicityTest(
         testId,
         workplace,
         district,
         region,
-        (bool)result(gen),
-        value(gen),
+        result,
+        testValue,
         note,
-        generateTime(gen, randomPerson->birthDay()),
-        randomPerson->birthNumber(),
-        randomPerson
+        date,
+        correspondingPerson->birthNumber(),
+        correspondingPerson
+    );
+    TestWrapper key(&duplicityTest);
+
+    while (outputStrucutres.at(0)->find(&key) != nullptr)
+    {
+        duplicityTest.setTestId(testIdInterval(gen));
+    }
+
+    auto newTest = new TestWrapper(new PCRTest(
+        testId,
+        workplace,
+        district,
+        region,
+        result,
+        testValue,
+        note,
+        date,
+        correspondingPerson->birthNumber(),
+        correspondingPerson
     ));
+
+    correspondingPerson->tests().insert(newTest);
+    for (auto& structure : outputStrucutres)
+    {
+        structure->insert(newTest);
+    }
 }

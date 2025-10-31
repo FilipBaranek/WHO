@@ -21,6 +21,7 @@ public:
 		m_birthNumber(birthNumber), m_firstName(firstName), m_lastName(lastName), m_birthDay(birthDay)
 	{}
 	
+	inline void setBirthNumber(std::string birthNumber) { m_birthNumber = birthNumber; }
 	inline std::string birthNumber() { return m_birthNumber; }
 	inline std::string firstName() { return m_firstName; }
 	inline std::string lastName() { return m_lastName; }
@@ -39,11 +40,5 @@ public:
 		return m_oss.str();
 	}
 
-	~Person()
-	{
-		if (m_tests.size() > 0)
-		{
-			m_tests.processPostOrder([](TestWrapper* wrapper) { delete wrapper; });
-		}
-	}
+	~Person() = default;
 };

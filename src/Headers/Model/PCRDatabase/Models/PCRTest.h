@@ -29,6 +29,7 @@ public:
 			m_testValue(testValue), m_note(note), m_testDate(testDate), m_birthNumber(birthNumber) , m_person(person)
 	{};
 
+	inline void setTestId(unsigned int id) { m_testId = id; }
 	inline unsigned int testId() { return m_testId; }
 	inline unsigned int workplaceId() { return m_workplaceId; }
 	inline unsigned int districtId() { return m_districtId; }
