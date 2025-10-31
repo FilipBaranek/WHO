@@ -18,9 +18,9 @@ add_executable (
     "Source/Model/Tests/TestObjects/Number.cpp" 
     "Source/Model/Tests/FunctionalityTester.cpp" 
     "Source/Model/Tests/SpeedTester.cpp" 
-    "Source/View/UI/FunctionalityTestWindow.cpp"  
+      
     "Headers/Presenter/Commands/Command.h" 
-    "Source/View/UI/SpeedTestWindow.cpp"
+    
     "Source/Model/PCRDatabase/Database.cpp"
     "Headers/Model/PCRDatabase/ModelWrappers/TestWrapper.h" 
     "Headers/Model/PCRDatabase/ModelWrappers/TestInDateOrderWrapper.h"
@@ -36,7 +36,7 @@ add_executable (
     "Headers/Presenter/Commands/FindTestResultCommand.h"
     "Source/Presenter/Commands/FindTestResultCommand.cpp"
     "Headers/Presenter/Commands/InsertCommand.h"
-    "Source/Presenter/Commands/InsertCommand.cpp")
+    "Source/Presenter/Commands/InsertCommand.cpp" "Source/View/UI/OutputWindow.cpp" "Headers/View/UI/OutputWindow.h" "Headers/View/UI/Window.h"  "Headers/View/UI/PersonWindow.h" "Source/View/UI/PersonWindow.cpp" "Headers/View/UI/TestWindow.h" "Source/View/UI/TestWindow.cpp")
 
 target_include_directories(BST PRIVATE ${glm_SOURCE_DIR})
 
