@@ -19,6 +19,9 @@ Application::Application()
     m_windows.push_back(new OutputWindow(m_presenter));
     m_windows.push_back(new PersonWindow(m_presenter));
     m_windows.push_back(new TestWindow(m_presenter));
+    m_windows.push_back(new GeneratorWindow(m_presenter));
+    m_windows.push_back(new OperationsWindow(m_presenter));
+    m_windows.push_back(new FileWindow(m_presenter));
 }
 
 void Application::run()

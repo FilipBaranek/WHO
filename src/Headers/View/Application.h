@@ -9,6 +9,9 @@
 #include "UI/OutputWindow.h"
 #include "UI/PersonWindow.h"
 #include "UI/TestWindow.h"
+#include "UI/GeneratorWindow.h"
+#include "UI/FileWindow.h"
+#include "UI/OperationsWindow.h"
 #include "../Presenter/Presenter.h"
 
 class Application

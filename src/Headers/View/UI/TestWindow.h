@@ -5,10 +5,10 @@
 class TestWindow : public Window
 {
 private:
-	unsigned int m_testId = 0;
-	unsigned int m_workplaceId = 0;
-	unsigned int m_districtId = 0;
-	unsigned int m_regionId = 0;
+	int m_testId = 0;
+	int m_workplaceId = 0;
+	int m_districtId = 0;
+	int m_regionId = 0;
 	bool m_result = false;
 	double m_testValue = 0;
 	std::string m_note;

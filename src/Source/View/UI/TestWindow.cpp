@@ -26,20 +26,20 @@ void TestWindow::renderWindow()
 
     // Row 1
     ImGui::Text("Test ID:");
-    ImGui::InputInt("##testId", reinterpret_cast<int*>(&m_testId), 0, 0);
+    ImGui::InputInt("##testId", &m_testId, 0, 0);
     ImGui::NextColumn();
 
     ImGui::Text("Workplace ID:");
-    ImGui::InputInt("##workplaceId", reinterpret_cast<int*>(&m_workplaceId), 0, 0);
+    ImGui::InputInt("##workplaceId", &m_workplaceId, 0, 0);
     ImGui::NextColumn();
 
     ImGui::Text("District ID:");
-    ImGui::InputInt("##districtId", reinterpret_cast<int*>(&m_districtId), 0, 0);
+    ImGui::InputInt("##districtId", &m_districtId, 0, 0);
     ImGui::NextColumn();
 
     // Row 2
     ImGui::Text("Region ID:");
-    ImGui::InputInt("##regionId", reinterpret_cast<int*>(&m_regionId), 0, 0);
+    ImGui::InputInt("##regionId", &m_regionId, 0, 0);
     ImGui::NextColumn();
 
     ImGui::Text("Test Value:");
