@@ -598,6 +598,9 @@ public:
 
 	~BinarySearchTree()
 	{
-		clear();
+		if (m_size > 0)
+		{
+			clear();
+		}
 	}
 };

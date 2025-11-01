@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 #include "../../Model/PCRDatabase/Database.h"
 
 class Command
@@ -8,6 +9,6 @@ protected:
 
 public:
 	Command(Database* database) : m_database(database) {};
-	virtual void execute() = 0;
+	virtual void execute(std::string& output, std::string& recordCount) = 0;
 	virtual ~Command() = default;
 };

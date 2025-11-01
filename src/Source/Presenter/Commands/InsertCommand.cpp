@@ -27,17 +27,35 @@ void InsertCommand::setParams(unsigned int testId, unsigned int workplaceId, uns
 	);
 }
 
-void InsertCommand::execute()
+void InsertCommand::execute(std::string& output, std::string& recordCount)
 {
 	if (m_person != nullptr)
 	{
-		m_database->insert(m_person);
+		if (m_database->insert(m_person))
+		{
+			output = "Person was registered to the database";
+			recordCount = "(1) record inserted";
+		}
+		else
+		{
+			output = "Insertion failed, person might be already inside";
+			recordCount = "(0) records inserted";
+		}
 	}
 	else
 	{
-		m_database->insert(m_test);
+		if (m_database->insert(m_test))
+		{
+			output = "Test was registered to the database";
+			recordCount = "(1) record inserted";
+		}
+		else
+		{
+			output = "Insertion failed, test might be already inside";
+			recordCount = "(0) records inserted";
+		}
 	}
-
+	
 	m_person = nullptr;
 	m_test = nullptr;
 }

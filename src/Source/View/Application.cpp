@@ -16,6 +16,8 @@ Application::Application()
     ImGui_ImplGlfw_InitForOpenGL(m_mainWindow, true);
     ImGui_ImplOpenGL3_Init("#version 130");
 
+    m_presenter = new Presenter();
+
     m_windows.push_back(new OutputWindow(m_presenter));
     m_windows.push_back(new PersonWindow(m_presenter));
     m_windows.push_back(new TestWindow(m_presenter));
@@ -54,6 +56,8 @@ Application::~Application()
     {
         delete window;
     }
+
+    delete m_presenter;
 
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();

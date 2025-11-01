@@ -25,6 +25,18 @@ void OutputWindow::renderWindow()
     ImGui::PushFont(ImGui::GetFont());
     ImGui::SetWindowFontScale(1.5f);
 
+    if (m_presenter->isExecuting())
+    {
+        m_output = "Please wait...";
+        m_recordsCount = "";
+    }
+    else
+    {
+        auto [output, recordCount] = m_presenter->output();
+        m_output = output;
+        m_recordsCount = recordCount;
+    }
+
     ImVec2 textSize = ImGui::CalcTextSize(m_output.c_str());
     float textX = (ImGui::GetWindowSize().x - textSize.x) * 0.5f;
     if (textX < 0) textX = 0;

@@ -67,7 +67,15 @@ void PersonWindow::renderWindow()
 
     if (ImGui::Button("Insert", ImVec2(buttonWidth, buttonHeight)))
     {
-        //
+        if (m_birthNumber != "" && m_lastName != "" && m_lastName != "" &&
+            m_year != 0 && m_month != 0 && m_day != 0)
+        {
+            m_presenter->insert(m_birthNumber, m_firstName, m_lastName, m_birthDay);
+        }
+        else
+        {
+            m_presenter->setOutput("Invalid input", "(0) records inserted");
+        }
     }
 
     ImGui::SameLine(0, 20.0f);

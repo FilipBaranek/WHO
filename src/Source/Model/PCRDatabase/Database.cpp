@@ -25,17 +25,21 @@ void Database::generateRandomTests(int testCount)
 	}
 }
 
-void Database::insert(Person* person)
+bool Database::insert(Person* person)
 {
-	m_people.insert(new PersonWrapper(person));
+	return m_people.insert(new PersonWrapper(person));
 }
 
-void Database::insert(PCRTest* pcrTest)
+bool Database::insert(PCRTest* pcrTest)
 {
 	for (auto& testStructure : m_testStructuresList)
 	{
-		testStructure->insert(new TestWrapper(pcrTest));
+		if (!testStructure->insert(new TestWrapper(pcrTest)))
+		{
+			return false;
+		}
 	}
+	return true;
 }
 
 Person* Database::findPerson(std::string birthNumber)
@@ -98,17 +102,23 @@ void Database::printAllData()
 
 void Database::clear()
 {
-	m_people.processPostOrder([](PersonWrapper* person) {
-		delete person->getData();
-		delete person;
-	});
+	if (m_people.size() > 0)
+	{
+		m_people.processPostOrder([](PersonWrapper* person) {
+			delete person->getData();
+			delete person;
+			});
+	}
 
 	for (auto& testStructure : m_testStructuresList)
 	{
-		m_tests.processPostOrder([](TestWrapper* test) {
-			delete test->getData();
-			delete test;
-		});
+		if (testStructure->size() > 0)
+		{
+			testStructure->processPostOrder([](TestWrapper* test) {
+				delete test->getData();
+				delete test;
+				});
+		}
 	}
 }
 

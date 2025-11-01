@@ -1,5 +1,7 @@
 #pragma once
 #include "Window.h"
+#include "OutputWindow.h"
+
 
 class OperationsWindow : public Window
 {

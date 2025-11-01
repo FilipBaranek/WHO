@@ -1,6 +1,7 @@
 #pragma once
 #include "Window.h"
 
+
 class GeneratorWindow : public Window
 {
 private:

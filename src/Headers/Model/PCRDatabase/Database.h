@@ -32,8 +32,8 @@ public:
 	Database();
 	void generateRandomPeople(int peopleCount);
 	void generateRandomTests(int testCount);
-	void insert(Person* person);
-	void insert(PCRTest* pcrTest);
+	bool insert(Person* person);
+	bool insert(PCRTest* pcrTest);
 	Person* findPerson(std::string birthNumber);
 	std::string findTestResultByIdAndPatientId(const unsigned int testId, const std::string birthBumber, bool printPerson = true);
 	void printAllData();

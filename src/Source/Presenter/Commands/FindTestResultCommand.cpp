@@ -7,11 +7,11 @@ void FindTestResultCommand::setParams(unsigned int testId, std::string birthNumb
 	m_birthNumber = birthNumber;
 }
 
-void FindTestResultCommand::execute()
+void FindTestResultCommand::execute(std::string& output, std::string& recordCount)
 {
 	if (m_testId != -1)
 	{
-		m_output = m_database->findTestResultByIdAndPatientId(m_testId, m_birthNumber, m_printPerson);
+		output = m_database->findTestResultByIdAndPatientId(m_testId, m_birthNumber, m_printPerson);
 	}
 	else
 	{
