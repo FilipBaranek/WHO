@@ -32,10 +32,10 @@ public:
 	{
 		m_oss.str("");
 		m_oss.clear();
-		m_oss << "[" << m_birthNumber << "] " << m_firstName << " " << m_lastName
+		m_oss << "\n[" << m_birthNumber << "] " << m_firstName << " " << m_lastName
 			  << " born " << static_cast<int>(m_birthDay.year()) << "-"
 		      << std::setw(2) << std::setfill('0') << static_cast<unsigned>(m_birthDay.month()) << "-"
-			  << std::setw(2) << std::setfill('0') << static_cast<unsigned>(m_birthDay.day()) << "\n";
+			  << std::setw(2) << std::setfill('0') << static_cast<unsigned>(m_birthDay.day());
 		
 		return m_oss.str();
 	}

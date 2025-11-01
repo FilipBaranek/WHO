@@ -75,10 +75,17 @@ void Presenter::insert(unsigned int testId, unsigned int workplaceId, unsigned i
 	});
 }
 
+void Presenter::printAllData()
+{
+	execute([=, this](std::string& output, std::string& recordCount) {
+		m_printAllDataCommand.execute(output, recordCount);
+	});
+}
+
 void Presenter::findResultByPatientAndTestId(unsigned int testId, std::string birthNumber, bool printPerson)
 {
 	execute([=, this](std::string& output, std::string& recordCount) {
 		m_resultCommand.setParams(testId, birthNumber, printPerson);
-		m_resultCommand.execute(m_output, m_recordCount);
+		m_resultCommand.execute(output, recordCount);
 	});
 }

@@ -36,7 +36,7 @@ public:
 	bool insert(PCRTest* pcrTest);
 	Person* findPerson(std::string birthNumber);
 	std::string findTestResultByIdAndPatientId(const unsigned int testId, const std::string birthBumber, bool printPerson = true);
-	void printAllData();
+	std::string printAllData();
 	void clear();
 	~Database();
 };

@@ -98,18 +98,22 @@ std::string Database::findTestResultByIdAndPatientId(const unsigned int testId, 
 	return "Record han't been found\n";
 }
 
-void Database::printAllData()
+std::string Database::printAllData()
 {
-	m_people.processPreOrder([this](PersonWrapper* person) {
-		std::cout << person->getData()->toString() << "\n";
+	std::ostringstream oss;
+
+	m_people.processPreOrder([this, &oss](PersonWrapper* person) {
+		oss << person->getData()->toString() << "\n";
 		
 		if (person->getData()->tests().size() > 0)
 		{
-			person->getData()->tests().processInOrder([](TestWrapper* test) {
-				std::cout << test->getData()->toString() << "\n";
+			person->getData()->tests().processInOrder([&oss](TestWrapper* test) {
+				oss << test->getData()->toString() << "\n";
 			});
 		}
 	});
+
+	return oss.str();
 }
 
 void Database::clear()

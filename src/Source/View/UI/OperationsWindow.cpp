@@ -3,14 +3,26 @@
 
 OperationsWindow::OperationsWindow(Presenter* presenter) : Window(presenter)
 {
-    m_operations[0] = []() {};
-    m_operations[1] = [this]() { displayTestIdPatientIdInputs(); };
+    m_operations[0] = {
+        []() {},
+        []() {}
+    };
+    m_operations[1] = {
+        [this]() { displayTestIdPatientIdInputs(); },
+        [this]() { findTestResultByPatientId(); }
+    };
+    m_operations[20] = {
+        []() {},
+        [this]() { printAllData(); }
+    };
 }
+
+//=================DISPLAY===========================
 
 void OperationsWindow::displayTestIdPatientIdInputs()
 {
     char birthBuf[20];
-    strncpy_s(birthBuf, sizeof(birthBuf), m_secondStringBuf.c_str(), _TRUNCATE);
+    strncpy_s(birthBuf, sizeof(birthBuf), m_firstStringBuf.c_str(), _TRUNCATE);
 
     float windowHeight = ImGui::GetWindowSize().y;
     float rowHeight = ImGui::GetTextLineHeight() + ImGui::GetStyle().FramePadding.y * 2; // height of one input row
@@ -26,13 +38,25 @@ void OperationsWindow::displayTestIdPatientIdInputs()
     ImGui::Text("Birth Number:");
     if (ImGui::InputText("##birthNumber", birthBuf, IM_ARRAYSIZE(birthBuf)))
     {
-        m_secondStringBuf = birthBuf;
+        m_firstStringBuf = birthBuf;
     }
 
     ImGui::Columns(1);
 }
 
+//===============REQUESTS==============================
+void OperationsWindow::printAllData()
+{
+    m_presenter->printAllData();
+}
 
+void OperationsWindow::findTestResultByPatientId()
+{
+    m_presenter->findResultByPatientAndTestId(m_firstNumInput, m_firstStringBuf, true);
+}
+
+
+//=================RENDER===============================
 void OperationsWindow::renderWindow()
 {
     ImGuiViewport* viewport = ImGui::GetMainViewport();
@@ -94,7 +118,7 @@ void OperationsWindow::renderWindow()
 
     if (m_currentItem < m_operations.size())
     {
-        m_operations[m_currentItem]();
+        m_operations[m_currentItem].display();
     }
 
     float buttonWidth = 100.0f;
@@ -106,7 +130,10 @@ void OperationsWindow::renderWindow()
 
     if (ImGui::Button("Run", ImVec2(buttonWidth, buttonHeight)))
     {
-        //
+        if (m_currentItem < m_operations.size())
+        {
+            m_operations[m_currentItem].execute();
+        }
     }
 
     ImGui::End();

@@ -5,11 +5,17 @@
 #include "OutputWindow.h"
 
 
+struct Operation
+{
+	std::function<void()> display;
+	std::function<void()> execute;
+};
+
 class OperationsWindow : public Window
 {
 private:
-	static constexpr int OPERATIONS_COUNT = 20;
-	std::array<std::function<void()>, OPERATIONS_COUNT> m_operations;
+	static constexpr int OPERATIONS_COUNT = 21;
+	std::array<Operation, OPERATIONS_COUNT> m_operations;
 
 	int m_firstNumInput = 0;
 	int m_secondNumInput = 0;
@@ -30,6 +36,8 @@ private:
 	void displayWorkplaceIdDateInputs();
 	void displayTestIdInputs();
 
+	void printAllData();
+	void findTestResultByPatientId();
 
 public:
 	OperationsWindow(Presenter* presenter);
