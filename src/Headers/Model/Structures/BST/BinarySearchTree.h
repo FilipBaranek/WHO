@@ -476,7 +476,7 @@ public:
 		return findMaxKeyNode(node)->getData();
 	}
 
-	virtual T remove(T& key)
+	virtual T remove(T key)
 	{
 		return removeNode(key).m_data;
 	}

@@ -183,7 +183,7 @@ public:
 		return true;
 	}
 
-	T remove(T& key) override
+	T remove(T key) override
 	{
 		RemoveData<T> rd = this->removeNode(key);
 		AVLNode<T>* rebalanceStartingNode = static_cast<AVLNode<T>*>(rd.m_removedNodeAncestor);

@@ -2,6 +2,7 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include <utility>
 #include <chrono>
 #include "./ModelWrappers/TestWrapper.h"
 #include "./ModelWrappers/PersonWrapper.h"
@@ -36,7 +37,10 @@ public:
 	bool insert(PCRTest* pcrTest);
 	Person* findPerson(std::string birthNumber);
 	std::string findTestResultByIdAndPatientId(const unsigned int testId, const std::string birthBumber, bool printPerson = true);
-	std::string printAllData();
+	std::string findTest(const unsigned int testId, bool printPerson);
+	std::pair<bool, int> removeTest(int testId);
+	std::pair<bool, int> removePerson(std::string birthNumber);
+	std::pair<std::string, int> printAllData();
 	void clear();
 	~Database();
 };

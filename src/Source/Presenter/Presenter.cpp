@@ -89,3 +89,19 @@ void Presenter::findResultByPatientAndTestId(unsigned int testId, std::string bi
 		m_resultCommand.execute(output, recordCount);
 	});
 }
+
+void Presenter::findTest(unsigned int testId)
+{
+	execute([=, this](std::string& output, std::string& recordCount) {
+		m_findTestCommand.setParams(testId);
+		m_findTestCommand.execute(output, recordCount);
+	});
+}
+
+void Presenter::removePerson(std::string birthNumber)
+{
+	execute([=, this](std::string& output, std::string& recordCount) {
+		m_removePersonCommand.setParams(birthNumber);
+		m_removePersonCommand.execute(output, recordCount);
+	});
+}

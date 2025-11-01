@@ -11,6 +11,14 @@ OperationsWindow::OperationsWindow(Presenter* presenter) : Window(presenter)
         [this]() { displayTestIdPatientIdInputs(); },
         [this]() { findTestResultByPatientId(); }
     };
+    m_operations[17] = {
+        [this]() { displayTestIdInputs(); },
+        [this]() { findTest(); }
+    };
+    m_operations[19] = {
+        [this]() { displayPatientIdInput(); },
+        [this]() { removePerson(); }
+    };
     m_operations[20] = {
         []() {},
         [this]() { printAllData(); }
@@ -44,6 +52,24 @@ void OperationsWindow::displayTestIdPatientIdInputs()
     ImGui::Columns(1);
 }
 
+void OperationsWindow::displayPatientIdInput()
+{
+    char birthBuf[20];
+    strncpy_s(birthBuf, sizeof(birthBuf), m_firstStringBuf.c_str(), _TRUNCATE);
+
+    ImGui::Text("Birth Number:");
+    if (ImGui::InputText("##birthNumber", birthBuf, IM_ARRAYSIZE(birthBuf)))
+    {
+        m_firstStringBuf = birthBuf;
+    }
+}
+
+void OperationsWindow::displayTestIdInputs()
+{
+    ImGui::Text("Test ID:");
+    ImGui::InputInt("##testId", &m_firstNumInput, 0, 0);
+}
+
 //===============REQUESTS==============================
 void OperationsWindow::printAllData()
 {
@@ -53,6 +79,16 @@ void OperationsWindow::printAllData()
 void OperationsWindow::findTestResultByPatientId()
 {
     m_presenter->findResultByPatientAndTestId(m_firstNumInput, m_firstStringBuf, true);
+}
+
+void OperationsWindow::findTest()
+{
+    m_presenter->findTest(m_firstNumInput);
+}
+
+void OperationsWindow::removePerson()
+{
+    m_presenter->removePerson(m_firstStringBuf);
 }
 
 

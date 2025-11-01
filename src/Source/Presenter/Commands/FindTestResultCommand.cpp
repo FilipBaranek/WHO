@@ -12,10 +12,7 @@ void FindTestResultCommand::execute(std::string& output, std::string& recordCoun
 	if (m_testId != -1)
 	{
 		output = m_database->findTestResultByIdAndPatientId(m_testId, m_birthNumber, m_printPerson);
-	}
-	else
-	{
-		throw std::runtime_error("Parameteres wasn't set");
+		recordCount = "(1) record found";
 	}
 
 	m_printPerson = true;

@@ -38,6 +38,8 @@ private:
 
 	void printAllData();
 	void findTestResultByPatientId();
+	void findTest();
+	void removePerson();
 
 public:
 	OperationsWindow(Presenter* presenter);

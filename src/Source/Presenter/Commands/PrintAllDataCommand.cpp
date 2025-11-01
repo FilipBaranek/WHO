@@ -2,5 +2,7 @@
 
 void PrintAllDataCommand::execute(std::string& output, std::string& recordCount)
 {
-	output = m_database->printAllData();
+	auto result = m_database->printAllData();
+	output = result.first;
+	recordCount = result.second;
 }

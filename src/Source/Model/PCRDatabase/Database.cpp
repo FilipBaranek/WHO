@@ -98,22 +98,128 @@ std::string Database::findTestResultByIdAndPatientId(const unsigned int testId, 
 	return "Record han't been found\n";
 }
 
-std::string Database::printAllData()
+std::string Database::findTest(const unsigned int testId, bool printPerson)
 {
+	//TOTO TREBA ZMENIT NA INTERVALOVE PREHLADAVANIE
+
+	PCRTest test(
+		testId,
+		DEFAULT_NUM_VAL,
+		DEFAULT_NUM_VAL,
+		DEFAULT_NUM_VAL,
+		DEFAULT_BOOL_VAL,
+		DEFAULT_NUM_VAL,
+		DEFAULT_STRING_VAL,
+		DEFAULT_TIME_POINT,
+		DEFAULT_STRING_VAL,
+		nullptr
+	);
+	TestWrapper key(&test);
+
+	auto output = m_tests.find(&key);
+	if (output != nullptr)
+	{
+		if (printPerson)
+		{
+			return output->getData()->person()->toString() + output->getData()->toString();
+		}
+		return output->getData()->toString();
+	}
+	return "Record hasn't been found\n";
+}
+
+std::pair<bool, int> Database::removeTest(int testId)
+{
+	//TU NESKOR DOPLNIT PODMIENKU ABY SA MAZAL LEN TEN TEST KTORY SA MA MAZAT
+
+	PCRTest test(
+		testId,
+		DEFAULT_NUM_VAL,
+		DEFAULT_NUM_VAL,
+		DEFAULT_NUM_VAL,
+		DEFAULT_BOOL_VAL,
+		DEFAULT_NUM_VAL,
+		DEFAULT_STRING_VAL,
+		DEFAULT_TIME_POINT,
+		DEFAULT_STRING_VAL,
+		nullptr
+	);
+	TestWrapper key(&test);
+
+	int count = 0;
+	for (auto& testStructure : m_testStructuresList)
+	{
+		TestWrapper* removedTest;
+		removedTest = m_tests.remove(&key);
+	
+		if (removedTest == nullptr)
+		{
+			return std::make_pair(false, 0);
+		}
+
+		if (testStructure == m_testStructuresList.back())
+		{
+			delete removedTest->getData();
+			delete removedTest;
+		}
+		++count;
+	}
+
+	return std::make_pair(true, count);
+}
+
+std::pair<bool, int> Database::removePerson(std::string birthNumber)
+{
+	Person person(birthNumber, DEFAULT_STRING_VAL, DEFAULT_STRING_VAL, DEFAULT_DATE);
+	PersonWrapper key(&person);
+
+	PersonWrapper* removedPerson = m_people.remove(&key);
+	if (removedPerson == nullptr)
+	{
+		return std::make_pair(false, 0);
+	}
+
+	int count = 1;
+	AVLTree<TestWrapper*>& personsTests = removedPerson->getData()->tests();
+	if (personsTests.size() > 0)
+	{
+		personsTests.processPostOrder([&count, this](TestWrapper* test) {
+			for (auto& testStructure : m_testStructuresList)
+			{
+				testStructure->remove(test);
+			}
+
+			delete test->getData();
+			delete test;
+
+			++count;
+		});
+	}
+
+	delete removedPerson->getData();
+	delete removedPerson;
+	return std::make_pair(true, count);
+}
+
+std::pair<std::string, int> Database::printAllData()
+{
+	int count = 0;
 	std::ostringstream oss;
 
-	m_people.processPreOrder([this, &oss](PersonWrapper* person) {
+	m_people.processPreOrder([this, &oss, &count](PersonWrapper* person) {
 		oss << person->getData()->toString() << "\n";
-		
+		++count;
+
 		if (person->getData()->tests().size() > 0)
 		{
-			person->getData()->tests().processInOrder([&oss](TestWrapper* test) {
+			person->getData()->tests().processInOrder([&oss, &count](TestWrapper* test) {
 				oss << test->getData()->toString() << "\n";
+				++count;
 			});
 		}
 	});
 
-	return oss.str();
+	return std::make_pair(oss.str(), count);
 }
 
 void Database::clear()
@@ -126,12 +232,15 @@ void Database::clear()
 		});
 	}
 
-	if (m_tests.size() > 0)
+	for (auto& testStructure : m_testStructuresList)
 	{
-		m_tests.processPostOrder([](TestWrapper* test) {
-			delete test->getData();
-			delete test;
-		});
+		if (testStructure->size() > 0)
+		{
+			testStructure->processPostOrder([](TestWrapper* test) {
+				delete test->getData();
+				delete test;
+			});
+		}
 	}
 }
 
