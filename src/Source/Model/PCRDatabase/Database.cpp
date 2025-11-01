@@ -27,15 +27,24 @@ void Database::generateRandomTests(int testCount)
 
 bool Database::insert(Person* person)
 {
-	return m_people.insert(new PersonWrapper(person));
+	PersonWrapper* personWrapper = new PersonWrapper(person);
+	if (m_people.insert(personWrapper))
+	{
+		return true;
+	}
+
+	delete personWrapper;
+	return false;
 }
 
 bool Database::insert(PCRTest* pcrTest)
 {
 	for (auto& testStructure : m_testStructuresList)
 	{
-		if (!testStructure->insert(new TestWrapper(pcrTest)))
+		TestWrapper* test = new TestWrapper(pcrTest);
+		if (!testStructure->insert(test))
 		{
+			delete test;
 			return false;
 		}
 	}
@@ -108,18 +117,15 @@ void Database::clear()
 		m_people.processPostOrder([](PersonWrapper* person) {
 			delete person->getData();
 			delete person;
-			});
+		});
 	}
 
-	for (auto& testStructure : m_testStructuresList)
+	if (m_tests.size() > 0)
 	{
-		if (testStructure->size() > 0)
-		{
-			testStructure->processPostOrder([](TestWrapper* test) {
-				delete test->getData();
-				delete test;
-				});
-		}
+		m_tests.processPostOrder([](TestWrapper* test) {
+			delete test->getData();
+			delete test;
+		});
 	}
 }
 

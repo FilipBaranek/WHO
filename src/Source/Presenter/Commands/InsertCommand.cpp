@@ -40,6 +40,8 @@ void InsertCommand::execute(std::string& output, std::string& recordCount)
 		{
 			output = "Insertion failed, person might be already inside";
 			recordCount = "(0) records inserted";
+
+			delete m_person;
 		}
 	}
 	else
@@ -60,6 +62,8 @@ void InsertCommand::execute(std::string& output, std::string& recordCount)
 		{
 			output = "Insertion failed, test might be already inside";
 			recordCount = "(0) records inserted";
+
+			delete m_test;
 		}
 	}
 	
