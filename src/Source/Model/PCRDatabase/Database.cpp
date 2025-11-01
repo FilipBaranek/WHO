@@ -130,8 +130,6 @@ std::string Database::findTest(const unsigned int testId, bool printPerson)
 
 std::pair<bool, int> Database::removeTest(int testId)
 {
-	//TU NESKOR DOPLNIT PODMIENKU ABY SA MAZAL LEN TEN TEST KTORY SA MA MAZAT
-
 	PCRTest test(
 		testId,
 		DEFAULT_NUM_VAL,
@@ -159,6 +157,8 @@ std::pair<bool, int> Database::removeTest(int testId)
 
 		if (testStructure == m_testStructuresList.back())
 		{
+			removedTest->getData()->person()->tests().remove(&key);
+
 			delete removedTest->getData();
 			delete removedTest;
 		}
