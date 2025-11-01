@@ -36,7 +36,7 @@ add_executable (
     "Headers/Presenter/Commands/FindTestResultCommand.h"
     "Source/Presenter/Commands/FindTestResultCommand.cpp"
     "Headers/Presenter/Commands/InsertCommand.h"
-    "Source/Presenter/Commands/InsertCommand.cpp" "Source/View/UI/OutputWindow.cpp" "Headers/View/UI/OutputWindow.h" "Headers/View/UI/Window.h"  "Headers/View/UI/PersonWindow.h" "Source/View/UI/PersonWindow.cpp" "Headers/View/UI/TestWindow.h" "Source/View/UI/TestWindow.cpp" "Headers/View/UI/GeneratorWindow.h" "Headers/View/UI/OperationsWindow.h" "Headers/View/UI/FileWindow.h" "Source/View/UI/GeneratorWindow.cpp" "Source/View/UI/FileWindow.cpp" "Source/View/UI/OperationsWindow.cpp")
+    "Source/Presenter/Commands/InsertCommand.cpp" "Source/View/UI/OutputWindow.cpp" "Headers/View/UI/OutputWindow.h" "Headers/View/UI/Window.h"  "Headers/View/UI/PersonWindow.h" "Source/View/UI/PersonWindow.cpp" "Headers/View/UI/TestWindow.h" "Source/View/UI/TestWindow.cpp" "Headers/View/UI/GeneratorWindow.h" "Headers/View/UI/OperationsWindow.h" "Headers/View/UI/FileWindow.h" "Source/View/UI/GeneratorWindow.cpp" "Source/View/UI/FileWindow.cpp" "Source/View/UI/OperationsWindow.cpp" "Headers/Presenter/Commands/GenerateCommand.h" "Source/Presenter/Commands/GenerateCommand.cpp")
 
 target_include_directories(BST PRIVATE ${glm_SOURCE_DIR})
 

@@ -31,7 +31,7 @@ private:
 public:
 	Database();
 	void generateRandomPeople(int peopleCount);
-	void generateRandomTests(int testCount);
+	bool generateRandomTests(int testCount);
 	bool insert(Person* person);
 	bool insert(PCRTest* pcrTest);
 	Person* findPerson(std::string birthNumber);

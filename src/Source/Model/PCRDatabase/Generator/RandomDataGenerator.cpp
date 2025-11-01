@@ -95,7 +95,7 @@ void RandomDataGenerator::generatePeople(std::vector<Person*>& peopleDuplicityLi
         duplicitPerson.setBirthNumber(generateBirthNumber(gen, birthDay));
     }
 
-    PersonWrapper* newPerson = new PersonWrapper(new Person(birthNumber, name, lastName, birthDay));
+    PersonWrapper* newPerson = new PersonWrapper(new Person(duplicitPerson.birthNumber(), name, lastName, birthDay));
 	output.insert(newPerson);
     peopleDuplicityList.push_back(newPerson->getData());
 }
@@ -140,7 +140,7 @@ void RandomDataGenerator::generateTests(std::vector<Person*>& peopleList, std::v
     }
 
     auto newTest = new TestWrapper(new PCRTest(
-        testId,
+        duplicityTest.testId(),
         workplace,
         district,
         region,

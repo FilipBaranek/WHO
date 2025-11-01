@@ -10,9 +10,9 @@ private:
 	std::string m_firstName;
 	std::string m_lastName;
 	std::chrono::year_month_day m_birthDay;
-	int m_year = 0;
-	int m_month = 0;
-	int m_day = 0;
+	int m_year = 2000;
+	int m_month = 1;
+	int m_day = 1;
 
 	static constexpr const int CHARACTER_SIZE = 20;
 	char birthNumberBuf[CHARACTER_SIZE];

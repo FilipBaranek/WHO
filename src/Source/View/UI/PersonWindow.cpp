@@ -59,8 +59,7 @@ void PersonWindow::renderWindow()
 
     float buttonWidth = 100.0f;
     float buttonHeight = 30.0f;
-    float totalButtonWidth = buttonWidth * 2 + 20.0f;
-    float centerX = (ImGui::GetWindowSize().x - totalButtonWidth) * 0.5f;
+    float centerX = (ImGui::GetWindowSize().x - buttonWidth) * 0.5f;
     float bottomY = ImGui::GetWindowSize().y - buttonHeight - 15.0f;
 
     ImGui::SetCursorPos(ImVec2(centerX, bottomY));
@@ -68,7 +67,7 @@ void PersonWindow::renderWindow()
     if (ImGui::Button("Insert", ImVec2(buttonWidth, buttonHeight)))
     {
         if (m_birthNumber != "" && m_lastName != "" && m_lastName != "" &&
-            m_year != 0 && m_month != 0 && m_day != 0)
+            m_year >= 0 && m_month >= 0 && m_day >= 0)
         {
             m_presenter->insert(m_birthNumber, m_firstName, m_lastName, m_birthDay);
         }
@@ -76,13 +75,6 @@ void PersonWindow::renderWindow()
         {
             m_presenter->setOutput("Invalid input", "(0) records inserted");
         }
-    }
-
-    ImGui::SameLine(0, 20.0f);
-
-    if (ImGui::Button("Delete", ImVec2(buttonWidth, buttonHeight)))
-    {
-        //
     }
 
     ImGui::End();

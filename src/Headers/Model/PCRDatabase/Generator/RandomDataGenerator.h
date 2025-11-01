@@ -20,7 +20,7 @@ private:
 
 	//Test
 	static constexpr const unsigned int MAX_TEST_CODE = 1'000'000;
-	static constexpr const unsigned int MAX_WORKPLACE_CODE = 100;
+	static constexpr const unsigned int MAX_WORKPLACE_CODE = 158;
 	static constexpr const unsigned int MAX_DISTRICT_CODE = 79;
 	static constexpr const unsigned int MAX_REGION_CODE = 8;
 	static constexpr const unsigned int NOTE_COUNT = 3;

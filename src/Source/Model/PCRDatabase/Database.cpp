@@ -14,7 +14,7 @@ void Database::generateRandomPeople(int peopleCount)
 	}
 }
 
-void Database::generateRandomTests(int testCount)
+bool Database::generateRandomTests(int testCount)
 {
 	if (m_people.size() > 0)
 	{
@@ -22,7 +22,9 @@ void Database::generateRandomTests(int testCount)
 		{
 			RandomDataGenerator::generateTests(m_peopleList, m_testStructuresList);
 		}
+		return true;
 	}
+	return false;
 }
 
 bool Database::insert(Person* person)

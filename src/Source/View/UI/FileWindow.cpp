@@ -4,8 +4,8 @@ void FileWindow::renderWindow()
 {
     ImGuiViewport* viewport = ImGui::GetMainViewport();
 
-    ImVec2 windowSize = ImVec2(viewport->Size.x * 0.25f, viewport->Size.y * 0.1f);
-    ImVec2 windowPos = ImVec2(viewport->Pos.x, viewport->Size.y - (viewport->Size.y * 0.1f));
+    ImVec2 windowSize = ImVec2(viewport->Size.x * 0.25f, viewport->Size.y * 0.09f);
+    ImVec2 windowPos = ImVec2(viewport->Pos.x, viewport->Size.y - (viewport->Size.y * 0.09f));
 
     ImGui::SetNextWindowPos(windowPos, ImGuiCond_Always);
     ImGui::SetNextWindowSize(windowSize, ImGuiCond_Always);

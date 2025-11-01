@@ -16,28 +16,49 @@ void OperationsWindow::renderWindow()
         ImGuiWindowFlags_NoSavedSettings
     );
 
-    ImGui::Columns(3, nullptr, false);
+    static int current_item = 0;
+    static const char* items[] = {
+        "Select...",
+        "2. Vysledok testu podla id testu a id pacienta",
+        "3. Vsetky testy pacienta usporiadanych podla datumu",
+        "4. Vsetky pozitivne testy za dane casove obdobie pre okres",
+        "5. Vsetky testy za dane casove odbobie pre okres",
+        "6. Vsetky pozitivne testy za dane casove obdobie pre kraj",
+        "7. Vsetky testy za dane casove obdobie pre kraj",
+        "20. Odstranit test",
+        "21. Odstranit osobu so vsetkymi zaznamami",
+        "Vypisat vsetky udaje"
+    };
 
-    if (ImGui::Button("2. Test result", ImVec2(-FLT_MIN, 30.0f)))
+    if (ImGui::BeginCombo("Select Operation", items[current_item]))
+    {
+        for (int n = 0; n < IM_ARRAYSIZE(items); n++)
+        {
+            bool is_selected = (current_item == n);
+            if (ImGui::Selectable(items[n], is_selected))
+            {
+                current_item = n;
+            }
+
+            if (is_selected)
+            {
+                ImGui::SetItemDefaultFocus();
+            }
+        }
+        ImGui::EndCombo();
+    }
+
+    float buttonWidth = 100.0f;
+    float buttonHeight = 30.0f;
+    float centerX = (ImGui::GetWindowSize().x - buttonWidth) * 0.5f;
+    float bottomY = ImGui::GetWindowSize().y - buttonHeight - 15.0f;
+
+    ImGui::SetCursorPos(ImVec2(centerX, bottomY));
+
+    if (ImGui::Button("Run", ImVec2(buttonWidth, buttonHeight)))
     {
         //
     }
-
-    ImGui::NextColumn();
-
-    if (ImGui::Button("3. Test by patient", ImVec2(-FLT_MIN, 30.0f)))
-    {
-        //
-    }
-
-    ImGui::NextColumn();
-
-    if (ImGui::Button("Print all data", ImVec2(-FLT_MIN, 30.0f)))
-    {
-        //
-    }
-
-    ImGui::Columns(1);
 
     ImGui::End();
 }
