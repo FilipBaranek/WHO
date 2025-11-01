@@ -52,7 +52,8 @@ Person* Database::findPerson(std::string birthNumber)
 	);
 	PersonWrapper key(&person);
 
-	return m_people.find(&key)->getData();
+	PersonWrapper* foundPerson = m_people.find(&key);
+	return foundPerson != nullptr ? foundPerson->getData() : nullptr;
 }
 
 std::string Database::findTestResultByIdAndPatientId(const unsigned int testId, const std::string birthBumber, bool printPerson)

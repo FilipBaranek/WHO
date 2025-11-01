@@ -11,7 +11,7 @@ private:
 	PCRTest* m_test;
 
 public:
-	InsertCommand(Database* database) : Command(database) {}
+	InsertCommand(Database* database) : Command(database), m_person(nullptr), m_test(nullptr) {}
 
 	void setParams(std::string birthNumber, std::string firstName, std::string lastName, std::chrono::year_month_day birthDay);
 	

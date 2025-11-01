@@ -44,7 +44,14 @@ void InsertCommand::execute(std::string& output, std::string& recordCount)
 	}
 	else
 	{
-		if (m_database->insert(m_test))
+		if (m_test->person() == nullptr)
+		{
+			output = "Insertion failed, person doesn't exist";
+			recordCount = "(0) records inserted";
+
+			delete m_test;
+		}
+		else if (m_database->insert(m_test))
 		{
 			output = "Test was registered to the database";
 			recordCount = "(1) record inserted";

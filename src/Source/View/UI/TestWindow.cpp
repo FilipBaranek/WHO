@@ -90,7 +90,25 @@ void TestWindow::renderWindow()
 
     if (ImGui::Button("Insert", ImVec2(buttonWidth, buttonHeight)))
     {
-        //
+        if (m_testId != 0 && m_workplaceId != 0 && m_districtId != 0 &&
+            m_regionId != 0 && m_testValue != 0 && m_birthNumber != "")
+        {
+            m_presenter->insert(
+                m_testId,
+                m_workplaceId,
+                m_districtId,
+                m_regionId,
+                m_result,
+                m_testValue,
+                m_note,
+                m_testDate,
+                m_birthNumber
+            );
+        }
+        else
+        {
+            m_presenter->setOutput("Invalid input", "(0) records inserted");
+        }
     }
 
     ImGui::SameLine(0, 20.0f);
