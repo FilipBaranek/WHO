@@ -2,18 +2,18 @@
 
 void InsertCommand::setParams(std::string birthNumber, std::string firstName, std::string lastName, std::chrono::year_month_day birthDay)
 {
-	m_person = new Person(
+	m_person = new PersonWrapper(new Person(
 		birthNumber,
 		firstName,
 		lastName,
 		birthDay
-	);
+	));
 }
 
 void InsertCommand::setParams(unsigned int testId, unsigned int workplaceId, unsigned int districtId, unsigned int regionId, bool result, double testValue,
 							  std::string note, std::chrono::time_point<std::chrono::system_clock> testDate, std::string birthNumber)
 {
-	m_test = new PCRTest(
+	m_test = new TestWrapper(new PCRTest(
 		testId,
 		workplaceId,
 		districtId,
@@ -24,7 +24,7 @@ void InsertCommand::setParams(unsigned int testId, unsigned int workplaceId, uns
 		testDate,
 		birthNumber,
 		m_database->findPerson(birthNumber)
-	);
+	));
 }
 
 void InsertCommand::execute(std::string& output, std::string& recordCount)

@@ -1,14 +1,14 @@
 #pragma once
 #include <string>
 #include "Command.h"
-#include "../../../Headers/Model/PCRDatabase/Models/Person.h"
-#include "../../../Headers/Model/PCRDatabase/Models/PCRTest.h"
+#include "../../../Headers/Model/PCRDatabase/ModelWrappers/PersonWrapper.h"
+#include "../../../Headers/Model/PCRDatabase/ModelWrappers/TestWrapper.h"
 
 class InsertCommand : public Command
 {
 private:
-	Person* m_person;
-	PCRTest* m_test;
+	PersonWrapper* m_person;
+	TestWrapper* m_test;
 
 public:
 	InsertCommand(Database* database) : Command(database), m_person(nullptr), m_test(nullptr) {}

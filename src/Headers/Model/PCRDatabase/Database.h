@@ -5,6 +5,7 @@
 #include <utility>
 #include <chrono>
 #include "./ModelWrappers/TestWrapper.h"
+#include "./ModelWrappers/TestByDateWrapper.h"
 #include "./ModelWrappers/PersonWrapper.h"
 #include "../Structures/AVL/AVLTree.h"
 #include "./Generator/RandomDataGenerator.h"
@@ -28,7 +29,7 @@ private:
 	
 	std::ostringstream m_oss;
 
-	std::vector<Person*> m_peopleList;
+	std::vector<PersonWrapper*> m_peopleList;
 	AVLTree<PersonWrapper*> m_people;
 
 	std::vector<AVLTree<TestWrapper*>*> m_testStructuresList;
@@ -38,10 +39,11 @@ public:
 	Database();
 	void generateRandomPeople(int peopleCount);
 	bool generateRandomTests(int testCount);
-	bool insert(Person* person);
-	bool insert(PCRTest* pcrTest);
+	bool insert(PersonWrapper* person);
+	bool insert(TestWrapper* pcrTest);
 	Person* findPerson(std::string birthNumber);
 	std::string findTestResultByIdAndPatientId(const unsigned int testId, const std::string birthBumber, bool printPerson = true);
+	std::pair<std::string, int> findPatientTestOrderByDate(std::string birthNumber);
 	std::string findTest(const unsigned int testId, bool printPerson);
 	int removeTest(int testId);
 	std::pair<bool, int> removePerson(std::string birthNumber);

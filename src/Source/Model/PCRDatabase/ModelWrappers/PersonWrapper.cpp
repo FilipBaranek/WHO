@@ -21,3 +21,12 @@ int PersonWrapper::compare(IComparable* other) const
 
 	return 0;
 }
+
+void PersonWrapper::writeLine()
+{
+}
+
+IStorable* PersonWrapper::loadLine()
+{
+	return nullptr;
+}

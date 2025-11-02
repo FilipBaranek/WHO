@@ -75,7 +75,7 @@ void RandomDataGenerator::generateLocation(std::mt19937& generator, unsigned int
     region = (district * MAX_REGION_CODE) / MAX_DISTRICT_CODE;
 }
 
-void RandomDataGenerator::generatePeople(std::vector<Person*>& peopleDuplicityList, AVLTree<PersonWrapper*>& output)
+void RandomDataGenerator::generatePeople(std::vector<PersonWrapper*>& peopleDuplicityList, AVLTree<PersonWrapper*>& output)
 {
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -97,10 +97,10 @@ void RandomDataGenerator::generatePeople(std::vector<Person*>& peopleDuplicityLi
 
     PersonWrapper* newPerson = new PersonWrapper(new Person(duplicitPerson.birthNumber(), name, lastName, birthDay));
 	output.insert(newPerson);
-    peopleDuplicityList.push_back(newPerson->getData());
+    peopleDuplicityList.push_back(newPerson);
 }
 
-void RandomDataGenerator::generateTests(std::vector<Person*>& peopleList, std::vector<AVLTree<TestWrapper*>*>& outputStrucutres)
+void RandomDataGenerator::generateTests(std::vector<PersonWrapper*>& peopleList, std::vector<AVLTree<TestWrapper*>*>& outputStrucutres)
 {
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -114,10 +114,10 @@ void RandomDataGenerator::generateTests(std::vector<Person*>& peopleList, std::v
     unsigned int workplace, district, region;
     generateLocation(gen, workplace, district, region);
     std::string note(s_notes[noteInterval(gen)]);
-    Person* correspondingPerson = peopleList[randomPersonInterval(gen)];
+    PersonWrapper* correspondingPerson = peopleList[randomPersonInterval(gen)];
     bool result = (bool)resultInterval(gen);
     double testValue = valueInterval(gen);
-    auto date = generateTime(gen, correspondingPerson->birthDay());
+    auto date = generateTime(gen, correspondingPerson->getData()->birthDay());
     unsigned int testId = testIdInterval(gen);
 
     PCRTest duplicityTest(
@@ -129,8 +129,8 @@ void RandomDataGenerator::generateTests(std::vector<Person*>& peopleList, std::v
         testValue,
         note,
         date,
-        correspondingPerson->birthNumber(),
-        correspondingPerson
+        correspondingPerson->getData()->birthNumber(),
+        correspondingPerson->getData()
     );
     TestWrapper key(&duplicityTest);
 
@@ -139,7 +139,7 @@ void RandomDataGenerator::generateTests(std::vector<Person*>& peopleList, std::v
         duplicityTest.setTestId(testIdInterval(gen));
     }
 
-    auto newTest = new TestWrapper(new PCRTest(
+    auto newTest = new PCRTest(
         duplicityTest.testId(),
         workplace,
         district,
@@ -148,13 +148,13 @@ void RandomDataGenerator::generateTests(std::vector<Person*>& peopleList, std::v
         testValue,
         note,
         date,
-        correspondingPerson->birthNumber(),
-        correspondingPerson
-    ));
+        correspondingPerson->getData()->birthNumber(),
+        correspondingPerson->getData()
+    );
 
-    correspondingPerson->tests().insert(newTest);
+    correspondingPerson->tests().insert(new TestByDateWrapper(newTest, correspondingPerson));
     for (auto& structure : outputStrucutres)
     {
-        structure->insert(newTest);
+        structure->insert(new TestWrapper(newTest, correspondingPerson));
     }
 }

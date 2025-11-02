@@ -20,13 +20,12 @@ private:
 	std::chrono::time_point<std::chrono::system_clock> m_testDate;
 	std::string m_birthNumber;
 	std::ostringstream m_oss;
-	Person* m_person;
 
 public:
 	PCRTest(unsigned int testId, unsigned int workplaceId, unsigned int districtId, unsigned int regionId, bool result, double testValue,
 			std::string note, std::chrono::time_point<std::chrono::system_clock> testDate, std::string birthNumber, Person* person) :
 			m_testId(testId), m_workplaceId(workplaceId), m_districtId(districtId), m_regionId(regionId), m_result(result),
-			m_testValue(testValue), m_note(note), m_testDate(testDate), m_birthNumber(birthNumber) , m_person(person)
+			m_testValue(testValue), m_note(note), m_testDate(testDate), m_birthNumber(birthNumber)
 	{};
 
 	inline void setTestId(unsigned int id) { m_testId = id; }
@@ -39,7 +38,6 @@ public:
 	inline std::string note() { return m_note; }
 	inline std::chrono::time_point<std::chrono::system_clock> testDate() { return m_testDate; }
 	inline std::string birthNumber() { return m_birthNumber; }
-	inline Person* person() { return m_person; }
 
 	inline std::string toString()
 	{

@@ -14,7 +14,6 @@ private:
 	std::string m_lastName;
 	std::chrono::year_month_day m_birthDay;
 	std::ostringstream m_oss;
-	AVLTree<TestWrapper*> m_tests;
 
 public:
 	Person(std::string birthNumber, std::string firstName, std::string lastName, std::chrono::year_month_day birthDay) :
@@ -26,7 +25,6 @@ public:
 	inline std::string firstName() { return m_firstName; }
 	inline std::string lastName() { return m_lastName; }
 	inline std::chrono::year_month_day birthDay() { return m_birthDay; }
-	inline AVLTree<TestWrapper*>& tests() { return m_tests; }
 
 	inline std::string toString()
 	{

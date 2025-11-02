@@ -205,6 +205,7 @@ void OperationsWindow::findTestResultByPatientId()
 
 void OperationsWindow::findPatientsSortedTests()
 {
+    m_presenter->findPatientTestOrderByDate(m_firstStringBuf);
 }
 
 void OperationsWindow::findPositiveTestsInDateRangeForDistrict()
@@ -325,7 +326,7 @@ void OperationsWindow::renderWindow()
 
     if (ImGui::BeginCombo("Select Operation", items[m_currentItem]))
     {
-        for (int n = 0; n < IM_ARRAYSIZE(items); n++)
+        for (int n = 0; n < IM_ARRAYSIZE(items); ++n)
         {
             bool is_selected = m_currentItem == n;
 

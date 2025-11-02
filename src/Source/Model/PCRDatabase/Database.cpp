@@ -27,9 +27,9 @@ bool Database::generateRandomTests(int testCount)
 	return false;
 }
 
-bool Database::insert(Person* person)
+bool Database::insert(PersonWrapper* personWrapper)
 {
-	PersonWrapper* personWrapper = new PersonWrapper(person);
+	//NEZABUDNUT DOROBIT
 	if (m_people.insert(personWrapper))
 	{
 		return true;
@@ -39,16 +39,17 @@ bool Database::insert(Person* person)
 	return false;
 }
 
-bool Database::insert(PCRTest* pcrTest)
+bool Database::insert(TestWrapper* test)
 {
+	//NEZABUDNUT DOROBIT
 	for (auto& testStructure : m_testStructuresList)
 	{
-		TestWrapper* test = new TestWrapper(pcrTest);
 		if (!testStructure->insert(test))
 		{
 			delete test;
 			return false;
 		}
+		test->person()->tests().insert(new TestByDateWrapper(test->getData()));
 	}
 	return true;
 }
@@ -69,8 +70,6 @@ Person* Database::findPerson(std::string birthNumber)
 
 std::string Database::findTestResultByIdAndPatientId(const unsigned int testId, const std::string birthBumber, bool printPerson)
 {
-	Person person(birthBumber, DEFAULT_STRING_VAL, DEFAULT_STRING_VAL, DEFAULT_DATE);
-	PersonWrapper personKey(&person);
 	PCRTest test(
 		testId,
 		DEFAULT_NUM_VAL,
@@ -83,24 +82,47 @@ std::string Database::findTestResultByIdAndPatientId(const unsigned int testId, 
 		birthBumber,
 		nullptr
 	);
-	TestWrapper testKey(&test);
+	TestWrapper key(&test);
 
-	auto personOutput = m_people.find(&personKey);
-	if (personOutput != nullptr)
+	TestWrapper* output = m_tests.find(&key);
+	if (output == nullptr)
 	{
-		auto testOutput = personOutput->getData()->tests().find(&testKey);
-		if (testOutput != nullptr)
-		{
-			std::string result = testOutput->getData()->result() ? "\nVysldedok: Pozitivny" : "\nVysledok: Negativny";
-
-			if (printPerson)
-			{
-				return personOutput->getData()->toString() + result;
-			}
-			return result;
-		}
+		return "Record han't been found\n";
 	}
-	return "Record han't been found\n";
+
+	std::string result = output->getData()->result() ? "\nVysldedok: Pozitivny" : "\nVysledok: Negativny";
+	if (printPerson)
+	{
+		return output->person()->getData()->toString() + result;
+	}
+	return result;
+}
+
+std::pair<std::string, int> Database::findPatientTestOrderByDate(std::string birthNumber)
+{
+	std::ostringstream oss;
+
+	Person person(birthNumber, DEFAULT_STRING_VAL, DEFAULT_STRING_VAL, DEFAULT_DATE);
+	PersonWrapper key(&person);
+
+	auto output = m_people.find(&key);
+	if (output == nullptr)
+	{
+		return std::make_pair("", 0);
+	}
+
+	oss << output->getData()->toString();
+	int count = 0;
+
+	if (output->tests().size() > 0)
+	{
+		output->tests().processInOrder([&oss, &count](TestByDateWrapper* test) {
+			oss << test->getData()->toString() << "\n";
+			++count;
+		});
+	}
+
+	return std::make_pair(oss.str(), count);
 }
 
 std::string Database::findTest(const unsigned int testId, bool printPerson)
@@ -124,7 +146,7 @@ std::string Database::findTest(const unsigned int testId, bool printPerson)
 	{
 		if (printPerson)
 		{
-			return output->getData()->person()->toString() + "\n" + output->getData()->toString();
+			return output->person()->getData()->toString() + "\n" + output->getData()->toString();
 		}
 		return output->getData()->toString();
 	}
@@ -157,7 +179,8 @@ int Database::removeTest(int testId)
 		{
 			if (testStructure == m_testStructuresList.back())
 			{
-				removedTest->getData()->person()->tests().remove(&key);
+				TestByDateWrapper testByDate(&test);
+				removedTest->person()->tests().remove((&testByDate));
 
 				delete removedTest->getData();
 				delete removedTest;
@@ -171,35 +194,38 @@ int Database::removeTest(int testId)
 
 std::pair<bool, int> Database::removePerson(std::string birthNumber)
 {
-	Person person(birthNumber, DEFAULT_STRING_VAL, DEFAULT_STRING_VAL, DEFAULT_DATE);
-	PersonWrapper key(&person);
+	//Person person(birthNumber, DEFAULT_STRING_VAL, DEFAULT_STRING_VAL, DEFAULT_DATE);
+	//PersonWrapper key(&person);
 
-	PersonWrapper* removedPerson = m_people.remove(&key);
-	if (removedPerson == nullptr)
-	{
-		return std::make_pair(false, 0);
-	}
+	//PersonWrapper* removedPerson = m_people.remove(&key);
+	//if (removedPerson == nullptr)
+	//{
+	//	return std::make_pair(false, 0);
+	//}
 
-	int count = 1;
-	AVLTree<TestWrapper*>& personsTests = removedPerson->getData()->tests();
-	if (personsTests.size() > 0)
-	{
-		personsTests.processPostOrder([&count, this](TestWrapper* test) {
-			for (auto& testStructure : m_testStructuresList)
-			{
-				testStructure->remove(test);
-			}
+	//int count = 1;
+	//AVLTree<TestByDateWrapper*>& personsTests = removedPerson->tests();
+	//if (personsTests.size() > 0)
+	//{
+	//	personsTests.processPostOrder([&count, this](TestByDateWrapper* test) {
+	//		for (auto& testStructure : m_testStructuresList)
+	//		{
+	//			TestWrapper key(test->getData());
+	//			testStructure->remove(&key);
+	//		}
 
-			delete test->getData();
-			delete test;
+	//		delete test->getData();
+	//		delete test;
 
-			++count;
-		});
-	}
+	//		++count;
+	//	});
+	//}
 
-	delete removedPerson->getData();
-	delete removedPerson;
-	return std::make_pair(true, count);
+	//delete removedPerson->getData();
+	//delete removedPerson;
+	//return std::make_pair(true, count);
+
+	return std::make_pair(false, 0);
 }
 
 std::pair<std::string, int> Database::printAllData()
@@ -211,9 +237,9 @@ std::pair<std::string, int> Database::printAllData()
 		oss << person->getData()->toString() << "\n";
 		++count;
 
-		if (person->getData()->tests().size() > 0)
+		if (person->tests().size() > 0)
 		{
-			person->getData()->tests().processInOrder([&oss, &count](TestWrapper* test) {
+			person->tests().processInOrder([&oss, &count](TestByDateWrapper* test) {
 				oss << test->getData()->toString() << "\n";
 				++count;
 			});

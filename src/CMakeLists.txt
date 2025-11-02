@@ -18,14 +18,9 @@ add_executable (
     "Source/Model/Tests/TestObjects/Number.cpp" 
     "Source/Model/Tests/FunctionalityTester.cpp" 
     "Source/Model/Tests/SpeedTester.cpp" 
-      
     "Headers/Presenter/Commands/Command.h" 
-    
     "Source/Model/PCRDatabase/Database.cpp"
     "Headers/Model/PCRDatabase/ModelWrappers/TestWrapper.h" 
-    "Headers/Model/PCRDatabase/ModelWrappers/TestInDateOrderWrapper.h"
-    "Headers/Model/PCRDatabase/ModelWrappers/PositiveTestInDistrictOrderWrapper.h"
-    "Headers/Model/PCRDatabase/ModelWrappers/NegativeTestInDistrictOrderWrapper.h"
     "Source/Model/PCRDatabase/ModelWrappers/TestWrapper.cpp"
     "Headers/Model/PCRDatabase/Generator/RandomDataGenerator.h" 
     "Source/Model/PCRDatabase/Generator/RandomDataGenerator.cpp" 
@@ -52,9 +47,20 @@ add_executable (
     "Source/View/UI/OperationsWindow.cpp"
     "Headers/Presenter/Commands/GenerateCommand.h"
     "Source/Presenter/Commands/GenerateCommand.cpp"
+    "Headers/Presenter/Commands/PrintAllDataCommand.h" 
+    "Source/Presenter/Commands/PrintAllDataCommand.cpp" 
+    "Headers/Presenter/Commands/RemovePersonCommand.h" 
+    "Source/Presenter/Commands/RemovePersonCommand.cpp" 
+    "Headers/Presenter/Commands/FindTestCommand.h" 
+    "Source/Presenter/Commands/FindTestCommand.cpp" 
+    "Headers/Presenter/Commands/RemoveTestCommand.h" 
+    "Source/Presenter/Commands/RemoveTestCommand.cpp"
+    "Headers/Model/Interfaces/IStorable.h"
+    "Headers/Model/PCRDatabase/ModelWrappers/TestByDateWrapper.h"
+    "Source/Model/PCRDatabase/ModelWrappers/TestByDateWrapper.cpp" 
+    "Headers/Presenter/Commands/FindPatientsTestsCommand.h" 
     
-    
- "Headers/Presenter/Commands/PrintAllDataCommand.h" "Source/Presenter/Commands/PrintAllDataCommand.cpp" "Headers/Presenter/Commands/RemovePersonCommand.h" "Source/Presenter/Commands/RemovePersonCommand.cpp" "Headers/Presenter/Commands/FindTestCommand.h" "Source/Presenter/Commands/FindTestCommand.cpp" "Headers/Presenter/Commands/RemoveTestCommand.h" "Source/Presenter/Commands/RemoveTestCommand.cpp")
+ "Source/Presenter/Commands/FindPatientsTestsCommand.cpp")
 
 target_include_directories(BST PRIVATE ${glm_SOURCE_DIR})
 

@@ -7,6 +7,7 @@
 #include "../Models/Person.h"
 #include "../ModelWrappers/PersonWrapper.h"
 #include "../../Structures/AVL/AVLTree.h"
+#include "../ModelWrappers/TestByDateWrapper.h"
 
 
 class RandomDataGenerator
@@ -33,7 +34,7 @@ private:
 
 public:
 	RandomDataGenerator() = delete;
-	static void generatePeople(std::vector<Person*>& peopleDuplicityList, AVLTree<PersonWrapper*>& output);
-	static void generateTests(std::vector<Person*>& peopleList, std::vector<AVLTree<TestWrapper*>*>& outputStrucutres);
+	static void generatePeople(std::vector<PersonWrapper*>& peopleDuplicityList, AVLTree<PersonWrapper*>& output);
+	static void generateTests(std::vector<PersonWrapper*>& peopleList, std::vector<AVLTree<TestWrapper*>*>& outputStrucutres);
 	~RandomDataGenerator() = delete;
 };

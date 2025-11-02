@@ -7,18 +7,18 @@
 
 class PersonWrapper;
 
-class TestWrapper : public IComparable, public IStorable
+class TestByDateWrapper : public IComparable, public IStorable
 {
 private:
 	PCRTest* m_pcrTest;
 	PersonWrapper* m_person;
 
 public:
-	TestWrapper(PCRTest* pcrTest, PersonWrapper* person = nullptr) : m_pcrTest(pcrTest), m_person(person) {}
+	TestByDateWrapper(PCRTest* pcrTest, PersonWrapper* person = nullptr) : m_pcrTest(pcrTest), m_person(person) {}
 	inline PCRTest* getData() { return m_pcrTest; }
 	inline PersonWrapper* person() { return m_person; }
 	int compare(IComparable* other) const override;
 	void writeLine() override;
 	IStorable* loadLine() override;
-	~TestWrapper() = default;
+	~TestByDateWrapper() = default;
 };

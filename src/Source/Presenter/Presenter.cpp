@@ -90,6 +90,14 @@ void Presenter::findResultByPatientAndTestId(unsigned int testId, std::string bi
 	});
 }
 
+void Presenter::findPatientTestOrderByDate(std::string birthNumber)
+{
+	execute([=, this](std::string& output, std::string& recordCount) {
+		m_findPatientsTestCommand.setParams(birthNumber);
+		m_findPatientsTestCommand.execute(output, recordCount);
+	});
+}
+
 void Presenter::findTest(unsigned int testId)
 {
 	execute([=, this](std::string& output, std::string& recordCount) {

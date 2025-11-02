@@ -19,3 +19,12 @@ int TestWrapper::compare(IComparable* other) const
 		return 0;
 	}
 }
+
+void TestWrapper::writeLine()
+{
+}
+
+IStorable* TestWrapper::loadLine()
+{
+	return nullptr;
+}

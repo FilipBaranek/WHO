@@ -6,6 +6,7 @@
 #include <vector>
 #include "BSTNode.h"
 #include "../../Interfaces/IComparable.h"
+#include "../../Interfaces/IStorable.h"
 
 template<typename T>
 struct RemoveData
@@ -580,6 +581,15 @@ public:
 				queue.push(currentNode->rightChild());
 			}
 		}
+	}
+
+	void save()
+	{
+		static_assert(std::is_base_of_v<IStorable, std::remove_pointer_t<T>>, "T must inherit from IStorable");
+		
+		processLevelOrder([](T nodeData) {
+			nodeData->writeLine();
+		});
 	}
 
 	void clear()
