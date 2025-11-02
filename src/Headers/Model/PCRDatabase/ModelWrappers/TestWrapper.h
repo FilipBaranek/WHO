@@ -1,15 +1,13 @@
 #pragma once
 #include "../../Interfaces/IComparable.h"
 #include "../../Interfaces/IStorable.h"
-#include "../../Structures/AVL/AVLTree.h"
 #include "../Models/PCRTest.h"
-#include "PersonWrapper.h"
 
 class PersonWrapper;
 
 class TestWrapper : public IComparable, public IStorable
 {
-private:
+protected:
 	PCRTest* m_pcrTest;
 	PersonWrapper* m_person;
 

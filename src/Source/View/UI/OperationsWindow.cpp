@@ -89,6 +89,24 @@ OperationsWindow::OperationsWindow(Presenter* presenter) : Window(presenter)
     };
 }
 
+//==================HELPERS===========================
+std::pair<std::chrono::time_point<std::chrono::system_clock>, std::chrono::time_point<std::chrono::system_clock>> OperationsWindow::getTimePointFormat()
+{
+    std::tm tmFrom = {};
+    tmFrom.tm_year = m_yearFrom - 1900;
+    tmFrom.tm_mon = m_monthFrom - 1;
+    tmFrom.tm_mday = m_dayFrom;
+    auto from = std::chrono::system_clock::from_time_t(std::mktime(&tmFrom));
+
+    std::tm tmTo = {};
+    tmTo.tm_year = m_yearTo - 1900;
+    tmTo.tm_mon = m_monthTo - 1;
+    tmTo.tm_mday = m_dayTo;
+    auto to = std::chrono::system_clock::from_time_t(std::mktime(&tmTo));
+
+    return std::make_pair(from, to);
+}
+
 //=================DISPLAY===========================
 void OperationsWindow::displayTestIdPatientIdInputs()
 {
@@ -145,24 +163,22 @@ void OperationsWindow::displayDateInputs()
 {
     ImGui::Dummy(ImVec2(20.0f, 50.0f));
 
-    static int yearFrom = 2025, monthFrom = 1, dayFrom = 1;
     ImGui::Text("Period from (Y/M/D):");
     ImGui::PushItemWidth(ImGui::GetColumnWidth() / 3.5f - 5.0f);
-    ImGui::InputInt("##yearFrom", &yearFrom, 0, 0);
+    ImGui::InputInt("##yearFrom", &m_yearFrom, 0, 0);
     ImGui::SameLine();
-    ImGui::InputInt("##monthFrom", &monthFrom, 0, 0);
+    ImGui::InputInt("##monthFrom", &m_monthFrom, 0, 0);
     ImGui::SameLine();
-    ImGui::InputInt("##dayFrom", &dayFrom, 0, 0);
+    ImGui::InputInt("##dayFrom", &m_dayFrom, 0, 0);
     ImGui::PopItemWidth();
 
-    static int yearTo = 2025, monthTo = 1, dayTo = 1;
     ImGui::Text("Period to (Y/M/D):");
     ImGui::PushItemWidth(ImGui::GetColumnWidth() / 3.5f - 5.0f);
-    ImGui::InputInt("##yearTo", &yearTo, 0, 0);
+    ImGui::InputInt("##yearTo", &m_yearTo, 0, 0);
     ImGui::SameLine();
-    ImGui::InputInt("##monthTo", &monthTo, 0, 0);
+    ImGui::InputInt("##monthTo", &m_monthTo, 0, 0);
     ImGui::SameLine();
-    ImGui::InputInt("##dayTo", &dayTo, 0, 0);
+    ImGui::InputInt("##dayTo", &m_dayTo, 0, 0);
     ImGui::PopItemWidth();
 }
 
@@ -210,11 +226,16 @@ void OperationsWindow::findPatientsSortedTests()
 
 void OperationsWindow::findPositiveTestsInDateRangeForDistrict()
 {
+    auto dateInterval = getTimePointFormat();
+
+    m_presenter->findPositiveTestsInDistrictCommand(m_firstNumInput, dateInterval.first, dateInterval.second);
 }
 
 void OperationsWindow::findAllTestsInDateRangeForDistrict()
 {
+    auto dateInterval = getTimePointFormat();
 
+    m_presenter->findAllTestsInDistrictCommand(m_firstNumInput, dateInterval.first, dateInterval.second);
 }
 
 void OperationsWindow::findPositiveTestsInDateRangeForRegion()

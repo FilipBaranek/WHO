@@ -59,8 +59,12 @@ add_executable (
     "Headers/Model/PCRDatabase/ModelWrappers/TestByDateWrapper.h"
     "Source/Model/PCRDatabase/ModelWrappers/TestByDateWrapper.cpp" 
     "Headers/Presenter/Commands/FindPatientsTestsCommand.h" 
-    
- "Source/Presenter/Commands/FindPatientsTestsCommand.cpp")
+    "Source/Presenter/Commands/FindPatientsTestsCommand.cpp"
+    "Headers/Model/PCRDatabase/ModelWrappers/TestInDistrictWrapper.h"
+    "Source/Model/PCRDatabase/ModelWrappers/TestInDistrictWrapper.cpp" 
+    "Headers/Presenter/Commands/FindPositiveTestsInDistrictCommand.h"
+    "Source/Presenter/Commands/FindPositiveTestsInDistrictCommand.cpp"
+ "Headers/Presenter/Commands/FindAllTestsInDistrictCommand.h" "Source/Presenter/Commands/FindAllTestsInDistrictCommand.cpp")
 
 target_include_directories(BST PRIVATE ${glm_SOURCE_DIR})
 

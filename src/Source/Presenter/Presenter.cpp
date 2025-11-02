@@ -98,6 +98,26 @@ void Presenter::findPatientTestOrderByDate(std::string birthNumber)
 	});
 }
 
+void Presenter::findPositiveTestsInDistrictCommand(unsigned int id,
+												   std::chrono::time_point<std::chrono::system_clock> from,
+												   std::chrono::time_point<std::chrono::system_clock> to)
+{
+	execute([=, this](std::string& output, std::string& recordCount) {
+		m_findPositiveTestsInDistrictCommand.setParams(id, from, to);
+		m_findPositiveTestsInDistrictCommand.execute(output, recordCount);
+	});
+}
+
+void Presenter::findAllTestsInDistrictCommand(unsigned int id,
+											  std::chrono::time_point<std::chrono::system_clock> from,
+											  std::chrono::time_point<std::chrono::system_clock> to)
+{
+	execute([=, this](std::string& output, std::string& recordCount) {
+		m_findAllTestsInDistrictCommand.setParams(id, from, to);
+		m_findAllTestsInDistrictCommand.execute(output, recordCount);
+	});
+}
+
 void Presenter::findTest(unsigned int testId)
 {
 	execute([=, this](std::string& output, std::string& recordCount) {

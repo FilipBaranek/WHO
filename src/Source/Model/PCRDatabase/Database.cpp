@@ -4,6 +4,8 @@
 Database::Database()
 {
 	m_testStructuresList.push_back(&m_tests);
+	m_testStructuresList.push_back(&m_positiveTestsInDistrict);
+	m_testStructuresList.push_back(&m_negativeTestsInDistrict);
 }
 
 void Database::generateRandomPeople(int peopleCount)
@@ -111,7 +113,7 @@ std::pair<std::string, int> Database::findPatientTestOrderByDate(std::string bir
 		return std::make_pair("", 0);
 	}
 
-	oss << output->getData()->toString();
+	oss << output->getData()->toString() << "\n";
 	int count = 0;
 
 	if (output->tests().size() > 0)
@@ -123,6 +125,114 @@ std::pair<std::string, int> Database::findPatientTestOrderByDate(std::string bir
 	}
 
 	return std::make_pair(oss.str(), count);
+}
+
+std::pair<std::string, int> Database::findPositiveTestsInDistrict(const unsigned int districtId,
+																  std::chrono::time_point<std::chrono::system_clock> from,
+																  std::chrono::time_point<std::chrono::system_clock> to)
+{
+	std::vector<TestWrapper*> output;
+	PCRTest min(
+		DEFAULT_NUM_VAL,
+		DEFAULT_NUM_VAL,
+		districtId,
+		DEFAULT_NUM_VAL,
+		DEFAULT_BOOL_VAL,
+		DEFAULT_NUM_VAL,
+		DEFAULT_STRING_VAL,
+		from,
+		DEFAULT_STRING_VAL,
+		nullptr
+	);
+	TestInDistrictWrapper minKey(&min);
+	PCRTest max(
+		DEFAULT_NUM_VAL,
+		DEFAULT_NUM_VAL,
+		districtId,
+		DEFAULT_NUM_VAL,
+		DEFAULT_BOOL_VAL,
+		DEFAULT_NUM_VAL,
+		DEFAULT_STRING_VAL,
+		to,
+		DEFAULT_STRING_VAL,
+		nullptr
+	);
+	TestInDistrictWrapper maxKey(&max);
+
+	m_positiveTestsInDistrict.find(&minKey, &maxKey, output);
+
+	if (output.size() <= 0)
+	{
+		return std::make_pair("No records found", 0);
+	}
+
+	int count = 0;
+	std::ostringstream oss;
+	for (auto& test : output)
+	{
+		oss << test->person()->getData()->toString() + "\n";
+		oss << test->getData()->toString();
+		++count;
+	}
+
+	return std::make_pair(oss.str(), count);
+}
+
+std::pair<std::string, int> Database::findAllTestsInDistrict(const unsigned int districtId,
+															 std::chrono::time_point<std::chrono::system_clock> from,
+															 std::chrono::time_point<std::chrono::system_clock> to)
+{
+	auto result = findPositiveTestsInDistrict(districtId, from, to);
+
+	std::vector<TestWrapper*> output;
+	PCRTest min(
+		DEFAULT_NUM_VAL,
+		DEFAULT_NUM_VAL,
+		districtId,
+		DEFAULT_NUM_VAL,
+		DEFAULT_BOOL_VAL,
+		DEFAULT_NUM_VAL,
+		DEFAULT_STRING_VAL,
+		from,
+		DEFAULT_STRING_VAL,
+		nullptr
+	);
+	TestInDistrictWrapper minKey(&min);
+	PCRTest max(
+		DEFAULT_NUM_VAL,
+		DEFAULT_NUM_VAL,
+		districtId,
+		DEFAULT_NUM_VAL,
+		DEFAULT_BOOL_VAL,
+		DEFAULT_NUM_VAL,
+		DEFAULT_STRING_VAL,
+		to,
+		DEFAULT_STRING_VAL,
+		nullptr
+	);
+	TestInDistrictWrapper maxKey(&max);
+
+	m_negativeTestsInDistrict.find(&minKey, &maxKey, output);
+
+	if (result.second == 0 && output.size() <= 0)
+	{
+		return result;
+	}
+	else if (result.second == 0)
+	{
+		result.first = "";
+	}
+
+	std::ostringstream oss;
+	oss << "\n";
+	for (auto& test : output)
+	{
+		oss << test->person()->getData()->toString() + "\n";
+		oss << test->getData()->toString();
+		++result.second;
+	}
+
+	return std::make_pair(result.first + oss.str(), result.second);
 }
 
 std::string Database::findTest(const unsigned int testId, bool printPerson)
@@ -254,20 +364,33 @@ void Database::clear()
 	if (m_people.size() > 0)
 	{
 		m_people.processPostOrder([](PersonWrapper* person) {
+			if (person->tests().size() > 0)
+			{
+				person->tests().processPostOrder([](TestWrapper* test) {
+					delete test;
+				});
+			}
+
 			delete person->getData();
 			delete person;
 		});
 	}
 
-	for (auto& testStructure : m_testStructuresList)
+	for (int i = 1; i < m_testStructuresList.size(); ++i)
 	{
-		if (testStructure->size() > 0)
+		if (m_testStructuresList.at(i)->size() > 0)
 		{
-			testStructure->processPostOrder([](TestWrapper* test) {
-				delete test->getData();
+			m_testStructuresList.at(i)->processPostOrder([](TestWrapper* test) {
 				delete test;
 			});
 		}
+	}
+	if (m_tests.size() > 0)
+	{
+		m_tests.processPostOrder([](TestWrapper* test) {
+			delete test->getData();
+			delete test;
+			});
 	}
 }
 
