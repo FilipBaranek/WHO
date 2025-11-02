@@ -69,6 +69,8 @@ Person* Database::findPerson(std::string birthNumber)
 
 std::string Database::findTestResultByIdAndPatientId(const unsigned int testId, const std::string birthBumber, bool printPerson)
 {
+	Person person(birthBumber, DEFAULT_STRING_VAL, DEFAULT_STRING_VAL, DEFAULT_DATE);
+	PersonWrapper personKey(&person);
 	PCRTest test(
 		testId,
 		DEFAULT_NUM_VAL,
@@ -81,27 +83,28 @@ std::string Database::findTestResultByIdAndPatientId(const unsigned int testId, 
 		birthBumber,
 		nullptr
 	);
+	TestWrapper testKey(&test);
 
-	TestWrapper key(&test);
-
-	auto output = m_tests.find(&key);
-	if (output != nullptr)
+	auto personOutput = m_people.find(&personKey);
+	if (personOutput != nullptr)
 	{
-		std::string result = output->getData()->result() ? "\nVysldedok: Pozitivny" : "\nVysledok: Negativny";
-
-		if (printPerson)
+		auto testOutput = personOutput->getData()->tests().find(&testKey);
+		if (testOutput != nullptr)
 		{
-			return output->getData()->person()->toString() + result;
+			std::string result = testOutput->getData()->result() ? "\nVysldedok: Pozitivny" : "\nVysledok: Negativny";
+
+			if (printPerson)
+			{
+				return personOutput->getData()->toString() + result;
+			}
+			return result;
 		}
-		return result;
 	}
 	return "Record han't been found\n";
 }
 
 std::string Database::findTest(const unsigned int testId, bool printPerson)
 {
-	//TOTO TREBA ZMENIT NA INTERVALOVE PREHLADAVANIE
-
 	PCRTest test(
 		testId,
 		DEFAULT_NUM_VAL,
@@ -121,14 +124,14 @@ std::string Database::findTest(const unsigned int testId, bool printPerson)
 	{
 		if (printPerson)
 		{
-			return output->getData()->person()->toString() + output->getData()->toString();
+			return output->getData()->person()->toString() + "\n" + output->getData()->toString();
 		}
 		return output->getData()->toString();
 	}
 	return "Record hasn't been found\n";
 }
 
-std::pair<bool, int> Database::removeTest(int testId)
+int Database::removeTest(int testId)
 {
 	PCRTest test(
 		testId,
@@ -149,23 +152,21 @@ std::pair<bool, int> Database::removeTest(int testId)
 	{
 		TestWrapper* removedTest;
 		removedTest = m_tests.remove(&key);
-	
-		if (removedTest == nullptr)
-		{
-			return std::make_pair(false, 0);
-		}
 
-		if (testStructure == m_testStructuresList.back())
+		if (removedTest != nullptr)
 		{
-			removedTest->getData()->person()->tests().remove(&key);
+			if (testStructure == m_testStructuresList.back())
+			{
+				removedTest->getData()->person()->tests().remove(&key);
 
-			delete removedTest->getData();
-			delete removedTest;
+				delete removedTest->getData();
+				delete removedTest;
+			}
+			++count;
 		}
-		++count;
 	}
 
-	return std::make_pair(true, count);
+	return count;
 }
 
 std::pair<bool, int> Database::removePerson(std::string birthNumber)

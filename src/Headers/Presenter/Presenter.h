@@ -9,6 +9,7 @@
 #include "Commands/PrintAllDataCommand.h"
 #include "Commands/RemovePersonCommand.h"
 #include "Commands/FindTestCommand.h"
+#include "Commands/RemoveTestCommand.h"
 
 class Presenter
 {
@@ -24,6 +25,7 @@ private:
 	PrintAllDataCommand m_printAllDataCommand;
 	FindTestCommand m_findTestCommand;
 	RemovePersonCommand m_removePersonCommand;
+	RemoveTestCommand m_removeTestCommand;
 
 	std::string m_output;
 	std::string m_recordCount;
@@ -32,7 +34,7 @@ private:
 
 public:
 	Presenter() : m_resultCommand(&m_database), m_insertCommand(&m_database), m_generateCommand(&m_database), m_isExecuting(false),
-				  m_printAllDataCommand(&m_database), m_removePersonCommand(&m_database), m_findTestCommand(&m_database)
+				  m_printAllDataCommand(&m_database), m_removePersonCommand(&m_database), m_findTestCommand(&m_database), m_removeTestCommand(&m_database)
 	{};
 	
 	inline bool isExecuting() { return m_isExecuting; }
@@ -56,6 +58,8 @@ public:
 	void findResultByPatientAndTestId(unsigned int testId, std::string birthNumber, bool printPerson);
 
 	void findTest(unsigned int testId);
+
+	void removeTest(unsigned int testId);
 
 	void removePerson(std::string birthNumber);
 	

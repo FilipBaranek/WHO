@@ -27,18 +27,32 @@ private:
 
 	void displayTestIdPatientIdInputs();
 	void displayPatientIdInput();
-	void displayDistrictIdDateInputs();
-	void displayRegionIdDateInputs();
+	void displayNumIdDateInputs();
 	void displayDateInputs();
-	void displayDistrictIdDateSickDaysInput();
-	void displayRegionDateSickDaysInputs();
+	void displaySickDaysInput();
+	void displayNumIdDateSickDaysInput();
 	void displayDateSickDaysInputs();
-	void displayWorkplaceIdDateInputs();
 	void displayTestIdInputs();
 
 	void printAllData();
 	void findTestResultByPatientId();
+	void findPatientsSortedTests();
+	void findPositiveTestsInDateRangeForDistrict();
+	void findAllTestsInDateRangeForDistrict();
+	void findPositiveTestsInDateRangeForRegion();
+	void findAllTestsInDateRangeForRegion();
+	void findPositiveTestsInDateRange();
+	void findAllTestsInDateRange();
+	void findSickPeopleInDistrictByDate();
+	void findSickPeopleInDistrictByDateSorted();
+	void findSickPeopleInRegionByDate();
+	void findSickPeopleByDate();
+	void findMostSickPersonInEveryDistrict();
+	void printAllDistrictsOrderedBySickPeopleCount();
+	void printAllRegionsOrderedBySickPeopleCount();
+	void findAllTestsDoneAtWorkplaceByDate();
 	void findTest();
+	void removeTest();
 	void removePerson();
 
 public:

@@ -164,7 +164,6 @@ void TestWindow::renderWindow()
     ImGui::NextColumn();
 
     static int year = 2025, month = 1, day = 1;
-
     ImGui::Text("Test Date (Y/M/D):");
     ImGui::PushItemWidth(ImGui::GetColumnWidth() / 3.5f - 5.0f);
     ImGui::InputInt("##year", &year, 0, 0);

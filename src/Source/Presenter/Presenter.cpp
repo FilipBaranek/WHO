@@ -98,6 +98,14 @@ void Presenter::findTest(unsigned int testId)
 	});
 }
 
+void Presenter::removeTest(unsigned int testId)
+{
+	execute([=, this](std::string& output, std::string& recordCount) {
+		m_removeTestCommand.setParams(testId);
+		m_removeTestCommand.execute(output, recordCount);
+	});
+}
+
 void Presenter::removePerson(std::string birthNumber)
 {
 	execute([=, this](std::string& output, std::string& recordCount) {

@@ -11,9 +11,73 @@ OperationsWindow::OperationsWindow(Presenter* presenter) : Window(presenter)
         [this]() { displayTestIdPatientIdInputs(); },
         [this]() { findTestResultByPatientId(); }
     };
+    m_operations[2] = {
+        [this]() { displayPatientIdInput(); },
+        [this]() { findPatientsSortedTests(); }
+    };
+    m_operations[3] = {
+        [this]() { displayNumIdDateInputs(); },
+        [this]() { findPositiveTestsInDateRangeForDistrict(); }
+    };
+    m_operations[4] = {
+        [this]() { displayNumIdDateInputs(); },
+        [this]() { findAllTestsInDateRangeForDistrict(); }
+    };
+    m_operations[5] = {
+        [this]() { displayNumIdDateInputs(); },
+        [this]() { findPositiveTestsInDateRangeForRegion(); }
+    };
+    m_operations[6] = {
+        [this]() { displayNumIdDateInputs(); },
+        [this]() { findAllTestsInDateRangeForRegion(); }
+    };
+    m_operations[7] = {
+        [this]() { displayDateInputs(); },
+        [this]() { findPositiveTestsInDateRange(); }
+    };
+    m_operations[8] = {
+        [this]() { displayDateInputs(); },
+        [this]() { findAllTestsInDateRange(); }
+    };
+    m_operations[9] = {
+        [this]() { displayNumIdDateSickDaysInput(); },
+        [this]() { findSickPeopleInDistrictByDate(); }
+    };
+    m_operations[10] = {
+        [this]() { displayNumIdDateSickDaysInput(); },
+        [this]() { findSickPeopleInDistrictByDateSorted(); }
+    };
+    m_operations[11] = {
+        [this]() { displayNumIdDateSickDaysInput(); },
+        [this]() { findSickPeopleInRegionByDate(); }
+    };
+    m_operations[12] = {
+        [this]() { displayDateSickDaysInputs(); },
+        [this]() { findSickPeopleByDate(); }
+    };
+    m_operations[13] = {
+        [this]() { displayDateSickDaysInputs(); },
+        [this]() { findMostSickPersonInEveryDistrict(); }
+    };
+    m_operations[14] = {
+        [this]() { displayDateSickDaysInputs(); },
+        [this]() { printAllDistrictsOrderedBySickPeopleCount(); }
+    };
+    m_operations[15] = {
+        [this]() { displayDateSickDaysInputs(); },
+        [this]() { printAllRegionsOrderedBySickPeopleCount(); }
+    };
+    m_operations[16] = {
+        [this]() { displayNumIdDateInputs(); },
+        [this]() { findAllTestsDoneAtWorkplaceByDate(); }
+    };
     m_operations[17] = {
         [this]() { displayTestIdInputs(); },
         [this]() { findTest(); }
+    };
+    m_operations[18] = {
+        [this]() { displayTestIdInputs(); },
+        [this]() { removeTest(); }
     };
     m_operations[19] = {
         [this]() { displayPatientIdInput(); },
@@ -26,9 +90,10 @@ OperationsWindow::OperationsWindow(Presenter* presenter) : Window(presenter)
 }
 
 //=================DISPLAY===========================
-
 void OperationsWindow::displayTestIdPatientIdInputs()
 {
+    ImGui::Dummy(ImVec2(20.0f, 60.0f));
+
     char birthBuf[20];
     strncpy_s(birthBuf, sizeof(birthBuf), m_firstStringBuf.c_str(), _TRUNCATE);
 
@@ -54,6 +119,8 @@ void OperationsWindow::displayTestIdPatientIdInputs()
 
 void OperationsWindow::displayPatientIdInput()
 {
+    ImGui::Dummy(ImVec2(20.0f, 70.0f));
+
     char birthBuf[20];
     strncpy_s(birthBuf, sizeof(birthBuf), m_firstStringBuf.c_str(), _TRUNCATE);
 
@@ -64,8 +131,63 @@ void OperationsWindow::displayPatientIdInput()
     }
 }
 
+void OperationsWindow::displayNumIdDateInputs()
+{
+    ImGui::Dummy(ImVec2(20.0f, 50.0f));
+
+    ImGui::Text("ID:");
+    ImGui::InputInt("##numId", &m_firstNumInput, 0, 0);
+
+    displayDateInputs();
+}
+
+void OperationsWindow::displayDateInputs()
+{
+    ImGui::Dummy(ImVec2(20.0f, 50.0f));
+
+    static int yearFrom = 2025, monthFrom = 1, dayFrom = 1;
+    ImGui::Text("Period from (Y/M/D):");
+    ImGui::PushItemWidth(ImGui::GetColumnWidth() / 3.5f - 5.0f);
+    ImGui::InputInt("##yearFrom", &yearFrom, 0, 0);
+    ImGui::SameLine();
+    ImGui::InputInt("##monthFrom", &monthFrom, 0, 0);
+    ImGui::SameLine();
+    ImGui::InputInt("##dayFrom", &dayFrom, 0, 0);
+    ImGui::PopItemWidth();
+
+    static int yearTo = 2025, monthTo = 1, dayTo = 1;
+    ImGui::Text("Period to (Y/M/D):");
+    ImGui::PushItemWidth(ImGui::GetColumnWidth() / 3.5f - 5.0f);
+    ImGui::InputInt("##yearTo", &yearTo, 0, 0);
+    ImGui::SameLine();
+    ImGui::InputInt("##monthTo", &monthTo, 0, 0);
+    ImGui::SameLine();
+    ImGui::InputInt("##dayTo", &dayTo, 0, 0);
+    ImGui::PopItemWidth();
+}
+
+void OperationsWindow::displaySickDaysInput()
+{
+    ImGui::Text("Sick days:");
+    ImGui::InputInt("##sickdaysId", &m_secondNumInput, 0, 0);
+}
+
+void OperationsWindow::displayNumIdDateSickDaysInput()
+{
+    displayNumIdDateInputs();
+    displaySickDaysInput();
+}
+
+void OperationsWindow::displayDateSickDaysInputs()
+{
+    displayDateInputs();
+    displaySickDaysInput();
+}
+
 void OperationsWindow::displayTestIdInputs()
 {
+    ImGui::Dummy(ImVec2(20.0f, 80.0f));
+
     ImGui::Text("Test ID:");
     ImGui::InputInt("##testId", &m_firstNumInput, 0, 0);
 }
@@ -81,9 +203,77 @@ void OperationsWindow::findTestResultByPatientId()
     m_presenter->findResultByPatientAndTestId(m_firstNumInput, m_firstStringBuf, true);
 }
 
+void OperationsWindow::findPatientsSortedTests()
+{
+}
+
+void OperationsWindow::findPositiveTestsInDateRangeForDistrict()
+{
+}
+
+void OperationsWindow::findAllTestsInDateRangeForDistrict()
+{
+
+}
+
+void OperationsWindow::findPositiveTestsInDateRangeForRegion()
+{
+
+}
+
+void OperationsWindow::findAllTestsInDateRangeForRegion()
+{
+}
+
+void OperationsWindow::findPositiveTestsInDateRange()
+{
+}
+
+void OperationsWindow::findAllTestsInDateRange()
+{
+
+}
+
+void OperationsWindow::findSickPeopleInDistrictByDate()
+{
+}
+
+void OperationsWindow::findSickPeopleInDistrictByDateSorted()
+{
+}
+
+void OperationsWindow::findSickPeopleInRegionByDate()
+{
+}
+
+void OperationsWindow::findSickPeopleByDate()
+{
+}
+
+void OperationsWindow::findMostSickPersonInEveryDistrict()
+{
+}
+
+void OperationsWindow::printAllDistrictsOrderedBySickPeopleCount()
+{
+}
+
+void OperationsWindow::printAllRegionsOrderedBySickPeopleCount()
+{
+}
+
+void OperationsWindow::findAllTestsDoneAtWorkplaceByDate()
+{
+}
+
 void OperationsWindow::findTest()
 {
     m_presenter->findTest(m_firstNumInput);
+}
+
+void OperationsWindow::removeTest()
+{
+    m_presenter->removeTest(m_firstNumInput);
 }
 
 void OperationsWindow::removePerson()

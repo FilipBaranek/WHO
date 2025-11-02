@@ -4,5 +4,5 @@ void PrintAllDataCommand::execute(std::string& output, std::string& recordCount)
 {
 	auto result = m_database->printAllData();
 	output = result.first;
-	recordCount = result.second;
+	recordCount = "(" + std::to_string(result.second) + ") records found";
 }

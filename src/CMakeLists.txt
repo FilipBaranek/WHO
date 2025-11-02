@@ -54,7 +54,7 @@ add_executable (
     "Source/Presenter/Commands/GenerateCommand.cpp"
     
     
- "Headers/Presenter/Commands/PrintAllDataCommand.h" "Source/Presenter/Commands/PrintAllDataCommand.cpp" "Headers/Presenter/Commands/RemovePersonCommand.h" "Source/Presenter/Commands/RemovePersonCommand.cpp" "Headers/Presenter/Commands/FindTestCommand.h" "Source/Presenter/Commands/FindTestCommand.cpp")
+ "Headers/Presenter/Commands/PrintAllDataCommand.h" "Source/Presenter/Commands/PrintAllDataCommand.cpp" "Headers/Presenter/Commands/RemovePersonCommand.h" "Source/Presenter/Commands/RemovePersonCommand.cpp" "Headers/Presenter/Commands/FindTestCommand.h" "Source/Presenter/Commands/FindTestCommand.cpp" "Headers/Presenter/Commands/RemoveTestCommand.h" "Source/Presenter/Commands/RemoveTestCommand.cpp")
 
 target_include_directories(BST PRIVATE ${glm_SOURCE_DIR})
 
