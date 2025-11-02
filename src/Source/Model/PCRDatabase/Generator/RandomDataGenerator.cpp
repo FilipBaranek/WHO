@@ -158,9 +158,13 @@ void RandomDataGenerator::generateTests(std::vector<PersonWrapper*>& peopleList,
     if (result)
     {
         outputStrucutres.at(1)->insert(new TestInDistrictWrapper(newTest, correspondingPerson));
+        outputStrucutres.at(3)->insert(new TestInRegionWrapper(newTest, correspondingPerson));
+        outputStrucutres.at(5)->insert(new TestByDateWrapper(newTest, correspondingPerson));
     }
     else
     {
         outputStrucutres.at(2)->insert(new TestInDistrictWrapper(newTest, correspondingPerson));
+        outputStrucutres.at(4)->insert(new TestInRegionWrapper(newTest, correspondingPerson));
+        outputStrucutres.at(6)->insert(new TestByDateWrapper(newTest, correspondingPerson));
     }
 }

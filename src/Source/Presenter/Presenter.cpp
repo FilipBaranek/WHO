@@ -103,8 +103,8 @@ void Presenter::findPositiveTestsInDistrictCommand(unsigned int id,
 												   std::chrono::time_point<std::chrono::system_clock> to)
 {
 	execute([=, this](std::string& output, std::string& recordCount) {
-		m_findPositiveTestsInDistrictCommand.setParams(id, from, to);
-		m_findPositiveTestsInDistrictCommand.execute(output, recordCount);
+		m_findPositiveTestsByLocationIdCommand.setParams(DISTRICT, id, from, to);
+		m_findPositiveTestsByLocationIdCommand.execute(output, recordCount);
 	});
 }
 
@@ -113,8 +113,46 @@ void Presenter::findAllTestsInDistrictCommand(unsigned int id,
 											  std::chrono::time_point<std::chrono::system_clock> to)
 {
 	execute([=, this](std::string& output, std::string& recordCount) {
-		m_findAllTestsInDistrictCommand.setParams(id, from, to);
-		m_findAllTestsInDistrictCommand.execute(output, recordCount);
+		m_findAllTestsByLocationIdCommand.setParams(DISTRICT, id, from, to);
+		m_findAllTestsByLocationIdCommand.execute(output, recordCount);
+	});
+}
+
+void Presenter::findPositiveTestsInRegionCommand(unsigned int id,
+												 std::chrono::time_point<std::chrono::system_clock> from,
+												 std::chrono::time_point<std::chrono::system_clock> to)
+{
+	execute([=, this](std::string& output, std::string& recordCount) {
+		m_findPositiveTestsByLocationIdCommand.setParams(REGION, id, from, to);
+		m_findPositiveTestsByLocationIdCommand.execute(output, recordCount);
+	});
+}
+
+void Presenter::findAllTestsInRegionCommand(unsigned int id,
+										    std::chrono::time_point<std::chrono::system_clock> from,
+											std::chrono::time_point<std::chrono::system_clock> to)
+{
+	execute([=, this](std::string& output, std::string& recordCount) {
+		m_findAllTestsByLocationIdCommand.setParams(REGION, id, from, to);
+		m_findAllTestsByLocationIdCommand.execute(output, recordCount);
+	});
+}
+
+void Presenter::findPositiveTests(std::chrono::time_point<std::chrono::system_clock> from,
+								  std::chrono::time_point<std::chrono::system_clock> to)
+{
+	execute([=, this](std::string& output, std::string& recordCount) {
+		m_findPositiveTestsByLocationIdCommand.setParams(COUNTRY, -1, from, to);
+		m_findPositiveTestsByLocationIdCommand.execute(output, recordCount);
+	});
+}
+
+void Presenter::findAllTests(std::chrono::time_point<std::chrono::system_clock> from,
+							 std::chrono::time_point<std::chrono::system_clock> to)
+{
+	execute([=, this](std::string& output, std::string& recordCount) {
+		m_findAllTestsByLocationIdCommand.setParams(COUNTRY, -1, from, to);
+		m_findAllTestsByLocationIdCommand.execute(output, recordCount);
 	});
 }
 

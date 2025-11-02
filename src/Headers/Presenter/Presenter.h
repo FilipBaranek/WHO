@@ -11,13 +11,17 @@
 #include "Commands/FindTestCommand.h"
 #include "Commands/RemoveTestCommand.h"
 #include "Commands/FindPatientsTestsCommand.h"
-#include "Commands/FindPositiveTestsInDistrictCommand.h"
-#include "Commands/FindAllTestsInDistrictCommand.h"
+#include "Commands/FindPositiveTestsByLocationIdCommand.h"
+#include "Commands/FindAllTestsByLocationIdCommand.h"
 
 
 class Presenter
 {
 private:
+	const int DISTRICT = 1;
+	const int REGION = 2;
+	const int COUNTRY = 3;
+
 	bool m_isExecuting;
 	std::mutex m_outputMutex;
 
@@ -31,8 +35,8 @@ private:
 	RemovePersonCommand m_removePersonCommand;
 	RemoveTestCommand m_removeTestCommand;
 	FindPatientsTestsCommand m_findPatientsTestCommand;
-	FindPositiveTestsInDistrictCommand m_findPositiveTestsInDistrictCommand;
-	FindAllTestsInDistrictCommand m_findAllTestsInDistrictCommand;
+	FindPositiveTestsByLocationIdCommand m_findPositiveTestsByLocationIdCommand;
+	FindAllTestsByLocationIdCommand m_findAllTestsByLocationIdCommand;
 
 	std::string m_output;
 	std::string m_recordCount;
@@ -42,7 +46,7 @@ private:
 public:
 	Presenter() : m_resultCommand(&m_database), m_insertCommand(&m_database), m_generateCommand(&m_database), m_isExecuting(false),
 				  m_printAllDataCommand(&m_database), m_removePersonCommand(&m_database), m_findTestCommand(&m_database), m_removeTestCommand(&m_database),
-				  m_findPatientsTestCommand(&m_database), m_findPositiveTestsInDistrictCommand(&m_database), m_findAllTestsInDistrictCommand(&m_database)
+				  m_findPatientsTestCommand(&m_database), m_findPositiveTestsByLocationIdCommand(&m_database), m_findAllTestsByLocationIdCommand(&m_database)
 	{};
 	
 	inline bool isExecuting() { return m_isExecuting; }
@@ -74,6 +78,20 @@ public:
 	void findAllTestsInDistrictCommand(unsigned int id,
 											std::chrono::time_point<std::chrono::system_clock> from,
 											std::chrono::time_point<std::chrono::system_clock> to);
+
+	void findPositiveTestsInRegionCommand(unsigned int id,
+											std::chrono::time_point<std::chrono::system_clock> from,
+											std::chrono::time_point<std::chrono::system_clock> to);
+
+	void findAllTestsInRegionCommand(unsigned int id,
+									   std::chrono::time_point<std::chrono::system_clock> from,
+									   std::chrono::time_point<std::chrono::system_clock> to);
+
+	void findPositiveTests(std::chrono::time_point<std::chrono::system_clock> from,
+						   std::chrono::time_point<std::chrono::system_clock> to);
+
+	void findAllTests(std::chrono::time_point<std::chrono::system_clock> from,
+					  std::chrono::time_point<std::chrono::system_clock> to);
 
 	void findTest(unsigned int testId);
 

@@ -6,6 +6,10 @@ Database::Database()
 	m_testStructuresList.push_back(&m_tests);
 	m_testStructuresList.push_back(&m_positiveTestsInDistrict);
 	m_testStructuresList.push_back(&m_negativeTestsInDistrict);
+	m_testStructuresList.push_back(&m_positiveTestsInRegion);
+	m_testStructuresList.push_back(&m_negativeTestsInRegion);
+	m_testStructuresList.push_back(&m_positiveTests);
+	m_testStructuresList.push_back(&m_negativeTests);
 }
 
 void Database::generateRandomPeople(int peopleCount)
@@ -213,6 +217,220 @@ std::pair<std::string, int> Database::findAllTestsInDistrict(const unsigned int 
 	TestInDistrictWrapper maxKey(&max);
 
 	m_negativeTestsInDistrict.find(&minKey, &maxKey, output);
+
+	if (result.second == 0 && output.size() <= 0)
+	{
+		return result;
+	}
+	else if (result.second == 0)
+	{
+		result.first = "";
+	}
+
+	std::ostringstream oss;
+	oss << "\n";
+	for (auto& test : output)
+	{
+		oss << test->person()->getData()->toString() + "\n";
+		oss << test->getData()->toString();
+		++result.second;
+	}
+
+	return std::make_pair(result.first + oss.str(), result.second);
+}
+
+std::pair<std::string, int> Database::findPositiveTestsInRegion(const unsigned int regionId,
+																std::chrono::time_point<std::chrono::system_clock> from,
+																std::chrono::time_point<std::chrono::system_clock> to)
+{
+	std::vector<TestWrapper*> output;
+	PCRTest min(
+		DEFAULT_NUM_VAL,
+		DEFAULT_NUM_VAL,
+		DEFAULT_NUM_VAL,
+		regionId,
+		DEFAULT_BOOL_VAL,
+		DEFAULT_NUM_VAL,
+		DEFAULT_STRING_VAL,
+		from,
+		DEFAULT_STRING_VAL,
+		nullptr
+	);
+	TestInRegionWrapper minKey(&min);
+	PCRTest max(
+		DEFAULT_NUM_VAL,
+		DEFAULT_NUM_VAL,
+		DEFAULT_NUM_VAL,
+		regionId,
+		DEFAULT_BOOL_VAL,
+		DEFAULT_NUM_VAL,
+		DEFAULT_STRING_VAL,
+		to,
+		DEFAULT_STRING_VAL,
+		nullptr
+	);
+	TestInRegionWrapper maxKey(&max);
+
+	m_positiveTestsInRegion.find(&minKey, &maxKey, output);
+
+	if (output.size() <= 0)
+	{
+		return std::make_pair("No records found", 0);
+	}
+
+	int count = 0;
+	std::ostringstream oss;
+	for (auto& test : output)
+	{
+		oss << test->person()->getData()->toString() + "\n";
+		oss << test->getData()->toString();
+		++count;
+	}
+
+	return std::make_pair(oss.str(), count);
+}
+
+std::pair<std::string, int> Database::findAllTestsInRegion(const unsigned int regionId,
+														   std::chrono::time_point<std::chrono::system_clock> from,
+														   std::chrono::time_point<std::chrono::system_clock> to)
+{
+	auto result = findPositiveTestsInRegion(regionId, from, to);
+
+	std::vector<TestWrapper*> output;
+	PCRTest min(
+		DEFAULT_NUM_VAL,
+		DEFAULT_NUM_VAL,
+		DEFAULT_NUM_VAL,
+		regionId,
+		DEFAULT_BOOL_VAL,
+		DEFAULT_NUM_VAL,
+		DEFAULT_STRING_VAL,
+		from,
+		DEFAULT_STRING_VAL,
+		nullptr
+	);
+	TestInRegionWrapper minKey(&min);
+	PCRTest max(
+		DEFAULT_NUM_VAL,
+		DEFAULT_NUM_VAL,
+		DEFAULT_NUM_VAL,
+		regionId,
+		DEFAULT_BOOL_VAL,
+		DEFAULT_NUM_VAL,
+		DEFAULT_STRING_VAL,
+		to,
+		DEFAULT_STRING_VAL,
+		nullptr
+	);
+	TestInRegionWrapper maxKey(&max);
+
+	m_negativeTestsInRegion.find(&minKey, &maxKey, output);
+
+	if (result.second == 0 && output.size() <= 0)
+	{
+		return result;
+	}
+	else if (result.second == 0)
+	{
+		result.first = "";
+	}
+
+	std::ostringstream oss;
+	oss << "\n";
+	for (auto& test : output)
+	{
+		oss << test->person()->getData()->toString() + "\n";
+		oss << test->getData()->toString();
+		++result.second;
+	}
+
+	return std::make_pair(result.first + oss.str(), result.second);
+}
+
+std::pair<std::string, int> Database::findPositiveTests(std::chrono::time_point<std::chrono::system_clock> from,
+														std::chrono::time_point<std::chrono::system_clock> to)
+{
+	std::vector<TestWrapper*> output;
+	PCRTest min(
+		MIN_ID,
+		DEFAULT_NUM_VAL,
+		DEFAULT_NUM_VAL,
+		DEFAULT_NUM_VAL,
+		DEFAULT_BOOL_VAL,
+		DEFAULT_NUM_VAL,
+		DEFAULT_STRING_VAL,
+		from,
+		DEFAULT_STRING_VAL,
+		nullptr
+	);
+	TestByDateWrapper minKey(&min);
+	PCRTest max(
+		MAX_ID,
+		DEFAULT_NUM_VAL,
+		DEFAULT_NUM_VAL,
+		DEFAULT_NUM_VAL,
+		DEFAULT_BOOL_VAL,
+		DEFAULT_NUM_VAL,
+		DEFAULT_STRING_VAL,
+		to,
+		DEFAULT_STRING_VAL,
+		nullptr
+	);
+	TestByDateWrapper maxKey(&max);
+
+	m_positiveTests.find(&minKey, &maxKey, output);
+
+	if (output.size() <= 0)
+	{
+		return std::make_pair("No records found", 0);
+	}
+
+	int count = 0;
+	std::ostringstream oss;
+	for (auto& test : output)
+	{
+		oss << test->person()->getData()->toString() + "\n";
+		oss << test->getData()->toString();
+		++count;
+	}
+
+	return std::make_pair(oss.str(), count);
+}
+
+std::pair<std::string, int> Database::findAllTests(std::chrono::time_point<std::chrono::system_clock> from,
+												   std::chrono::time_point<std::chrono::system_clock> to)
+{
+	auto result = findPositiveTests(from, to);
+
+	std::vector<TestWrapper*> output;
+	PCRTest min(
+		MIN_ID,
+		DEFAULT_NUM_VAL,
+		DEFAULT_NUM_VAL,
+		DEFAULT_NUM_VAL,
+		DEFAULT_BOOL_VAL,
+		DEFAULT_NUM_VAL,
+		DEFAULT_STRING_VAL,
+		from,
+		DEFAULT_STRING_VAL,
+		nullptr
+	);
+	TestByDateWrapper minKey(&min);
+	PCRTest max(
+		MAX_ID,
+		DEFAULT_NUM_VAL,
+		DEFAULT_NUM_VAL,
+		DEFAULT_NUM_VAL,
+		DEFAULT_BOOL_VAL,
+		DEFAULT_NUM_VAL,
+		DEFAULT_STRING_VAL,
+		to,
+		DEFAULT_STRING_VAL,
+		nullptr
+	);
+	TestByDateWrapper maxKey(&max);
+
+	m_negativeTests.find(&minKey, &maxKey, output);
 
 	if (result.second == 0 && output.size() <= 0)
 	{

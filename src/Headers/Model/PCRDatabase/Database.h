@@ -10,6 +10,7 @@
 #include "./ModelWrappers/TestWrapper.h"
 #include "./ModelWrappers/TestByDateWrapper.h"
 #include "./ModelWrappers/TestInDistrictWrapper.h"
+#include "./ModelWrappers/TestInRegionWrapper.h"
 
 
 class Database
@@ -37,6 +38,10 @@ private:
 	AVLTree<TestWrapper*> m_tests;
 	AVLTree<TestWrapper*> m_positiveTestsInDistrict;
 	AVLTree<TestWrapper*> m_negativeTestsInDistrict;
+	AVLTree<TestWrapper*> m_positiveTestsInRegion;
+	AVLTree<TestWrapper*> m_negativeTestsInRegion;
+	AVLTree<TestWrapper*> m_positiveTests;
+	AVLTree<TestWrapper*> m_negativeTests;
 
 public:
 	Database();
@@ -62,6 +67,20 @@ public:
 	std::pair<std::string, int> findAllTestsInDistrict(const unsigned int districtId,
 															std::chrono::time_point<std::chrono::system_clock> from,
 															std::chrono::time_point<std::chrono::system_clock> to);
+
+	std::pair<std::string, int> findPositiveTestsInRegion(const unsigned int regionId,
+															std::chrono::time_point<std::chrono::system_clock> from,
+															std::chrono::time_point<std::chrono::system_clock> to);
+
+	std::pair<std::string, int> findAllTestsInRegion(const unsigned int regionId,
+															std::chrono::time_point<std::chrono::system_clock> from,
+															std::chrono::time_point<std::chrono::system_clock> to);
+
+	std::pair<std::string, int> findPositiveTests(std::chrono::time_point<std::chrono::system_clock> from,
+						  						  std::chrono::time_point<std::chrono::system_clock> to);
+
+	std::pair<std::string, int> findAllTests(std::chrono::time_point<std::chrono::system_clock> from,
+											 std::chrono::time_point<std::chrono::system_clock> to);
 	
 	std::string findTest(const unsigned int testId, bool printPerson);
 	

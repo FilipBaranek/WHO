@@ -9,6 +9,7 @@
 #include "../ModelWrappers/PersonWrapper.h"
 #include "../ModelWrappers/TestByDateWrapper.h"
 #include "../ModelWrappers/TestInDistrictWrapper.h"
+#include "../ModelWrappers/TestInRegionWrapper.h"
 
 
 class RandomDataGenerator

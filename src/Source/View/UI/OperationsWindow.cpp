@@ -240,20 +240,30 @@ void OperationsWindow::findAllTestsInDateRangeForDistrict()
 
 void OperationsWindow::findPositiveTestsInDateRangeForRegion()
 {
+    auto dateInterval = getTimePointFormat();
 
+    m_presenter->findPositiveTestsInRegionCommand(m_firstNumInput, dateInterval.first, dateInterval.second);
 }
 
 void OperationsWindow::findAllTestsInDateRangeForRegion()
 {
+    auto dateInterval = getTimePointFormat();
+
+    m_presenter->findAllTestsInRegionCommand(m_firstNumInput, dateInterval.first, dateInterval.second);
 }
 
 void OperationsWindow::findPositiveTestsInDateRange()
 {
+    auto dateInterval = getTimePointFormat();
+
+    m_presenter->findPositiveTests(dateInterval.first, dateInterval.second);
 }
 
 void OperationsWindow::findAllTestsInDateRange()
 {
+    auto dateInterval = getTimePointFormat();
 
+    m_presenter->findAllTests(dateInterval.first, dateInterval.second);
 }
 
 void OperationsWindow::findSickPeopleInDistrictByDate()
