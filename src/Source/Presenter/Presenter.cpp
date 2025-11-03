@@ -156,6 +156,16 @@ void Presenter::findAllTests(std::chrono::time_point<std::chrono::system_clock> 
 	});
 }
 
+void Presenter::findSickPeopleInDistrictCommand(unsigned int id,
+												std::chrono::time_point<std::chrono::system_clock> from,
+												std::chrono::time_point<std::chrono::system_clock> to)
+{
+	execute([=, this](std::string& output, std::string& recordCount) {
+		m_findPositiveTestsByLocationIdCommand.setParams(SICK_IN_DISTRICT, id, from, to);
+		m_findPositiveTestsByLocationIdCommand.execute(output, recordCount);
+	});
+}
+
 void Presenter::findTest(unsigned int testId)
 {
 	execute([=, this](std::string& output, std::string& recordCount) {

@@ -100,7 +100,9 @@ void RandomDataGenerator::generatePeople(std::vector<PersonWrapper*>& peopleDupl
     peopleDuplicityList.push_back(newPerson);
 }
 
-void RandomDataGenerator::generateTests(std::vector<PersonWrapper*>& peopleList, std::vector<AVLTree<TestWrapper*>*>& outputStrucutres)
+void RandomDataGenerator::generateTests(std::vector<PersonWrapper*>& peopleList,
+                                        std::vector<AVLTree<TestWrapper*>*>& testStructures,
+                                        std::vector<AVLTree<LocationWrapper*>*>& locationStructures)
 {
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -134,7 +136,7 @@ void RandomDataGenerator::generateTests(std::vector<PersonWrapper*>& peopleList,
     );
     TestWrapper key(&duplicityTest);
 
-    while (outputStrucutres.at(0)->find(&key) != nullptr)
+    while (testStructures.at(0)->find(&key) != nullptr)
     {
         duplicityTest.setTestId(testIdInterval(gen));
     }
@@ -152,19 +154,52 @@ void RandomDataGenerator::generateTests(std::vector<PersonWrapper*>& peopleList,
         correspondingPerson->getData()
     );
 
+    LocationWrapper* districtWrapper = new LocationWrapper(district);
+    LocationWrapper* regionWrapper = new LocationWrapper(region);
+    if (!locationStructures.at(0)->insert(districtWrapper))
+    {
+        LocationWrapper* foundDistrict = locationStructures.at(0)->find(districtWrapper);
+        delete districtWrapper;
+        districtWrapper = foundDistrict;
+    }
+    if (!locationStructures.at(1)->insert(regionWrapper))
+    {
+        LocationWrapper* foundRegion = locationStructures.at(1)->find(regionWrapper);
+        delete regionWrapper;
+        regionWrapper = foundRegion;
+    }
+
     correspondingPerson->tests().insert(new TestByDateWrapper(newTest, correspondingPerson));
-    outputStrucutres.at(0)->insert(new TestWrapper(newTest, correspondingPerson));
+    testStructures.at(0)->insert(new TestWrapper(newTest, correspondingPerson));
 
     if (result)
     {
-        outputStrucutres.at(1)->insert(new TestInDistrictWrapper(newTest, correspondingPerson));
-        outputStrucutres.at(3)->insert(new TestInRegionWrapper(newTest, correspondingPerson));
-        outputStrucutres.at(5)->insert(new TestByDateWrapper(newTest, correspondingPerson));
+        testStructures.at(1)->insert(new TestInDistrictWrapper(newTest, correspondingPerson));
+        testStructures.at(3)->insert(new TestInRegionWrapper(newTest, correspondingPerson));
+        testStructures.at(5)->insert(new TestByDateWrapper(newTest, correspondingPerson));
+    
+        if (districtWrapper != nullptr)
+        {
+            districtWrapper->positiveTests().insert(new TestByDateWrapper(newTest, correspondingPerson));
+        }
+        if (regionWrapper != nullptr)
+        {
+            regionWrapper->positiveTests().insert(new TestByDateWrapper(newTest, correspondingPerson));
+        }
     }
     else
     {
-        outputStrucutres.at(2)->insert(new TestInDistrictWrapper(newTest, correspondingPerson));
-        outputStrucutres.at(4)->insert(new TestInRegionWrapper(newTest, correspondingPerson));
-        outputStrucutres.at(6)->insert(new TestByDateWrapper(newTest, correspondingPerson));
+        testStructures.at(2)->insert(new TestInDistrictWrapper(newTest, correspondingPerson));
+        testStructures.at(4)->insert(new TestInRegionWrapper(newTest, correspondingPerson));
+        testStructures.at(6)->insert(new TestByDateWrapper(newTest, correspondingPerson));
+
+        if (districtWrapper != nullptr)
+        {
+            districtWrapper->negativeTests().insert(new TestByDateWrapper(newTest, correspondingPerson));
+        }
+        if (regionWrapper != nullptr)
+        {
+            regionWrapper->negativeTests().insert(new TestByDateWrapper(newTest, correspondingPerson));
+        }
     }
 }

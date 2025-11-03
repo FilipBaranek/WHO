@@ -68,7 +68,8 @@ add_executable (
     "Source/Presenter/Commands/FindAllTestsByLocationIdCommand.cpp" 
     "Headers/Model/PCRDatabase/ModelWrappers/TestInRegionWrapper.h"
     "Source/Model/PCRDatabase/ModelWrappers/TestInRegionWrapper.cpp"
-)
+    "Headers/Model/PCRDatabase/ModelWrappers/LocationWrapper.h" 
+ "Source/Model/PCRDatabase/ModelWrappers/LocationWrapper.cpp")
 
 target_include_directories(BST PRIVATE ${glm_SOURCE_DIR})
 

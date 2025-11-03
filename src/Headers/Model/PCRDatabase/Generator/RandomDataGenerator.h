@@ -7,6 +7,7 @@
 #include "../Models/PCRTest.h"
 #include "../Models/Person.h"
 #include "../ModelWrappers/PersonWrapper.h"
+#include "../ModelWrappers/LocationWrapper.h"
 #include "../ModelWrappers/TestByDateWrapper.h"
 #include "../ModelWrappers/TestInDistrictWrapper.h"
 #include "../ModelWrappers/TestInRegionWrapper.h"
@@ -36,7 +37,12 @@ private:
 
 public:
 	RandomDataGenerator() = delete;
+
 	static void generatePeople(std::vector<PersonWrapper*>& peopleDuplicityList, AVLTree<PersonWrapper*>& output);
-	static void generateTests(std::vector<PersonWrapper*>& peopleList, std::vector<AVLTree<TestWrapper*>*>& outputStrucutres);
+	
+	static void generateTests(std::vector<PersonWrapper*>& peopleList,
+							  std::vector<AVLTree<TestWrapper*>*>& testStructures,
+							  std::vector<AVLTree<LocationWrapper*>*>& locationStructures);
+	
 	~RandomDataGenerator() = delete;
 };

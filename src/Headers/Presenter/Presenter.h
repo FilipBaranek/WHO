@@ -21,6 +21,7 @@ private:
 	const int DISTRICT = 1;
 	const int REGION = 2;
 	const int COUNTRY = 3;
+	const int SICK_IN_DISTRICT = 4;
 
 	bool m_isExecuting;
 	std::mutex m_outputMutex;
@@ -76,8 +77,8 @@ public:
 											std::chrono::time_point<std::chrono::system_clock> to);
 
 	void findAllTestsInDistrictCommand(unsigned int id,
-											std::chrono::time_point<std::chrono::system_clock> from,
-											std::chrono::time_point<std::chrono::system_clock> to);
+									   std::chrono::time_point<std::chrono::system_clock> from,
+									   std::chrono::time_point<std::chrono::system_clock> to);
 
 	void findPositiveTestsInRegionCommand(unsigned int id,
 											std::chrono::time_point<std::chrono::system_clock> from,
@@ -92,6 +93,10 @@ public:
 
 	void findAllTests(std::chrono::time_point<std::chrono::system_clock> from,
 					  std::chrono::time_point<std::chrono::system_clock> to);
+
+	void findSickPeopleInDistrictCommand(unsigned int id,
+							   			 std::chrono::time_point<std::chrono::system_clock> from,
+										 std::chrono::time_point<std::chrono::system_clock> to);
 
 	void findTest(unsigned int testId);
 

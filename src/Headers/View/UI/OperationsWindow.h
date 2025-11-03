@@ -33,10 +33,13 @@ private:
 
 
 	std::pair<std::chrono::time_point<std::chrono::system_clock>, std::chrono::time_point<std::chrono::system_clock>> getTimePointFormat();
+	std::pair<std::chrono::time_point<std::chrono::system_clock>, std::chrono::time_point<std::chrono::system_clock>> getTimePointFormatSickDays();
 
+	void displayNumIdInputs();
 	void displayTestIdPatientIdInputs();
 	void displayPatientIdInput();
 	void displayNumIdDateInputs();
+	void displaySingleDateInputs();
 	void displayDateInputs();
 	void displaySickDaysInput();
 	void displayNumIdDateSickDaysInput();

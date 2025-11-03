@@ -7,6 +7,7 @@
 #include "../Structures/AVL/AVLTree.h"
 #include "./Generator/RandomDataGenerator.h"
 #include "./ModelWrappers/PersonWrapper.h"
+#include "./ModelWrappers/LocationWrapper.h"
 #include "./ModelWrappers/TestWrapper.h"
 #include "./ModelWrappers/TestByDateWrapper.h"
 #include "./ModelWrappers/TestInDistrictWrapper.h"
@@ -33,6 +34,10 @@ private:
 
 	std::vector<PersonWrapper*> m_peopleList;
 	AVLTree<PersonWrapper*> m_people;
+
+	std::vector<AVLTree<LocationWrapper*>*> m_locationStructures;
+	AVLTree<LocationWrapper*> m_districts;
+	AVLTree<LocationWrapper*> m_regions;
 
 	std::vector<AVLTree<TestWrapper*>*> m_testStructuresList;
 	AVLTree<TestWrapper*> m_tests;
@@ -65,22 +70,30 @@ public:
 															std::chrono::time_point<std::chrono::system_clock> to);
 
 	std::pair<std::string, int> findAllTestsInDistrict(const unsigned int districtId,
-															std::chrono::time_point<std::chrono::system_clock> from,
-															std::chrono::time_point<std::chrono::system_clock> to);
+													   std::chrono::time_point<std::chrono::system_clock> from,
+												   	   std::chrono::time_point<std::chrono::system_clock> to);
 
 	std::pair<std::string, int> findPositiveTestsInRegion(const unsigned int regionId,
-															std::chrono::time_point<std::chrono::system_clock> from,
-															std::chrono::time_point<std::chrono::system_clock> to);
+													      std::chrono::time_point<std::chrono::system_clock> from,
+														  std::chrono::time_point<std::chrono::system_clock> to);
 
 	std::pair<std::string, int> findAllTestsInRegion(const unsigned int regionId,
-															std::chrono::time_point<std::chrono::system_clock> from,
-															std::chrono::time_point<std::chrono::system_clock> to);
+												     std::chrono::time_point<std::chrono::system_clock> from,
+													 std::chrono::time_point<std::chrono::system_clock> to);
 
 	std::pair<std::string, int> findPositiveTests(std::chrono::time_point<std::chrono::system_clock> from,
 						  						  std::chrono::time_point<std::chrono::system_clock> to);
 
 	std::pair<std::string, int> findAllTests(std::chrono::time_point<std::chrono::system_clock> from,
 											 std::chrono::time_point<std::chrono::system_clock> to);
+
+	std::pair<std::string, int> findSickPeopleInDistrict(const unsigned int districtId,
+														 std::chrono::time_point<std::chrono::system_clock> from,
+														 std::chrono::time_point<std::chrono::system_clock> to);
+
+	std::pair<std::string, int> findSickPeopleInDistrictOrderedByTestValue(const unsigned int districtId,
+																		   std::chrono::time_point<std::chrono::system_clock> from,
+																		   std::chrono::time_point<std::chrono::system_clock> to);
 	
 	std::string findTest(const unsigned int testId, bool printPerson);
 	

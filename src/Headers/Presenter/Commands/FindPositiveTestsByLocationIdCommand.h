@@ -9,6 +9,7 @@ private:
 	const int DISTRICT = 1;
 	const int REGION = 2;
 	const int COUNTRY = 3;
+	const int SICK_IN_DISTRICT = 4;
 
 	int m_location;
 	int m_id;

@@ -90,6 +90,18 @@ OperationsWindow::OperationsWindow(Presenter* presenter) : Window(presenter)
 }
 
 //==================HELPERS===========================
+std::pair<std::chrono::time_point<std::chrono::system_clock>, std::chrono::time_point<std::chrono::system_clock>> OperationsWindow::getTimePointFormatSickDays()
+{
+    std::tm tmFrom = {};
+    tmFrom.tm_year = m_yearFrom - 1900;
+    tmFrom.tm_mon = m_monthFrom - 1;
+    tmFrom.tm_mday = m_dayFrom;
+    auto from = std::chrono::system_clock::from_time_t(std::mktime(&tmFrom));
+    auto to = from + std::chrono::days{ m_secondNumInput };
+
+    return std::make_pair(from, to);
+}
+
 std::pair<std::chrono::time_point<std::chrono::system_clock>, std::chrono::time_point<std::chrono::system_clock>> OperationsWindow::getTimePointFormat()
 {
     std::tm tmFrom = {};
@@ -108,6 +120,14 @@ std::pair<std::chrono::time_point<std::chrono::system_clock>, std::chrono::time_
 }
 
 //=================DISPLAY===========================
+void OperationsWindow::displayNumIdInputs()
+{
+    ImGui::Dummy(ImVec2(20.0f, 60.0f));
+
+    ImGui::Text("Location ID:");
+    ImGui::InputInt("##locationId", &m_firstNumInput, 0, 0);
+}
+
 void OperationsWindow::displayTestIdPatientIdInputs()
 {
     ImGui::Dummy(ImVec2(20.0f, 60.0f));
@@ -159,6 +179,20 @@ void OperationsWindow::displayNumIdDateInputs()
     displayDateInputs();
 }
 
+void OperationsWindow::displaySingleDateInputs()
+{
+    ImGui::Dummy(ImVec2(20.0f, 50.0f));
+
+    ImGui::Text("Period from (Y/M/D):");
+    ImGui::PushItemWidth(ImGui::GetColumnWidth() / 3.5f - 5.0f);
+    ImGui::InputInt("##yearFrom", &m_yearFrom, 0, 0);
+    ImGui::SameLine();
+    ImGui::InputInt("##monthFrom", &m_monthFrom, 0, 0);
+    ImGui::SameLine();
+    ImGui::InputInt("##dayFrom", &m_dayFrom, 0, 0);
+    ImGui::PopItemWidth();
+}
+
 void OperationsWindow::displayDateInputs()
 {
     ImGui::Dummy(ImVec2(20.0f, 50.0f));
@@ -190,13 +224,14 @@ void OperationsWindow::displaySickDaysInput()
 
 void OperationsWindow::displayNumIdDateSickDaysInput()
 {
-    displayNumIdDateInputs();
+    displayNumIdInputs();
+    displaySingleDateInputs();
     displaySickDaysInput();
 }
 
 void OperationsWindow::displayDateSickDaysInputs()
 {
-    displayDateInputs();
+    displaySingleDateInputs();
     displaySickDaysInput();
 }
 
@@ -268,6 +303,9 @@ void OperationsWindow::findAllTestsInDateRange()
 
 void OperationsWindow::findSickPeopleInDistrictByDate()
 {
+    auto dateInterval = getTimePointFormatSickDays();
+
+    m_presenter->findSickPeopleInDistrictCommand(m_firstNumInput, dateInterval.first, dateInterval.second);
 }
 
 void OperationsWindow::findSickPeopleInDistrictByDateSorted()

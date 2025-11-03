@@ -10,6 +10,9 @@ Database::Database()
 	m_testStructuresList.push_back(&m_negativeTestsInRegion);
 	m_testStructuresList.push_back(&m_positiveTests);
 	m_testStructuresList.push_back(&m_negativeTests);
+
+	m_locationStructures.push_back(&m_districts);
+	m_locationStructures.push_back(&m_regions);
 }
 
 void Database::generateRandomPeople(int peopleCount)
@@ -26,7 +29,7 @@ bool Database::generateRandomTests(int testCount)
 	{
 		for (int i{}; i < testCount; ++i)
 		{
-			RandomDataGenerator::generateTests(m_peopleList, m_testStructuresList);
+			RandomDataGenerator::generateTests(m_peopleList, m_testStructuresList, m_locationStructures);
 		}
 		return true;
 	}
@@ -453,6 +456,72 @@ std::pair<std::string, int> Database::findAllTests(std::chrono::time_point<std::
 	return std::make_pair(result.first + oss.str(), result.second);
 }
 
+std::pair<std::string, int> Database::findSickPeopleInDistrict(const unsigned int districtId,
+															   std::chrono::time_point<std::chrono::system_clock> from,
+															   std::chrono::time_point<std::chrono::system_clock> to)
+{
+	LocationWrapper location(districtId);
+	LocationWrapper* foundDistrict = m_districts.find(&location);
+
+	if (foundDistrict == nullptr)
+	{
+		return std::make_pair("District doesn't exist", 0);
+	}
+
+	std::vector<TestWrapper*> output;
+	PCRTest minTest(
+		MIN_ID,
+		DEFAULT_NUM_VAL,
+		districtId,
+		DEFAULT_NUM_VAL,
+		DEFAULT_BOOL_VAL,
+		DEFAULT_NUM_VAL,
+		DEFAULT_STRING_VAL,
+		from,
+		DEFAULT_STRING_VAL,
+		nullptr
+	);
+	TestByDateWrapper minKey(&minTest);
+	PCRTest maxTest(
+		MAX_ID,
+		DEFAULT_NUM_VAL,
+		districtId,
+		DEFAULT_NUM_VAL,
+		DEFAULT_BOOL_VAL,
+		DEFAULT_NUM_VAL,
+		DEFAULT_STRING_VAL,
+		to,
+		DEFAULT_STRING_VAL,
+		nullptr
+	);
+	TestByDateWrapper maxKey(&maxTest);
+
+	foundDistrict->positiveTests().find(&minKey, &maxKey, output);
+
+	if (output.size() <= 0)
+	{
+		return std::make_pair("No tests in the district", 0);
+	}
+
+	int count = 0;
+	std::ostringstream oss;
+	for (auto& test : output)
+	{
+		oss << test->person()->getData()->toString() + "\n";
+		oss << test->getData()->toString();
+		++count;
+	}
+
+	return std::make_pair(oss.str(), count);
+}
+
+std::pair<std::string, int> Database::findSickPeopleInDistrictOrderedByTestValue(const unsigned int districtId,
+																				 std::chrono::time_point<std::chrono::system_clock> from,
+																				 std::chrono::time_point<std::chrono::system_clock> to)
+{
+	return std::pair<std::string, int>();
+}
+
 std::string Database::findTest(const unsigned int testId, bool printPerson)
 {
 	PCRTest test(
@@ -592,6 +661,29 @@ void Database::clear()
 			delete person->getData();
 			delete person;
 		});
+	}
+
+	for (auto& location : m_locationStructures)
+	{
+		if (location->size() > 0)
+		{
+			location->processPostOrder([](LocationWrapper* location) {
+				if (location->positiveTests().size() > 0)
+				{
+					location->positiveTests().processPostOrder([](TestWrapper* test) {
+						delete test;
+					});
+				}
+				if (location->negativeTests().size() > 0)
+				{
+					location->negativeTests().processPostOrder([](TestWrapper* test) {
+						delete test;
+					});
+				}
+
+				delete location;
+			});
+		}
 	}
 
 	for (int i = 1; i < m_testStructuresList.size(); ++i)

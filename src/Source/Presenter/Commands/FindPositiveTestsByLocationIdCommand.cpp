@@ -20,4 +20,10 @@ void FindPositiveTestsByLocationIdCommand::execute(std::string& output, std::str
 		output = result.first;
 		recordCount = "(" + std::to_string(result.second) + ") records found";
 	}
+	else if (m_location == SICK_IN_DISTRICT)
+	{
+		auto result = m_database->findSickPeopleInDistrict(m_id, m_from, m_to);
+		output = result.first;
+		recordCount = "(" + std::to_string(result.second) + ") records found";
+	}
 }
