@@ -9,6 +9,7 @@
 #include "../Models/Person.h"
 #include "../ModelWrappers/PersonWrapper.h"
 #include "../ModelWrappers/LocationWrapper.h"
+#include "../ModelWrappers/TestWrapper.h"
 #include "../ModelWrappers/TestByDateWrapper.h"
 
 
@@ -54,7 +55,7 @@ public:
 	
 	static void generateTests(std::vector<PersonWrapper*>& peopleList,
 							  std::pair<AVLTree<TestByDateWrapper*>*, AVLTree<TestByDateWrapper*>*>& testStructures,
-							  std::vector<AVLTree<LocationWrapper*>*>& locationStructures);
+							  AVLTree<TestWrapper*>& tests, std::vector<AVLTree<LocationWrapper*>*>& locationStructures);
 	
 	~RandomDataGenerator() = delete;
 };

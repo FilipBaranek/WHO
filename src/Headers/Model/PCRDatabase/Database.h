@@ -9,6 +9,7 @@
 #include "./ModelWrappers/PersonWrapper.h"
 #include "./ModelWrappers/LocationWrapper.h"
 #include "./ModelWrappers/TestByDateWrapper.h"
+#include "./ModelWrappers/TestWrapper.h"
 
 
 using namespace std::chrono;
@@ -40,10 +41,12 @@ private:
 	std::pair<AVLTree<TestByDateWrapper*>*, AVLTree<TestByDateWrapper*>*> m_testStructuresList;
 	AVLTree<TestByDateWrapper*> m_positiveTests;
 	AVLTree<TestByDateWrapper*> m_negativeTests;
+	AVLTree<TestWrapper*> m_tests;
 
 	std::pair<std::string, int> outputToString(std::vector<TestByDateWrapper*>& output);
 	void sickPeopleInDistrict(const unsigned int& districtId, time_point<system_clock>& from,
 							  time_point<system_clock>& to, LocationWrapper*& foundLocation, std::vector<TestByDateWrapper*>& output);
+	TestWrapper* findTestWrapper(int testId);
 
 public:
 	Database();
@@ -106,7 +109,7 @@ public:
 	std::pair<std::string, int> findAllTestsAtWorkplace(int workplaceId, time_point<system_clock> from, time_point<system_clock> to);
 
 	//(18)
-	std::string findTest(const unsigned int testId, bool printPerson);
+	std::string findTest(const unsigned int testId);
 
 	//(19)
 	bool insert(PersonWrapper* person);

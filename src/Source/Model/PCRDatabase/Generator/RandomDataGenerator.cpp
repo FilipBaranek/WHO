@@ -102,7 +102,7 @@ void RandomDataGenerator::generatePeople(std::vector<PersonWrapper*>& peopleDupl
 
 void RandomDataGenerator::generateTests(std::vector<PersonWrapper*>& peopleList,
                                         std::pair<AVLTree<TestByDateWrapper*>*, AVLTree<TestByDateWrapper*>*>& testStructures,
-                                        std::vector<AVLTree<LocationWrapper*>*>& locationStructures)
+                                        AVLTree<TestWrapper*>& tests, std::vector<AVLTree<LocationWrapper*>*>& locationStructures)
 {
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -131,8 +131,7 @@ void RandomDataGenerator::generateTests(std::vector<PersonWrapper*>& peopleList,
         testValue,
         note,
         date,
-        correspondingPerson->getData()->birthNumber(),
-        correspondingPerson->getData()
+        correspondingPerson->getData()->birthNumber()
     );
     TestByDateWrapper key(&duplicityTest);
 
@@ -150,8 +149,7 @@ void RandomDataGenerator::generateTests(std::vector<PersonWrapper*>& peopleList,
         testValue,
         note,
         date,
-        correspondingPerson->getData()->birthNumber(),
-        correspondingPerson->getData()
+        correspondingPerson->getData()->birthNumber()
     );
 
     LocationWrapper* regionWrapper = new LocationWrapper(region);
@@ -176,19 +174,22 @@ void RandomDataGenerator::generateTests(std::vector<PersonWrapper*>& peopleList,
         workplaceWrapper = foundWorkplace;
     }
 
-    correspondingPerson->tests().insert(new TestByDateWrapper(newTest, correspondingPerson));
+    TestByDateWrapper* newTestByDateWrapper = new TestByDateWrapper(newTest, correspondingPerson);
+
+    tests.insert(new TestWrapper(newTest, correspondingPerson));
+    correspondingPerson->tests().insert(newTestByDateWrapper);
     if (result)
     {
-        testStructures.first->insert(new TestByDateWrapper(newTest, correspondingPerson));
-        regionWrapper->positiveTests().insert(new TestByDateWrapper(newTest, correspondingPerson));
-        districtWrapper->positiveTests().insert(new TestByDateWrapper(newTest, correspondingPerson));
-        workplaceWrapper->positiveTests().insert(new TestByDateWrapper(newTest, correspondingPerson));
+        testStructures.first->insert(newTestByDateWrapper);
+        regionWrapper->positiveTests().insert(newTestByDateWrapper);
+        districtWrapper->positiveTests().insert(newTestByDateWrapper);
+        workplaceWrapper->positiveTests().insert(newTestByDateWrapper);
     }
     else
     {
-        testStructures.second->insert(new TestByDateWrapper(newTest, correspondingPerson));
-        regionWrapper->negativeTests().insert(new TestByDateWrapper(newTest, correspondingPerson));
-        districtWrapper->negativeTests().insert(new TestByDateWrapper(newTest, correspondingPerson));
-        workplaceWrapper->negativeTests().insert(new TestByDateWrapper(newTest, correspondingPerson));
+        testStructures.second->insert(newTestByDateWrapper);
+        regionWrapper->negativeTests().insert(newTestByDateWrapper);
+        districtWrapper->negativeTests().insert(newTestByDateWrapper);
+        workplaceWrapper->negativeTests().insert(newTestByDateWrapper);
     }
 }

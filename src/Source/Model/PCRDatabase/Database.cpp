@@ -42,7 +42,7 @@ bool Database::generateRandomTests(int testCount)
 	{
 		for (int i{}; i < testCount; ++i)
 		{
-			RandomDataGenerator::generateTests(m_peopleList, m_testStructuresList, m_locationStructures);
+			RandomDataGenerator::generateTests(m_peopleList, m_testStructuresList, m_tests, m_locationStructures);
 		}
 		return true;
 	}
@@ -82,6 +82,8 @@ bool Database::insert(TestByDateWrapper* test)
 
 	if (inserted)
 	{
+		auto testData = test->getData();
+		m_tests.insert(new TestWrapper(test->getData(), test->person()));
 		findPerson(test->getData()->birthNumber())->tests().insert(test);
 
 		if (!m_regions.insert(region))
@@ -116,43 +118,19 @@ bool Database::insert(TestByDateWrapper* test)
 			workplace->negativeTests().insert(test);
 		}
 	}
+	else
+	{
+		delete test->getData();
+		delete test;
+	}
 
 	return inserted;
 }
 
-//(2) == k tomuto sa vratit
+//(2)
 std::string Database::findTestResultByIdAndPatientId(const unsigned int testId, const std::string birthBumber, bool printPerson)
 {
-	PCRTest test(
-		testId,
-		DEFAULT_NUM_VAL,
-		DEFAULT_NUM_VAL,
-		DEFAULT_NUM_VAL,
-		DEFAULT_NUM_VAL,
-		DEFAULT_NUM_VAL,
-		DEFAULT_STRING_VAL,
-		DEFAULT_TIME_POINT,
-		birthBumber,
-		nullptr
-	);
-	TestByDateWrapper key(&test);
-
-	TestByDateWrapper* output = m_positiveTests.find(&key);
-	if (output == nullptr)
-	{
-		output = m_negativeTests.find(&key);
-	}
-	if (output == nullptr)
-	{
-		return "Record han't been found\n";
-	}
-
-	std::string result = output->getData()->result() ? "\nVysldedok: Pozitivny" : "\nVysledok: Negativny";
-	if (printPerson)
-	{
-		return output->person()->getData()->toString() + result;
-	}
-	return result;
+	return findTest(testId);
 }
 
 //(3)
@@ -204,8 +182,7 @@ std::pair<std::string, int> Database::findPositiveTestsInDistrict(const unsigned
 		DEFAULT_NUM_VAL,
 		DEFAULT_STRING_VAL,
 		from,
-		DEFAULT_STRING_VAL,
-		nullptr
+		DEFAULT_STRING_VAL
 	);
 	TestByDateWrapper minKey(&min);
 	PCRTest max(
@@ -217,8 +194,7 @@ std::pair<std::string, int> Database::findPositiveTestsInDistrict(const unsigned
 		DEFAULT_NUM_VAL,
 		DEFAULT_STRING_VAL,
 		to,
-		DEFAULT_STRING_VAL,
-		nullptr
+		DEFAULT_STRING_VAL
 	);
 	TestByDateWrapper maxKey(&max);
 
@@ -247,8 +223,7 @@ std::pair<std::string, int> Database::findAllTestsInDistrict(const unsigned int 
 		DEFAULT_NUM_VAL,
 		DEFAULT_STRING_VAL,
 		from,
-		DEFAULT_STRING_VAL,
-		nullptr
+		DEFAULT_STRING_VAL
 	);
 	TestByDateWrapper minKey(&min);
 	PCRTest max(
@@ -260,8 +235,7 @@ std::pair<std::string, int> Database::findAllTestsInDistrict(const unsigned int 
 		DEFAULT_NUM_VAL,
 		DEFAULT_STRING_VAL,
 		to,
-		DEFAULT_STRING_VAL,
-		nullptr
+		DEFAULT_STRING_VAL
 	);
 	TestByDateWrapper maxKey(&max);
 
@@ -298,8 +272,7 @@ std::pair<std::string, int> Database::findPositiveTestsInRegion(const unsigned i
 		DEFAULT_NUM_VAL,
 		DEFAULT_STRING_VAL,
 		from,
-		DEFAULT_STRING_VAL,
-		nullptr
+		DEFAULT_STRING_VAL
 	);
 	TestByDateWrapper minKey(&min);
 	PCRTest max(
@@ -311,8 +284,7 @@ std::pair<std::string, int> Database::findPositiveTestsInRegion(const unsigned i
 		DEFAULT_NUM_VAL,
 		DEFAULT_STRING_VAL,
 		to,
-		DEFAULT_STRING_VAL,
-		nullptr
+		DEFAULT_STRING_VAL
 	);
 	TestByDateWrapper maxKey(&max);
 
@@ -341,8 +313,7 @@ std::pair<std::string, int> Database::findAllTestsInRegion(const unsigned int re
 		DEFAULT_NUM_VAL,
 		DEFAULT_STRING_VAL,
 		from,
-		DEFAULT_STRING_VAL,
-		nullptr
+		DEFAULT_STRING_VAL
 	);
 	TestByDateWrapper minKey(&min);
 	PCRTest max(
@@ -354,8 +325,7 @@ std::pair<std::string, int> Database::findAllTestsInRegion(const unsigned int re
 		DEFAULT_NUM_VAL,
 		DEFAULT_STRING_VAL,
 		to,
-		DEFAULT_STRING_VAL,
-		nullptr
+		DEFAULT_STRING_VAL
 	);
 	TestByDateWrapper maxKey(&max);
 
@@ -384,8 +354,7 @@ std::pair<std::string, int> Database::findPositiveTests(time_point<system_clock>
 		DEFAULT_NUM_VAL,
 		DEFAULT_STRING_VAL,
 		from,
-		DEFAULT_STRING_VAL,
-		nullptr
+		DEFAULT_STRING_VAL
 	);
 	TestByDateWrapper minKey(&min);
 	PCRTest max(
@@ -397,8 +366,7 @@ std::pair<std::string, int> Database::findPositiveTests(time_point<system_clock>
 		DEFAULT_NUM_VAL,
 		DEFAULT_STRING_VAL,
 		to,
-		DEFAULT_STRING_VAL,
-		nullptr
+		DEFAULT_STRING_VAL
 	);
 	TestByDateWrapper maxKey(&max);
 
@@ -419,8 +387,7 @@ std::pair<std::string, int> Database::findAllTests(time_point<system_clock> from
 		DEFAULT_NUM_VAL,
 		DEFAULT_STRING_VAL,
 		from,
-		DEFAULT_STRING_VAL,
-		nullptr
+		DEFAULT_STRING_VAL
 	);
 	TestByDateWrapper minKey(&min);
 	PCRTest max(
@@ -432,8 +399,7 @@ std::pair<std::string, int> Database::findAllTests(time_point<system_clock> from
 		DEFAULT_NUM_VAL,
 		DEFAULT_STRING_VAL,
 		to,
-		DEFAULT_STRING_VAL,
-		nullptr
+		DEFAULT_STRING_VAL
 	);
 	TestByDateWrapper maxKey(&max);
 
@@ -469,8 +435,7 @@ void Database::sickPeopleInDistrict(const unsigned int& districtId, time_point<s
 		DEFAULT_NUM_VAL,
 		DEFAULT_STRING_VAL,
 		from,
-		DEFAULT_STRING_VAL,
-		nullptr
+		DEFAULT_STRING_VAL
 	);
 	TestByDateWrapper minKey(&minTest);
 	PCRTest maxTest(
@@ -482,8 +447,7 @@ void Database::sickPeopleInDistrict(const unsigned int& districtId, time_point<s
 		DEFAULT_NUM_VAL,
 		DEFAULT_STRING_VAL,
 		to,
-		DEFAULT_STRING_VAL,
-		nullptr
+		DEFAULT_STRING_VAL
 	);
 	TestByDateWrapper maxKey(&maxTest);
 
@@ -553,8 +517,7 @@ std::pair<std::string, int> Database::findSickPeopleInRegion(const unsigned int 
 		DEFAULT_NUM_VAL,
 		DEFAULT_STRING_VAL,
 		from,
-		DEFAULT_STRING_VAL,
-		nullptr
+		DEFAULT_STRING_VAL
 	);
 	TestByDateWrapper minKey(&minTest);
 	PCRTest maxTest(
@@ -566,8 +529,7 @@ std::pair<std::string, int> Database::findSickPeopleInRegion(const unsigned int 
 		DEFAULT_NUM_VAL,
 		DEFAULT_STRING_VAL,
 		to,
-		DEFAULT_STRING_VAL,
-		nullptr
+		DEFAULT_STRING_VAL
 	);
 	TestByDateWrapper maxKey(&maxTest);
 
@@ -589,8 +551,7 @@ std::pair<std::string, int> Database::findSickPeople(time_point<system_clock> fr
 		DEFAULT_NUM_VAL,
 		DEFAULT_STRING_VAL,
 		from,
-		DEFAULT_STRING_VAL,
-		nullptr
+		DEFAULT_STRING_VAL
 	);
 	TestByDateWrapper minKey(&minTest);
 	PCRTest maxTest(
@@ -602,8 +563,7 @@ std::pair<std::string, int> Database::findSickPeople(time_point<system_clock> fr
 		DEFAULT_NUM_VAL,
 		DEFAULT_STRING_VAL,
 		to,
-		DEFAULT_STRING_VAL,
-		nullptr
+		DEFAULT_STRING_VAL
 	);
 	TestByDateWrapper maxKey(&maxTest);
 
@@ -641,8 +601,7 @@ std::pair<std::string, int> Database::findMostSickPersonInDistrict(time_point<sy
 			DEFAULT_NUM_VAL,
 			DEFAULT_STRING_VAL,
 			from,
-			DEFAULT_STRING_VAL,
-			nullptr
+			DEFAULT_STRING_VAL
 		);
 		TestByDateWrapper minKey(&minTest);
 		PCRTest maxTest(
@@ -654,8 +613,7 @@ std::pair<std::string, int> Database::findMostSickPersonInDistrict(time_point<sy
 			DEFAULT_NUM_VAL,
 			DEFAULT_STRING_VAL,
 			to,
-			DEFAULT_STRING_VAL,
-			nullptr
+			DEFAULT_STRING_VAL
 		);
 		TestByDateWrapper maxKey(&maxTest);
 
@@ -705,8 +663,7 @@ std::pair<std::string, int> Database::findDistrictsOrderedBySickPeopleCount(time
 			DEFAULT_NUM_VAL,
 			DEFAULT_STRING_VAL,
 			from,
-			DEFAULT_STRING_VAL,
-			nullptr
+			DEFAULT_STRING_VAL
 		);
 		TestByDateWrapper minKey(&minTest);
 		PCRTest maxTest(
@@ -718,8 +675,7 @@ std::pair<std::string, int> Database::findDistrictsOrderedBySickPeopleCount(time
 			DEFAULT_NUM_VAL,
 			DEFAULT_STRING_VAL,
 			to,
-			DEFAULT_STRING_VAL,
-			nullptr
+			DEFAULT_STRING_VAL
 		);
 		TestByDateWrapper maxKey(&maxTest);
 
@@ -764,8 +720,7 @@ std::pair<std::string, int> Database::findRegionsOrderedBySickPeopleCount(time_p
 			DEFAULT_NUM_VAL,
 			DEFAULT_STRING_VAL,
 			from,
-			DEFAULT_STRING_VAL,
-			nullptr
+			DEFAULT_STRING_VAL
 		);
 		TestByDateWrapper minKey(&minTest);
 		PCRTest maxTest(
@@ -777,8 +732,7 @@ std::pair<std::string, int> Database::findRegionsOrderedBySickPeopleCount(time_p
 			DEFAULT_NUM_VAL,
 			DEFAULT_STRING_VAL,
 			to,
-			DEFAULT_STRING_VAL,
-			nullptr
+			DEFAULT_STRING_VAL
 		);
 		TestByDateWrapper maxKey(&maxTest);
 
@@ -822,8 +776,7 @@ std::pair<std::string, int> Database::findAllTestsAtWorkplace(int workplaceId, t
 		DEFAULT_NUM_VAL,
 		DEFAULT_STRING_VAL,
 		from,
-		DEFAULT_STRING_VAL,
-		nullptr
+		DEFAULT_STRING_VAL
 	);
 	TestByDateWrapper minKey(&minTest);
 	PCRTest maxTest(
@@ -835,8 +788,7 @@ std::pair<std::string, int> Database::findAllTestsAtWorkplace(int workplaceId, t
 		DEFAULT_NUM_VAL,
 		DEFAULT_STRING_VAL,
 		to,
-		DEFAULT_STRING_VAL,
-		nullptr
+		DEFAULT_STRING_VAL
 	);
 	TestByDateWrapper maxKey(&maxTest);
 
@@ -852,32 +804,32 @@ std::pair<std::string, int> Database::findAllTestsAtWorkplace(int workplaceId, t
 	return std::make_pair(positiveResult.first + "\n" + negativeResult.first, positiveResult.second + negativeResult.second);
 }
 
-//(18)
-std::string Database::findTest(const unsigned int testId, bool printPerson)
+TestWrapper* Database::findTestWrapper(int testId)
 {
-	//PCRTest test(
-	//	testId,
-	//	DEFAULT_NUM_VAL,
-	//	DEFAULT_NUM_VAL,
-	//	DEFAULT_NUM_VAL,
-	//	DEFAULT_BOOL_VAL,
-	//	DEFAULT_NUM_VAL,
-	//	DEFAULT_STRING_VAL,
-	//	DEFAULT_TIME_POINT,
-	//	DEFAULT_STRING_VAL,
-	//	nullptr
-	//);
-	//TestByDateWrapper key(&test);
+	PCRTest test(
+		testId,
+		DEFAULT_NUM_VAL,
+		DEFAULT_NUM_VAL,
+		DEFAULT_NUM_VAL,
+		DEFAULT_BOOL_VAL,
+		DEFAULT_NUM_VAL,
+		DEFAULT_STRING_VAL,
+		DEFAULT_TIME_POINT,
+		DEFAULT_STRING_VAL
+	);
+	TestWrapper key(&test);
 
-	//auto output = m_tests.find(&key);
-	//if (output != nullptr)
-	//{
-	//	if (printPerson)
-	//	{
-	//		return output->person()->getData()->toString() + "\n" + output->getData()->toString();
-	//	}
-	//	return output->getData()->toString();
-	//}
+	return m_tests.find(&key);
+}
+
+//(18)
+std::string Database::findTest(const unsigned int testId)
+{
+	auto output = findTestWrapper(testId);
+	if (output != nullptr)
+	{
+		return output->person()->getData()->toString() + "\n" + output->getData()->toString();
+	}
 	return "Record hasn't been found\n";
 }
 
@@ -896,39 +848,59 @@ bool Database::insert(PersonWrapper* personWrapper)
 //(20)
 int Database::removeTest(int testId)
 {
-	//PCRTest test(
-	//	testId,
-	//	DEFAULT_NUM_VAL,
-	//	DEFAULT_NUM_VAL,
-	//	DEFAULT_NUM_VAL,
-	//	DEFAULT_BOOL_VAL,
-	//	DEFAULT_NUM_VAL,
-	//	DEFAULT_STRING_VAL,
-	//	DEFAULT_TIME_POINT,
-	//	DEFAULT_STRING_VAL,
-	//	nullptr
-	//);
-	//TestByDateWrapper key(&test);
+	PCRTest testDummy(
+		testId,
+		DEFAULT_NUM_VAL,
+		DEFAULT_NUM_VAL,
+		DEFAULT_NUM_VAL,
+		DEFAULT_BOOL_VAL,
+		DEFAULT_NUM_VAL,
+		DEFAULT_STRING_VAL,
+		DEFAULT_TIME_POINT,
+		DEFAULT_STRING_VAL
+	);
+	TestWrapper key(&testDummy);
 
 	int count = 0;
-	//for (auto& testStructure : m_testStructuresList)
-	//{
-	//	TestByDateWrapper* removedTest;
-	//	removedTest = m_tests.remove(&key);
+	auto testWrapper = m_tests.remove(&key);
 
-	//	if (removedTest != nullptr)
-	//	{
-	//		if (testStructure == m_testStructuresList.back())
-	//		{
-	//			TestByDateWrapper testByDate(&test);
-	//			removedTest->person()->tests().remove((&testByDate));
+	if (testWrapper != nullptr)
+	{
+		PCRTest testByDateDummy(
+			testId,
+			DEFAULT_NUM_VAL,
+			DEFAULT_NUM_VAL,
+			DEFAULT_NUM_VAL,
+			DEFAULT_BOOL_VAL,
+			DEFAULT_NUM_VAL,
+			DEFAULT_STRING_VAL,
+			testWrapper->getData()->testDate(),
+			DEFAULT_STRING_VAL
+		);
+		TestByDateWrapper keyWithDate(&testByDateDummy);
 
-	//			delete removedTest->getData();
-	//			delete removedTest;
-	//		}
-	//		++count;
-	//	}
-	//}
+		testWrapper->person()->tests().remove(&keyWithDate);
+
+		LocationWrapper region(testWrapper->getData()->regionId());
+		LocationWrapper district(testWrapper->getData()->districtId());
+		LocationWrapper workplace(testWrapper->getData()->workplaceId());
+		if (testWrapper->getData()->result())
+		{
+			m_regions.find(&region)->positiveTests().remove(&keyWithDate);
+			m_districts.find(&district)->positiveTests().remove(&keyWithDate);
+			m_workplaces.find(&workplace)->positiveTests().remove(&keyWithDate);
+			delete m_positiveTests.remove(&keyWithDate);
+		}
+		else
+		{
+			m_regions.find(&region)->negativeTests().remove(&keyWithDate);
+			m_districts.find(&district)->negativeTests().remove(&keyWithDate);
+			m_workplaces.find(&workplace)->negativeTests().remove(&keyWithDate);
+			delete m_negativeTests.remove(&keyWithDate);
+		}
+		delete testWrapper->getData();
+		delete testWrapper;
+	}
 
 	return count;
 }
@@ -980,39 +952,11 @@ std::pair<std::string, int> Database::printAllData()
 
 void Database::clear()
 {
-	if (m_people.size() > 0)
-	{
-		m_people.processPostOrder([](PersonWrapper* person) {
-			if (person->tests().size() > 0)
-			{
-				person->tests().processPostOrder([](TestByDateWrapper* test) {
-					delete test;
-				});
-			}
-
-			delete person->getData();
-			delete person;
-		});
-	}
-
 	for (auto& location : m_locationStructures)
 	{
 		if (location->size() > 0)
 		{
 			location->processPostOrder([](LocationWrapper* location) {
-				if (location->positiveTests().size() > 0)
-				{
-					location->positiveTests().processPostOrder([](TestByDateWrapper* test) {
-						delete test;
-					});
-				}
-				if (location->negativeTests().size() > 0)
-				{
-					location->negativeTests().processPostOrder([](TestByDateWrapper* test) {
-						delete test;
-					});
-				}
-
 				delete location;
 			});
 		}
@@ -1028,6 +972,13 @@ void Database::clear()
 	if (m_negativeTests.size() > 0)
 	{
 		m_negativeTests.processPostOrder([](TestByDateWrapper* test) {
+			delete test->getData();
+			delete test;
+		});
+	}
+	if (m_tests.size() > 0)
+	{
+		m_tests.processPostOrder([](TestWrapper* test) {
 			delete test->getData();
 			delete test;
 		});

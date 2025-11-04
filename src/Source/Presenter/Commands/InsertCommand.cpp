@@ -22,9 +22,8 @@ void InsertCommand::setParams(unsigned int testId, unsigned int workplaceId, uns
 		testValue,
 		note,
 		testDate,
-		birthNumber,
-		m_database->findPerson(birthNumber)->getData()
-	));
+		birthNumber
+	), m_database->findPerson(birthNumber));
 }
 
 void InsertCommand::execute(std::string& output, std::string& recordCount)
@@ -40,8 +39,6 @@ void InsertCommand::execute(std::string& output, std::string& recordCount)
 		{
 			output = "Insertion failed, person might be already inside";
 			recordCount = "(0) records inserted";
-
-			delete m_person;
 		}
 	}
 	else
@@ -50,8 +47,6 @@ void InsertCommand::execute(std::string& output, std::string& recordCount)
 		{
 			output = "Insertion failed, person doesn't exist";
 			recordCount = "(0) records inserted";
-
-			delete m_test;
 		}
 		else if (m_database->insert(m_test))
 		{
@@ -62,8 +57,6 @@ void InsertCommand::execute(std::string& output, std::string& recordCount)
 		{
 			output = "Insertion failed, test might be already inside";
 			recordCount = "(0) records inserted";
-
-			delete m_test;
 		}
 	}
 	

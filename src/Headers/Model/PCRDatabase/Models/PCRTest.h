@@ -23,7 +23,7 @@ private:
 
 public:
 	PCRTest(unsigned int testId, unsigned int workplaceId, unsigned int districtId, unsigned int regionId, bool result, double testValue,
-			std::string note, std::chrono::time_point<std::chrono::system_clock> testDate, std::string birthNumber, Person* person) :
+			std::string note, std::chrono::time_point<std::chrono::system_clock> testDate, std::string birthNumber) :
 			m_testId(testId), m_workplaceId(workplaceId), m_districtId(districtId), m_regionId(regionId), m_result(result),
 			m_testValue(testValue), m_note(note), m_testDate(testDate), m_birthNumber(birthNumber)
 	{};
