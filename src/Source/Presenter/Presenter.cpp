@@ -48,14 +48,7 @@ void Presenter::generateTests(int count)
 	});
 }
 
-void Presenter::insert(std::string birthNumber, std::string firstName, std::string lastName, year_month_day birthDay)
-{
-	execute([=, this](std::string& output, std::string& recordCount) {
-		m_insertCommand.setParams(birthNumber, firstName, lastName, birthDay);
-		m_insertCommand.execute(output, recordCount);
-	});
-}
-
+//(1)
 void Presenter::insert(unsigned int testId, unsigned int workplaceId, unsigned int districtId, unsigned int regionId, 
 					   bool result, double testValue, std::string note, time_point<system_clock> testDate, std::string birthNumber)
 {
@@ -75,13 +68,7 @@ void Presenter::insert(unsigned int testId, unsigned int workplaceId, unsigned i
 	});
 }
 
-void Presenter::printAllData()
-{
-	execute([=, this](std::string& output, std::string& recordCount) {
-		m_printAllDataCommand.execute(output, recordCount);
-	});
-}
-
+//(2)
 void Presenter::findResultByPatientAndTestId(unsigned int testId, std::string birthNumber, bool printPerson)
 {
 	execute([=, this](std::string& output, std::string& recordCount) {
@@ -90,6 +77,7 @@ void Presenter::findResultByPatientAndTestId(unsigned int testId, std::string bi
 	});
 }
 
+//(3)
 void Presenter::findPatientTestOrderByDate(std::string birthNumber)
 {
 	execute([=, this](std::string& output, std::string& recordCount) {
@@ -98,7 +86,8 @@ void Presenter::findPatientTestOrderByDate(std::string birthNumber)
 	});
 }
 
-void Presenter::findPositiveTestsInDistrictCommand(unsigned int id, time_point<system_clock> from, time_point<system_clock> to)
+//(4)
+void Presenter::findPositiveTestsInDistrict(unsigned int id, time_point<system_clock> from, time_point<system_clock> to)
 {
 	execute([=, this](std::string& output, std::string& recordCount) {
 		m_findPositiveTestsByLocationIdCommand.setParams(SEARCHTYPE::BY_DATE);
@@ -108,7 +97,8 @@ void Presenter::findPositiveTestsInDistrictCommand(unsigned int id, time_point<s
 	});
 }
 
-void Presenter::findAllTestsInDistrictCommand(unsigned int id, time_point<system_clock> from, time_point<system_clock> to)
+//(5)
+void Presenter::findAllTestsInDistrict(unsigned int id, time_point<system_clock> from, time_point<system_clock> to)
 {
 	execute([=, this](std::string& output, std::string& recordCount) {
 		m_findAllTestsByLocationIdCommand.setParams(LOCATION::DISTRICT, from, to, id);
@@ -116,7 +106,8 @@ void Presenter::findAllTestsInDistrictCommand(unsigned int id, time_point<system
 	});
 }
 
-void Presenter::findPositiveTestsInRegionCommand(unsigned int id, time_point<system_clock> from, time_point<system_clock> to)
+//(6)
+void Presenter::findPositiveTestsInRegion(unsigned int id, time_point<system_clock> from, time_point<system_clock> to)
 {
 	execute([=, this](std::string& output, std::string& recordCount) {
 		m_findPositiveTestsByLocationIdCommand.setParams(SEARCHTYPE::BY_DATE);
@@ -126,7 +117,8 @@ void Presenter::findPositiveTestsInRegionCommand(unsigned int id, time_point<sys
 	});
 }
 
-void Presenter::findAllTestsInRegionCommand(unsigned int id, time_point<system_clock> from, time_point<system_clock> to)
+//(7)
+void Presenter::findAllTestsInRegion(unsigned int id, time_point<system_clock> from, time_point<system_clock> to)
 {
 	execute([=, this](std::string& output, std::string& recordCount) {
 		m_findAllTestsByLocationIdCommand.setParams(LOCATION::REGION, from, to, id);
@@ -134,6 +126,7 @@ void Presenter::findAllTestsInRegionCommand(unsigned int id, time_point<system_c
 	});
 }
 
+//(8)
 void Presenter::findPositiveTests(time_point<system_clock> from, time_point<system_clock> to)
 {
 	execute([=, this](std::string& output, std::string& recordCount) {
@@ -144,6 +137,7 @@ void Presenter::findPositiveTests(time_point<system_clock> from, time_point<syst
 	});
 }
 
+//(9)
 void Presenter::findAllTests(time_point<system_clock> from, time_point<system_clock> to)
 {
 	execute([=, this](std::string& output, std::string& recordCount) {
@@ -152,7 +146,8 @@ void Presenter::findAllTests(time_point<system_clock> from, time_point<system_cl
 	});
 }
 
-void Presenter::findSickPeopleInDistrictCommand(unsigned int id, time_point<system_clock> from, time_point<system_clock> to)
+//(10)
+void Presenter::findSickPeopleInDistrict(unsigned int id, time_point<system_clock> from, time_point<system_clock> to)
 {
 	execute([=, this](std::string& output, std::string& recordCount) {
 		m_findPositiveTestsByLocationIdCommand.setParams(SEARCHTYPE::SICK_PEOPLE);
@@ -162,6 +157,82 @@ void Presenter::findSickPeopleInDistrictCommand(unsigned int id, time_point<syst
 	});
 }
 
+//(11)
+void Presenter::findSickPeopleInDistrictOrderByTestValue(unsigned int id, time_point<system_clock> from, time_point<system_clock> to)
+{
+	execute([=, this](std::string& output, std::string& recordCount) {
+		m_findPositiveTestsByLocationIdCommand.setParams(SEARCHTYPE::SICK_PEOPLE);
+		m_findPositiveTestsByLocationIdCommand.setParams(LOCATION::DISTRICT);
+		m_findPositiveTestsByLocationIdCommand.setParams(from, to, id, true);
+		m_findPositiveTestsByLocationIdCommand.execute(output, recordCount);
+	});
+}
+
+//(12)
+void Presenter::findSickPeopleInRegion(const unsigned int id, time_point<system_clock> from, time_point<system_clock> to)
+{
+	execute([=, this](std::string& output, std::string& recordCount) {
+		m_findPositiveTestsByLocationIdCommand.setParams(SEARCHTYPE::SICK_PEOPLE);
+		m_findPositiveTestsByLocationIdCommand.setParams(LOCATION::REGION);
+		m_findPositiveTestsByLocationIdCommand.setParams(from, to, id);
+		m_findPositiveTestsByLocationIdCommand.execute(output, recordCount);
+	});
+}
+
+//(13)
+void Presenter::findSickPeople(time_point<system_clock> from, time_point<system_clock> to)
+{
+	execute([=, this](std::string& output, std::string& recordCount) {
+		m_findPositiveTestsByLocationIdCommand.setParams(SEARCHTYPE::SICK_PEOPLE);
+		m_findPositiveTestsByLocationIdCommand.setParams(LOCATION::COUNTRY);
+		m_findPositiveTestsByLocationIdCommand.setParams(from, to);
+		m_findPositiveTestsByLocationIdCommand.execute(output, recordCount);
+	});
+}
+
+//(14)
+void Presenter::findMostSickPersonInDistrict(time_point<system_clock> from, time_point<system_clock> to)
+{
+	execute([=, this](std::string& output, std::string& recordCount) {
+		m_findPositiveTestsByLocationIdCommand.setParams(SEARCHTYPE::MOST_SICK_PERSON);
+		m_findPositiveTestsByLocationIdCommand.setParams(LOCATION::DISTRICT);
+		m_findPositiveTestsByLocationIdCommand.setParams(from, to);
+		m_findPositiveTestsByLocationIdCommand.execute(output, recordCount);
+	});
+}
+
+//(15)
+void Presenter::findDistrictsOrderedBySickPeopleCount(time_point<system_clock> from, time_point<system_clock> to)
+{
+	execute([=, this](std::string& output, std::string& recordCount) {
+		m_findPositiveTestsByLocationIdCommand.setParams(SEARCHTYPE::ORDERED_BY_SICK_PEOPLE);
+		m_findPositiveTestsByLocationIdCommand.setParams(LOCATION::DISTRICT);
+		m_findPositiveTestsByLocationIdCommand.setParams(from, to);
+		m_findPositiveTestsByLocationIdCommand.execute(output, recordCount);
+	});
+}
+
+//(16)
+void Presenter::findRegionsOrderedBySickPeopleCount(time_point<system_clock> from, time_point<system_clock> to)
+{
+	execute([=, this](std::string& output, std::string& recordCount) {
+		m_findPositiveTestsByLocationIdCommand.setParams(SEARCHTYPE::ORDERED_BY_SICK_PEOPLE);
+		m_findPositiveTestsByLocationIdCommand.setParams(LOCATION::REGION);
+		m_findPositiveTestsByLocationIdCommand.setParams(from, to);
+		m_findPositiveTestsByLocationIdCommand.execute(output, recordCount);
+	});
+}
+
+//(17)
+void Presenter::findAllTestsAtWorkplace(int workplaceId, time_point<system_clock> from, time_point<system_clock> to)
+{
+	execute([=, this](std::string& output, std::string& recordCount) {
+		m_findAllTestsByLocationIdCommand.setParams(LOCATION::WORKPLACE, from, to);
+		m_findAllTestsByLocationIdCommand.execute(output, recordCount);
+	});
+}
+
+//(18)
 void Presenter::findTest(unsigned int testId)
 {
 	execute([=, this](std::string& output, std::string& recordCount) {
@@ -170,6 +241,16 @@ void Presenter::findTest(unsigned int testId)
 	});
 }
 
+//(19)
+void Presenter::insert(std::string birthNumber, std::string firstName, std::string lastName, year_month_day birthDay)
+{
+	execute([=, this](std::string& output, std::string& recordCount) {
+		m_insertCommand.setParams(birthNumber, firstName, lastName, birthDay);
+		m_insertCommand.execute(output, recordCount);
+	});
+}
+
+//(20)
 void Presenter::removeTest(unsigned int testId)
 {
 	execute([=, this](std::string& output, std::string& recordCount) {
@@ -179,6 +260,7 @@ void Presenter::removeTest(unsigned int testId)
 	});
 }
 
+//(21)
 void Presenter::removePerson(std::string birthNumber)
 {
 	execute([=, this](std::string& output, std::string& recordCount) {
@@ -186,4 +268,11 @@ void Presenter::removePerson(std::string birthNumber)
 		m_removeCommand.setParams(birthNumber);
 		m_removeCommand.execute(output, recordCount);
 	});
+}
+
+void Presenter::printAllData()
+{
+	execute([=, this](std::string& output, std::string& recordCount) {
+		m_printAllDataCommand.execute(output, recordCount);
+		});
 }

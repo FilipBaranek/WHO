@@ -263,28 +263,28 @@ void OperationsWindow::findPositiveTestsInDateRangeForDistrict()
 {
     auto dateInterval = getTimePointFormat();
 
-    m_presenter->findPositiveTestsInDistrictCommand(m_firstNumInput, dateInterval.first, dateInterval.second);
+    m_presenter->findPositiveTestsInDistrict(m_firstNumInput, dateInterval.first, dateInterval.second);
 }
 
 void OperationsWindow::findAllTestsInDateRangeForDistrict()
 {
     auto dateInterval = getTimePointFormat();
 
-    m_presenter->findAllTestsInDistrictCommand(m_firstNumInput, dateInterval.first, dateInterval.second);
+    m_presenter->findAllTestsInDistrict(m_firstNumInput, dateInterval.first, dateInterval.second);
 }
 
 void OperationsWindow::findPositiveTestsInDateRangeForRegion()
 {
     auto dateInterval = getTimePointFormat();
 
-    m_presenter->findPositiveTestsInRegionCommand(m_firstNumInput, dateInterval.first, dateInterval.second);
+    m_presenter->findPositiveTestsInRegion(m_firstNumInput, dateInterval.first, dateInterval.second);
 }
 
 void OperationsWindow::findAllTestsInDateRangeForRegion()
 {
     auto dateInterval = getTimePointFormat();
 
-    m_presenter->findAllTestsInRegionCommand(m_firstNumInput, dateInterval.first, dateInterval.second);
+    m_presenter->findAllTestsInRegion(m_firstNumInput, dateInterval.first, dateInterval.second);
 }
 
 void OperationsWindow::findPositiveTestsInDateRange()
@@ -305,35 +305,56 @@ void OperationsWindow::findSickPeopleInDistrictByDate()
 {
     auto dateInterval = getTimePointFormatSickDays();
 
-    m_presenter->findSickPeopleInDistrictCommand(m_firstNumInput, dateInterval.first, dateInterval.second);
+    m_presenter->findSickPeopleInDistrict(m_firstNumInput, dateInterval.first, dateInterval.second);
 }
 
 void OperationsWindow::findSickPeopleInDistrictByDateSorted()
 {
+    auto dateInterval = getTimePointFormatSickDays();
+
+    m_presenter->findSickPeopleInDistrictOrderByTestValue(m_firstNumInput, dateInterval.first, dateInterval.second);
 }
 
 void OperationsWindow::findSickPeopleInRegionByDate()
 {
+    auto dateInterval = getTimePointFormatSickDays();
+
+    m_presenter->findSickPeopleInRegion(m_firstNumInput, dateInterval.first, dateInterval.second);
 }
 
 void OperationsWindow::findSickPeopleByDate()
 {
+    auto dateInterval = getTimePointFormatSickDays();
+
+    m_presenter->findSickPeople(dateInterval.first, dateInterval.second);
 }
 
 void OperationsWindow::findMostSickPersonInEveryDistrict()
 {
+    auto dateInterval = getTimePointFormatSickDays();
+
+    m_presenter->findMostSickPersonInDistrict(dateInterval.first, dateInterval.second);
 }
 
 void OperationsWindow::printAllDistrictsOrderedBySickPeopleCount()
 {
+    auto dateInterval = getTimePointFormatSickDays();
+
+    m_presenter->findDistrictsOrderedBySickPeopleCount(dateInterval.first, dateInterval.second);
 }
 
 void OperationsWindow::printAllRegionsOrderedBySickPeopleCount()
 {
+    auto dateInterval = getTimePointFormatSickDays();
+
+    m_presenter->findRegionsOrderedBySickPeopleCount(dateInterval.first, dateInterval.second);
 }
 
 void OperationsWindow::findAllTestsDoneAtWorkplaceByDate()
 {
+    auto dateInterval = getTimePointFormatSickDays();
+
+    m_presenter->findAllTestsAtWorkplace(m_firstNumInput, dateInterval.first, dateInterval.second);
 }
 
 void OperationsWindow::findTest()
