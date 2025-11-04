@@ -8,10 +8,7 @@
 #include "./Generator/RandomDataGenerator.h"
 #include "./ModelWrappers/PersonWrapper.h"
 #include "./ModelWrappers/LocationWrapper.h"
-#include "./ModelWrappers/TestWrapper.h"
 #include "./ModelWrappers/TestByDateWrapper.h"
-#include "./ModelWrappers/TestInDistrictWrapper.h"
-#include "./ModelWrappers/TestInRegionWrapper.h"
 
 
 using namespace std::chrono;
@@ -31,8 +28,6 @@ private:
 	static constexpr const char* DEFAULT_STRING_VAL = "\0";
 	static constexpr const time_point<system_clock> DEFAULT_TIME_POINT{};
 	static constexpr const year_month_day DEFAULT_DATE{};
-	
-	std::ostringstream m_oss;
 
 	std::vector<PersonWrapper*> m_peopleList;
 	AVLTree<PersonWrapper*> m_people;
@@ -40,19 +35,15 @@ private:
 	std::vector<AVLTree<LocationWrapper*>*> m_locationStructures;
 	AVLTree<LocationWrapper*> m_districts;
 	AVLTree<LocationWrapper*> m_regions;
+	AVLTree<LocationWrapper*> m_workplaces;
 
-	std::vector<AVLTree<TestWrapper*>*> m_testStructuresList;
-	AVLTree<TestWrapper*> m_tests;
-	AVLTree<TestWrapper*> m_positiveTestsInDistrict;
-	AVLTree<TestWrapper*> m_negativeTestsInDistrict;
-	AVLTree<TestWrapper*> m_positiveTestsInRegion;
-	AVLTree<TestWrapper*> m_negativeTestsInRegion;
-	AVLTree<TestWrapper*> m_positiveTests;
-	AVLTree<TestWrapper*> m_negativeTests;
+	std::pair<AVLTree<TestByDateWrapper*>*, AVLTree<TestByDateWrapper*>*> m_testStructuresList;
+	AVLTree<TestByDateWrapper*> m_positiveTests;
+	AVLTree<TestByDateWrapper*> m_negativeTests;
 
-	std::pair<std::string, int> outputToString(std::vector<TestWrapper*>& output);
+	std::pair<std::string, int> outputToString(std::vector<TestByDateWrapper*>& output);
 	void sickPeopleInDistrict(const unsigned int& districtId, time_point<system_clock>& from,
-							  time_point<system_clock>& to, LocationWrapper*& foundLocation, std::vector<TestWrapper*>& output);
+							  time_point<system_clock>& to, LocationWrapper*& foundLocation, std::vector<TestByDateWrapper*>& output);
 
 public:
 	Database();
@@ -61,10 +52,10 @@ public:
 	
 	bool generateRandomTests(int testCount);
 	
-	Person* findPerson(std::string birthNumber);
+	PersonWrapper* findPerson(std::string birthNumber);
 
 	//(1)
-	bool insert(TestWrapper* pcrTest);
+	bool insert(TestByDateWrapper* pcrTest);
 	
 	//(2)
 	std::string findTestResultByIdAndPatientId(const unsigned int testId, const std::string birthBumber, bool printPerson = true);
@@ -103,13 +94,16 @@ public:
 	std::pair<std::string, int> findSickPeople(time_point<system_clock> from, time_point<system_clock> to);
 
 	//(14)
-	std::pair<std::string, int> findMostSickPersonInDistrict();
+	std::pair<std::string, int> findMostSickPersonInDistrict(time_point<system_clock> from, time_point<system_clock> to);
 	
 	//(15)
+	std::pair<std::string, int> findDistrictsOrderedBySickPeopleCount(time_point<system_clock> from, time_point<system_clock> to);
 
 	//(16)
+	std::pair<std::string, int> findRegionsOrderedBySickPeopleCount(time_point<system_clock> from, time_point<system_clock> to);
 
 	//(17)
+	std::pair<std::string, int> findAllTestsAtWorkplace(int workplaceId, time_point<system_clock> from, time_point<system_clock> to);
 
 	//(18)
 	std::string findTest(const unsigned int testId, bool printPerson);

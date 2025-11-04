@@ -4,47 +4,47 @@ std::chrono::year_month_day RandomDataGenerator::generateRandomDate(std::mt19937
 {
     using namespace std::chrono;
 
-    year_month_day start{ year{1980}, month{1}, day{1} };
-    year_month_day end{ year{2010}, month{12}, day{31} };
+    year_month_day start{ year{MIN_YEAR}, month{1}, day{1} };
+    year_month_day end{ year{MAX_YEAR}, month{12}, day{31} };
 
-    sys_days start_days = sys_days(start);
-    sys_days end_days = sys_days(end);
+    sys_days startDays = sys_days(start);
+    sys_days endDays = sys_days(end);
 
-    std::uniform_int_distribution<int> dist(0, (end_days - start_days).count());
-    sys_days random_day = start_days + days(dist(generator));
+    std::uniform_int_distribution<int> dist(0, (endDays - startDays).count());
+    sys_days randomDay = startDays + days(dist(generator));
 
-    return year_month_day{ random_day };
+    return year_month_day{ randomDay };
 }
 
 std::chrono::time_point<std::chrono::system_clock> RandomDataGenerator::generateTime(std::mt19937& generator, const std::chrono::year_month_day& birthDate)
 {
     using namespace std::chrono;
 
-    const year_month_day start = birthDate + years{ 15 };
+    const year_month_day start = birthDate + years{ MIN_AGE };
 
     const auto now = std::chrono::system_clock::now();
-    const auto current_ymd = floor<days>(now);
-    const year_month_day end{ current_ymd };
+    const auto currentYmd = floor<days>(now);
+    const year_month_day end{ currentYmd };
 
     if (end < start) {
         return std::chrono::system_clock::now();
     }
 
-    sys_days start_days = sys_days(start);
-    sys_days end_days = sys_days(end);
+    sys_days startDays = sys_days(start);
+    sys_days endDays = sys_days(end);
 
-    std::uniform_int_distribution<int> dist(0, (end_days - start_days).count());
-    sys_days random_day = start_days + days(dist(generator));
+    std::uniform_int_distribution<int> dist(0, (endDays - startDays).count());
+    sys_days randomDay = startDays + days(dist(generator));
 
     std::uniform_int_distribution<int> hour_dist(0, 23);
     std::uniform_int_distribution<int> min_dist(0, 59);
     std::uniform_int_distribution<int> sec_dist(0, 59);
 
-    auto random_time = std::chrono::hours(hour_dist(generator)) +
-        std::chrono::minutes(min_dist(generator)) +
-        std::chrono::seconds(sec_dist(generator));
+    auto randomTime = std::chrono::hours(hour_dist(generator)) +
+                      std::chrono::minutes(min_dist(generator)) +
+                      std::chrono::seconds(sec_dist(generator));
 
-    return random_day + random_time;
+    return randomDay + randomTime;
 }
 
 std::string RandomDataGenerator::generateBirthNumber(std::mt19937& generator, std::chrono::year_month_day& birthDay)
@@ -61,7 +61,7 @@ std::string RandomDataGenerator::generateBirthNumber(std::mt19937& generator, st
     pn << std::setw(2) << std::setfill('0') << year
        << std::setw(2) << std::setfill('0') << month
        << std::setw(2) << std::setfill('0') << day
-       << "/" << std::setw(3) << std::setfill('0') << std::to_string(birthNumberInterval(generator));
+       << "/" << std::setw(4) << std::setfill('0') << std::to_string(birthNumberInterval(generator));
 
     return pn.str();
 }
@@ -101,7 +101,7 @@ void RandomDataGenerator::generatePeople(std::vector<PersonWrapper*>& peopleDupl
 }
 
 void RandomDataGenerator::generateTests(std::vector<PersonWrapper*>& peopleList,
-                                        std::vector<AVLTree<TestWrapper*>*>& testStructures,
+                                        std::pair<AVLTree<TestByDateWrapper*>*, AVLTree<TestByDateWrapper*>*>& testStructures,
                                         std::vector<AVLTree<LocationWrapper*>*>& locationStructures)
 {
     std::random_device rd;
@@ -134,9 +134,9 @@ void RandomDataGenerator::generateTests(std::vector<PersonWrapper*>& peopleList,
         correspondingPerson->getData()->birthNumber(),
         correspondingPerson->getData()
     );
-    TestWrapper key(&duplicityTest);
+    TestByDateWrapper key(&duplicityTest);
 
-    while (testStructures.at(0)->find(&key) != nullptr)
+    while (testStructures.first->find(&key) != nullptr || testStructures.second->find(&key) != nullptr)
     {
         duplicityTest.setTestId(testIdInterval(gen));
     }
@@ -154,52 +154,41 @@ void RandomDataGenerator::generateTests(std::vector<PersonWrapper*>& peopleList,
         correspondingPerson->getData()
     );
 
-    LocationWrapper* districtWrapper = new LocationWrapper(district);
     LocationWrapper* regionWrapper = new LocationWrapper(region);
-    if (!locationStructures.at(0)->insert(districtWrapper))
+    LocationWrapper* districtWrapper = new LocationWrapper(district);
+    LocationWrapper* workplaceWrapper = new LocationWrapper(workplace);
+    if (!locationStructures.at(LOCATIONS::REGION)->insert(regionWrapper))
     {
-        LocationWrapper* foundDistrict = locationStructures.at(0)->find(districtWrapper);
-        delete districtWrapper;
-        districtWrapper = foundDistrict;
-    }
-    if (!locationStructures.at(1)->insert(regionWrapper))
-    {
-        LocationWrapper* foundRegion = locationStructures.at(1)->find(regionWrapper);
+        LocationWrapper* foundRegion = locationStructures.at(LOCATIONS::REGION)->find(regionWrapper);
         delete regionWrapper;
         regionWrapper = foundRegion;
     }
+    if (!locationStructures.at(LOCATIONS::DISTRICT)->insert(districtWrapper))
+    {
+        LocationWrapper* foundDistrict = locationStructures.at(LOCATIONS::DISTRICT)->find(districtWrapper);
+        delete districtWrapper;
+        districtWrapper = foundDistrict;
+    }
+    if (!locationStructures.at(LOCATIONS::WORKPLACE)->insert(workplaceWrapper))
+    {
+        LocationWrapper* foundWorkplace = locationStructures.at(LOCATIONS::WORKPLACE)->find(workplaceWrapper);
+        delete workplaceWrapper;
+        workplaceWrapper = foundWorkplace;
+    }
 
     correspondingPerson->tests().insert(new TestByDateWrapper(newTest, correspondingPerson));
-    testStructures.at(0)->insert(new TestWrapper(newTest, correspondingPerson));
-
     if (result)
     {
-        testStructures.at(1)->insert(new TestInDistrictWrapper(newTest, correspondingPerson));
-        testStructures.at(3)->insert(new TestInRegionWrapper(newTest, correspondingPerson));
-        testStructures.at(5)->insert(new TestByDateWrapper(newTest, correspondingPerson));
-    
-        if (districtWrapper != nullptr)
-        {
-            districtWrapper->positiveTests().insert(new TestByDateWrapper(newTest, correspondingPerson));
-        }
-        if (regionWrapper != nullptr)
-        {
-            regionWrapper->positiveTests().insert(new TestByDateWrapper(newTest, correspondingPerson));
-        }
+        testStructures.first->insert(new TestByDateWrapper(newTest, correspondingPerson));
+        regionWrapper->positiveTests().insert(new TestByDateWrapper(newTest, correspondingPerson));
+        districtWrapper->positiveTests().insert(new TestByDateWrapper(newTest, correspondingPerson));
+        workplaceWrapper->positiveTests().insert(new TestByDateWrapper(newTest, correspondingPerson));
     }
     else
     {
-        testStructures.at(2)->insert(new TestInDistrictWrapper(newTest, correspondingPerson));
-        testStructures.at(4)->insert(new TestInRegionWrapper(newTest, correspondingPerson));
-        testStructures.at(6)->insert(new TestByDateWrapper(newTest, correspondingPerson));
-
-        if (districtWrapper != nullptr)
-        {
-            districtWrapper->negativeTests().insert(new TestByDateWrapper(newTest, correspondingPerson));
-        }
-        if (regionWrapper != nullptr)
-        {
-            regionWrapper->negativeTests().insert(new TestByDateWrapper(newTest, correspondingPerson));
-        }
+        testStructures.second->insert(new TestByDateWrapper(newTest, correspondingPerson));
+        regionWrapper->negativeTests().insert(new TestByDateWrapper(newTest, correspondingPerson));
+        districtWrapper->negativeTests().insert(new TestByDateWrapper(newTest, correspondingPerson));
+        workplaceWrapper->negativeTests().insert(new TestByDateWrapper(newTest, correspondingPerson));
     }
 }

@@ -3,19 +3,30 @@
 #include <vector>
 #include <chrono>
 #include <random>
+#include <utility>
 #include "../../Structures/AVL/AVLTree.h"
 #include "../Models/PCRTest.h"
 #include "../Models/Person.h"
 #include "../ModelWrappers/PersonWrapper.h"
 #include "../ModelWrappers/LocationWrapper.h"
 #include "../ModelWrappers/TestByDateWrapper.h"
-#include "../ModelWrappers/TestInDistrictWrapper.h"
-#include "../ModelWrappers/TestInRegionWrapper.h"
 
+
+enum LOCATIONS
+{
+	REGION = 0,
+	DISTRICT = 1,
+	WORKPLACE = 2
+};
 
 class RandomDataGenerator
 {
 private:
+	//Date
+	static constexpr const unsigned int MIN_YEAR = 1970;
+	static constexpr const unsigned int MAX_YEAR = 2010;
+	static constexpr const unsigned int MIN_AGE = 15;
+
 	//Person
 	static constexpr const unsigned int MAX_BIRTH_NUMBER = 10'000;
 	static constexpr const unsigned int NAMES_COUNT = 5;
@@ -27,6 +38,7 @@ private:
 	static constexpr const unsigned int MAX_WORKPLACE_CODE = 158;
 	static constexpr const unsigned int MAX_DISTRICT_CODE = 79;
 	static constexpr const unsigned int MAX_REGION_CODE = 8;
+	static constexpr const double MAX_TEST_VALUE = 40.0;
 	static constexpr const unsigned int NOTE_COUNT = 3;
 	static constexpr std::string_view s_notes[] = { "Pacient v karantene", "Vysledok zaslany elektronicky", "Opakovany test odporucany" };
 
@@ -41,7 +53,7 @@ public:
 	static void generatePeople(std::vector<PersonWrapper*>& peopleDuplicityList, AVLTree<PersonWrapper*>& output);
 	
 	static void generateTests(std::vector<PersonWrapper*>& peopleList,
-							  std::vector<AVLTree<TestWrapper*>*>& testStructures,
+							  std::pair<AVLTree<TestByDateWrapper*>*, AVLTree<TestByDateWrapper*>*>& testStructures,
 							  std::vector<AVLTree<LocationWrapper*>*>& locationStructures);
 	
 	~RandomDataGenerator() = delete;
