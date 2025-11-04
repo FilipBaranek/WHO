@@ -48,7 +48,7 @@ void Presenter::generateTests(int count)
 	});
 }
 
-void Presenter::insert(std::string birthNumber, std::string firstName, std::string lastName, std::chrono::year_month_day birthDay)
+void Presenter::insert(std::string birthNumber, std::string firstName, std::string lastName, year_month_day birthDay)
 {
 	execute([=, this](std::string& output, std::string& recordCount) {
 		m_insertCommand.setParams(birthNumber, firstName, lastName, birthDay);
@@ -57,7 +57,7 @@ void Presenter::insert(std::string birthNumber, std::string firstName, std::stri
 }
 
 void Presenter::insert(unsigned int testId, unsigned int workplaceId, unsigned int districtId, unsigned int regionId, 
-					   bool result, double testValue, std::string note, std::chrono::time_point<std::chrono::system_clock> testDate, std::string birthNumber)
+					   bool result, double testValue, std::string note, time_point<system_clock> testDate, std::string birthNumber)
 {
 	execute([=, this](std::string& output, std::string& recordCount) {
 		m_insertCommand.setParams(
@@ -98,70 +98,66 @@ void Presenter::findPatientTestOrderByDate(std::string birthNumber)
 	});
 }
 
-void Presenter::findPositiveTestsInDistrictCommand(unsigned int id,
-												   std::chrono::time_point<std::chrono::system_clock> from,
-												   std::chrono::time_point<std::chrono::system_clock> to)
+void Presenter::findPositiveTestsInDistrictCommand(unsigned int id, time_point<system_clock> from, time_point<system_clock> to)
 {
 	execute([=, this](std::string& output, std::string& recordCount) {
-		m_findPositiveTestsByLocationIdCommand.setParams(DISTRICT, id, from, to);
+		m_findPositiveTestsByLocationIdCommand.setParams(SEARCHTYPE::BY_DATE);
+		m_findPositiveTestsByLocationIdCommand.setParams(LOCATION::DISTRICT);
+		m_findPositiveTestsByLocationIdCommand.setParams(from, to, id);
 		m_findPositiveTestsByLocationIdCommand.execute(output, recordCount);
 	});
 }
 
-void Presenter::findAllTestsInDistrictCommand(unsigned int id,
-											  std::chrono::time_point<std::chrono::system_clock> from,
-											  std::chrono::time_point<std::chrono::system_clock> to)
+void Presenter::findAllTestsInDistrictCommand(unsigned int id, time_point<system_clock> from, time_point<system_clock> to)
 {
 	execute([=, this](std::string& output, std::string& recordCount) {
-		m_findAllTestsByLocationIdCommand.setParams(DISTRICT, id, from, to);
+		m_findAllTestsByLocationIdCommand.setParams(LOCATION::DISTRICT, from, to, id);
 		m_findAllTestsByLocationIdCommand.execute(output, recordCount);
 	});
 }
 
-void Presenter::findPositiveTestsInRegionCommand(unsigned int id,
-												 std::chrono::time_point<std::chrono::system_clock> from,
-												 std::chrono::time_point<std::chrono::system_clock> to)
+void Presenter::findPositiveTestsInRegionCommand(unsigned int id, time_point<system_clock> from, time_point<system_clock> to)
 {
 	execute([=, this](std::string& output, std::string& recordCount) {
-		m_findPositiveTestsByLocationIdCommand.setParams(REGION, id, from, to);
+		m_findPositiveTestsByLocationIdCommand.setParams(SEARCHTYPE::BY_DATE);
+		m_findPositiveTestsByLocationIdCommand.setParams(LOCATION::REGION);
+		m_findPositiveTestsByLocationIdCommand.setParams(from, to, id);
 		m_findPositiveTestsByLocationIdCommand.execute(output, recordCount);
 	});
 }
 
-void Presenter::findAllTestsInRegionCommand(unsigned int id,
-										    std::chrono::time_point<std::chrono::system_clock> from,
-											std::chrono::time_point<std::chrono::system_clock> to)
+void Presenter::findAllTestsInRegionCommand(unsigned int id, time_point<system_clock> from, time_point<system_clock> to)
 {
 	execute([=, this](std::string& output, std::string& recordCount) {
-		m_findAllTestsByLocationIdCommand.setParams(REGION, id, from, to);
+		m_findAllTestsByLocationIdCommand.setParams(LOCATION::REGION, from, to, id);
 		m_findAllTestsByLocationIdCommand.execute(output, recordCount);
 	});
 }
 
-void Presenter::findPositiveTests(std::chrono::time_point<std::chrono::system_clock> from,
-								  std::chrono::time_point<std::chrono::system_clock> to)
+void Presenter::findPositiveTests(time_point<system_clock> from, time_point<system_clock> to)
 {
 	execute([=, this](std::string& output, std::string& recordCount) {
-		m_findPositiveTestsByLocationIdCommand.setParams(COUNTRY, -1, from, to);
+		m_findPositiveTestsByLocationIdCommand.setParams(SEARCHTYPE::BY_DATE);
+		m_findPositiveTestsByLocationIdCommand.setParams(LOCATION::COUNTRY);
+		m_findPositiveTestsByLocationIdCommand.setParams(from, to);
 		m_findPositiveTestsByLocationIdCommand.execute(output, recordCount);
 	});
 }
 
-void Presenter::findAllTests(std::chrono::time_point<std::chrono::system_clock> from,
-							 std::chrono::time_point<std::chrono::system_clock> to)
+void Presenter::findAllTests(time_point<system_clock> from, time_point<system_clock> to)
 {
 	execute([=, this](std::string& output, std::string& recordCount) {
-		m_findAllTestsByLocationIdCommand.setParams(COUNTRY, -1, from, to);
+		m_findAllTestsByLocationIdCommand.setParams(LOCATION::COUNTRY, from, to);
 		m_findAllTestsByLocationIdCommand.execute(output, recordCount);
 	});
 }
 
-void Presenter::findSickPeopleInDistrictCommand(unsigned int id,
-												std::chrono::time_point<std::chrono::system_clock> from,
-												std::chrono::time_point<std::chrono::system_clock> to)
+void Presenter::findSickPeopleInDistrictCommand(unsigned int id, time_point<system_clock> from, time_point<system_clock> to)
 {
 	execute([=, this](std::string& output, std::string& recordCount) {
-		m_findPositiveTestsByLocationIdCommand.setParams(SICK_IN_DISTRICT, id, from, to);
+		m_findPositiveTestsByLocationIdCommand.setParams(SEARCHTYPE::SICK_PEOPLE);
+		m_findPositiveTestsByLocationIdCommand.setParams(LOCATION::DISTRICT);
+		m_findPositiveTestsByLocationIdCommand.setParams(from, to, id);
 		m_findPositiveTestsByLocationIdCommand.execute(output, recordCount);
 	});
 }
@@ -177,15 +173,17 @@ void Presenter::findTest(unsigned int testId)
 void Presenter::removeTest(unsigned int testId)
 {
 	execute([=, this](std::string& output, std::string& recordCount) {
-		m_removeTestCommand.setParams(testId);
-		m_removeTestCommand.execute(output, recordCount);
+		m_removeCommand.setParams(REMOVETYPE::TEST);
+		m_removeCommand.setParams(testId);
+		m_removeCommand.execute(output, recordCount);
 	});
 }
 
 void Presenter::removePerson(std::string birthNumber)
 {
 	execute([=, this](std::string& output, std::string& recordCount) {
-		m_removePersonCommand.setParams(birthNumber);
-		m_removePersonCommand.execute(output, recordCount);
+		m_removeCommand.setParams(REMOVETYPE::PERSON);
+		m_removeCommand.setParams(birthNumber);
+		m_removeCommand.execute(output, recordCount);
 	});
 }

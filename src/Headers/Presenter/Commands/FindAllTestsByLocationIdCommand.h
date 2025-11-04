@@ -1,26 +1,24 @@
 #pragma once
 #include <string>
 #include <chrono>
+#include <utility>
 #include "Command.h"
+#include "../Enums/Location.h"
+
+using namespace std::chrono;
 
 class FindAllTestsByLocationIdCommand : public Command
 {
 private:
-	const int DISTRICT = 1;
-	const int REGION = 2;
-	const int COUNTRY = 3;
-
-	int m_location;
+	LOCATION m_location;
 	int m_id;
-	std::chrono::time_point<std::chrono::system_clock> m_from;
-	std::chrono::time_point<std::chrono::system_clock> m_to;
+	time_point<system_clock> m_from;
+	time_point<system_clock> m_to;
 
 public:
-	FindAllTestsByLocationIdCommand(Database* database) : Command(database), m_location(0), m_id(0) {}
+	FindAllTestsByLocationIdCommand(Database* database) : Command(database), m_id(0) {}
 
-	inline void setParams(int location, int id,
-		std::chrono::time_point<std::chrono::system_clock> from,
-		std::chrono::time_point<std::chrono::system_clock> to)
+	inline void setParams(LOCATION location,time_point<system_clock> from, time_point<system_clock> to, int id = -1)
 	{
 		m_location = location;
 		m_id = id;

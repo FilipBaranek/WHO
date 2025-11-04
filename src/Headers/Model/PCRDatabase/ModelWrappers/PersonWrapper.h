@@ -3,8 +3,7 @@
 #include "../../Interfaces/IComparable.h"
 #include "../../Structures/AVL/AVLTree.h"
 #include "../Models/Person.h"
-
-class TestByDateWrapper;
+#include "../ModelWrappers/TestByDateWrapper.h"
 
 class PersonWrapper : public IComparable, public IStorable
 {

@@ -2,13 +2,13 @@
 #include <string>
 #include "Command.h"
 #include "../../../Headers/Model/PCRDatabase/ModelWrappers/PersonWrapper.h"
-#include "../../../Headers/Model/PCRDatabase/ModelWrappers/TestWrapper.h"
+#include "../../../Headers/Model/PCRDatabase/ModelWrappers/TestByDateWrapper.h"
 
 class InsertCommand : public Command
 {
 private:
 	PersonWrapper* m_person;
-	TestWrapper* m_test;
+	TestByDateWrapper* m_test;
 
 public:
 	InsertCommand(Database* database) : Command(database), m_person(nullptr), m_test(nullptr) {}

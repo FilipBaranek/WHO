@@ -2,28 +2,61 @@
 
 void FindPositiveTestsByLocationIdCommand::execute(std::string& output, std::string& recordCount)
 {
-	if (m_location == DISTRICT)
+	std::pair<std::string, int> result;
+	
+	if (m_searchType == SEARCHTYPE::BY_DATE)
 	{
-		auto result = m_database->findPositiveTestsInDistrict(m_id, m_from, m_to);
-		output = result.first;
-		recordCount = "(" + std::to_string(result.second) + ") records found";
+		if (m_location == LOCATION::DISTRICT)
+		{
+			result = m_database->findPositiveTestsInDistrict(m_id, m_from, m_to);
+		}
+		else if (m_location == LOCATION::REGION)
+		{
+			result = m_database->findPositiveTestsInRegion(m_id, m_from, m_to);
+		}
+		else if (m_location == LOCATION::COUNTRY)
+		{
+			result = m_database->findPositiveTests(m_from, m_to);
+		}
 	}
-	else if (m_location == REGION)
+	else if (m_searchType == SEARCHTYPE::SICK_PEOPLE)
 	{
-		auto result = m_database->findPositiveTestsInRegion(m_id, m_from, m_to);
-		output = result.first;
-		recordCount = "(" + std::to_string(result.second) + ") records found";
+		if (m_location == LOCATION::DISTRICT && !m_orderBy)
+		{
+			result = m_database->findSickPeopleInDistrict(m_id, m_from, m_to);
+		}
+		else if (m_location == LOCATION::DISTRICT && m_orderBy)
+		{
+			result = m_database->findSickPeopleInDistrictOrderedByTestValue(m_id, m_from, m_to);
+		}
+		else if (m_location == LOCATION::REGION)
+		{
+			result = m_database->findSickPeopleInRegion(m_id, m_from, m_to);
+		}
+		else if (m_location == LOCATION::COUNTRY)
+		{
+			result = m_database->findSickPeople(m_from, m_to);
+		}
 	}
-	else if (m_location == COUNTRY)
+	else if (m_searchType == SEARCHTYPE::ORDERED_BY_SICK_PEOPLE)
 	{
-		auto result = m_database->findPositiveTests(m_from, m_to);
-		output = result.first;
-		recordCount = "(" + std::to_string(result.second) + ") records found";
+		if (m_location == LOCATION::DISTRICT)
+		{
+			result = m_database->findDistrictsOrderedBySickPeopleCount(m_from, m_to);
+		}
+		else if (m_location == LOCATION::REGION)
+		{
+			result = m_database->findRegionsOrderedBySickPeopleCount(m_from, m_to);
+		}
 	}
-	else if (m_location == SICK_IN_DISTRICT)
+	else if (m_searchType == SEARCHTYPE::MOST_SICK_PERSON)
 	{
-		auto result = m_database->findSickPeopleInDistrict(m_id, m_from, m_to);
-		output = result.first;
-		recordCount = "(" + std::to_string(result.second) + ") records found";
+		if (m_location == LOCATION::DISTRICT)
+		{
+			result = m_database->findMostSickPersonInDistrict(m_from, m_to);
+		}
 	}
+
+	output = result.first;
+	recordCount = "(" + std::to_string(result.second) + ") records found";
 }

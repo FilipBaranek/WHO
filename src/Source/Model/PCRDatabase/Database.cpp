@@ -934,7 +934,7 @@ int Database::removeTest(int testId)
 }
 
 //(21)
-std::pair<bool, int> Database::removePerson(std::string birthNumber)
+int Database::removePerson(std::string birthNumber)
 {
 	Person person(
 		birthNumber,
@@ -952,11 +952,9 @@ std::pair<bool, int> Database::removePerson(std::string birthNumber)
 		foundPerson->tests().processPostOrder([this, &count](TestByDateWrapper* test) {
 			count += removeTest(test->getData()->testId());
 		});
-
-		return std::make_pair(true, count);
 	}
 
-	return std::make_pair(false, count);
+	return count;
 }
 
 std::pair<std::string, int> Database::printAllData()

@@ -1,0 +1,17 @@
+#pragma once
+
+enum class SEARCHTYPE
+{
+	BY_DATE,
+	SICK_PEOPLE,
+	ORDERED_BY_SICK_PEOPLE,
+	MOST_SICK_PERSON
+};
+
+enum class LOCATION
+{
+	COUNTRY,
+	REGION,
+	DISTRICT,
+	WORKPLACE,
+};

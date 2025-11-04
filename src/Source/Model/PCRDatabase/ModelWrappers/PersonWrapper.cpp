@@ -1,5 +1,4 @@
 #include "../../../../Headers/Model/PCRDatabase/ModelWrappers/PersonWrapper.h"
-#include "../../../../Headers/Model/PCRDatabase/ModelWrappers/TestByDateWrapper.h"
 
 int PersonWrapper::compare(IComparable* other) const
 {

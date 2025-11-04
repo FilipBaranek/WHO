@@ -1,32 +1,35 @@
 #pragma once
 #include <string>
 #include <chrono>
+#include <utility>
 #include "Command.h"
+#include "../Enums/Location.h"
+
+using namespace std::chrono;
 
 class FindPositiveTestsByLocationIdCommand : public Command
 {
 private:
-	const int DISTRICT = 1;
-	const int REGION = 2;
-	const int COUNTRY = 3;
-	const int SICK_IN_DISTRICT = 4;
-
-	int m_location;
+	SEARCHTYPE m_searchType;
+	LOCATION m_location;
+	bool m_orderBy;
 	int m_id;
-	std::chrono::time_point<std::chrono::system_clock> m_from;
-	std::chrono::time_point<std::chrono::system_clock> m_to;
+	time_point<system_clock> m_from;
+	time_point<system_clock> m_to;
 
 public:
-	FindPositiveTestsByLocationIdCommand(Database* database) : Command(database), m_id(0), m_location(0) {}
+	FindPositiveTestsByLocationIdCommand(Database* database) : Command(database), m_id(0) {}
 	
-	inline void setParams(int location, int id,
-						  std::chrono::time_point<std::chrono::system_clock> from,
-						  std::chrono::time_point<std::chrono::system_clock> to)
+	inline void setParams(SEARCHTYPE searchType) { m_searchType = searchType; }
+
+	inline void setParams(LOCATION location) { m_location = location; }
+
+	inline void setParams(time_point<system_clock> from, time_point<system_clock> to, int id = -1, bool orderBy = false)
 	{
-		m_location = location;
 		m_id = id;
 		m_from = from;
 		m_to = to;
+		m_orderBy = orderBy;
 	};
 	
 	void execute(std::string& output, std::string& recordCount) override;

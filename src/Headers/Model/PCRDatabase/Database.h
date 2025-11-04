@@ -115,7 +115,7 @@ public:
 	int removeTest(int testId);
 	
 	//(21)
-	std::pair<bool, int> removePerson(std::string birthNumber);
+	int removePerson(std::string birthNumber);
 	
 	std::pair<std::string, int> printAllData();
 	

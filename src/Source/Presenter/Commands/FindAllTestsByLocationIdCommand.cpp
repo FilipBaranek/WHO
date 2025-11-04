@@ -2,22 +2,24 @@
 
 void FindAllTestsByLocationIdCommand::execute(std::string& output, std::string& recordCount)
 {
-	if (m_location == DISTRICT)
+	std::pair<std::string, int> result;
+
+	if (m_location == LOCATION::DISTRICT)
 	{
-		auto result = m_database->findAllTestsInDistrict(m_id, m_from, m_to);
-		output = result.first;
-		recordCount = "(" + std::to_string(result.second) + ") records found";
+		result = m_database->findAllTestsInDistrict(m_id, m_from, m_to);
 	}
-	else if (m_location == REGION)
+	else if (m_location == LOCATION::REGION)
 	{
-		auto result = m_database->findAllTestsInRegion(m_id, m_from, m_to);
-		output = result.first;
-		recordCount = "(" + std::to_string(result.second) + ") records found";
+		result = m_database->findAllTestsInRegion(m_id, m_from, m_to);
 	}
-	else if (m_location == COUNTRY)
+	else if (m_location == LOCATION::COUNTRY)
 	{
-		auto result = m_database->findAllTests(m_from, m_to);
-		output = result.first;
-		recordCount = "(" + std::to_string(result.second) + ") records found";
+		result = m_database->findAllTests(m_from, m_to);
 	}
+	else if (m_location == LOCATION::WORKPLACE)
+	{
+		result = m_database->findAllTestsAtWorkplace(m_id, m_from, m_to);
+	}
+	output = result.first;
+	recordCount = "(" + std::to_string(result.second) + ") records found";
 }
