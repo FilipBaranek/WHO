@@ -26,7 +26,27 @@ std::string PersonWrapper::writeLine()
 	return m_person->toCsvFormat();
 }
 
-IStorable* PersonWrapper::loadLine()
+IStorable* PersonWrapper::loadLine(std::string line)
 {
-	return nullptr;
+	std::vector<std::string> attributes;
+	std::stringstream ss(line);
+	std::string token;
+
+	while (std::getline(ss, token, ';'))
+	{
+		attributes.push_back(token);
+	}
+
+	std::istringstream iss(attributes.at(3));
+	std::chrono::sys_days tp;
+	iss >> std::chrono::parse("%Y-%m-%d", tp);
+
+	Person* person = new Person(
+		attributes.at(0),
+		attributes.at(1),
+		attributes.at(2),
+		std::chrono::year_month_day{ tp }
+	);
+
+	return new PersonWrapper(person);
 }

@@ -943,6 +943,11 @@ int Database::removePerson(std::string birthNumber)
 
 std::pair<std::string, int> Database::printAllData()
 {
+	if (m_people.size() == 0)
+	{
+		return std::make_pair("Database is empty", 0);
+	}
+
 	int count = 0;
 	std::ostringstream oss;
 
@@ -980,39 +985,95 @@ std::pair<std::string, int> Database::saveToFile()
 
 	int count = 0;
 	//People
-	std::ofstream peopleFile(peopleFilePath);
-	if (!peopleFile.is_open())
+	if (m_people.size() > 0)
 	{
-		return std::make_pair("Couldn't open the people file", 0);
+		std::ofstream peopleFile(peopleFilePath);
+		if (!peopleFile.is_open())
+		{
+			return std::make_pair("Couldn't open the people file", 0);
+		}
+
+		m_people.processLevelOrder([&peopleFile, &count](PersonWrapper* person) {
+			peopleFile << person->writeLine();
+			++count;
+		});
+
+		peopleFile.close();
 	}
-
-	m_people.processLevelOrder([&peopleFile, &count](PersonWrapper* person) {
-		peopleFile << person->writeLine();
-		++count;
-	});
-
-	peopleFile.close();
 
 	//Tests
-	std::ofstream testFile(testFilePath);
-	if (!testFile.is_open())
+	if (m_tests.size() > 0)
 	{
-		return std::make_pair("Couldn't open the tests file", 0);
+		std::ofstream testFile(testFilePath);
+		if (!testFile.is_open())
+		{
+			return std::make_pair("Couldn't open the tests file", 0);
+		}
+
+		m_tests.processLevelOrder([&testFile, &count](TestWrapper* test) {
+			testFile << test->writeLine();
+			++count;
+		});
+
+		testFile.close();
 	}
-
-	m_tests.processLevelOrder([&testFile, &count](TestWrapper* test) {
-		testFile << test->writeLine();
-		++count;
-	});
-
-	testFile.close();
 
 	return std::make_pair("All the data were saved to file located inside applications data folder", count);
 }
 
 std::pair<std::string, int> Database::loadFromFile()
 {
-	return std::make_pair("", 0);
+	namespace fs = std::filesystem;
+
+	fs::path peopleFilePath = PEOPLE_FILE_PATH;
+	fs::path testFilePath = TESTS_FILE_PATH;
+
+	int count = 0;
+	std::string line;
+
+	//People
+	std::ifstream peopleFile(peopleFilePath);
+	if (!peopleFile.is_open())
+	{
+		return std::make_pair("Couldn't open the people file", 0);
+	}
+
+	while (std::getline(peopleFile, line))
+	{
+		if (line.find(';') == std::string::npos)
+		{
+			continue;
+		}
+
+		m_people.insert(static_cast<PersonWrapper*>(PersonWrapper::loadLine(line)));
+		++count;
+	}
+	peopleFile.close();
+
+	//Tests
+	std::ifstream testsFile(testFilePath);
+	if (!testsFile.is_open())
+	{
+		return std::make_pair("Couldn't open the tests file", 0);
+	}
+
+	while (std::getline(testsFile, line))
+	{
+		if (line.find(';') == std::string::npos)
+		{
+			continue;
+		}
+
+		TestWrapper* test = static_cast<TestWrapper*>(TestWrapper::loadLine(line));
+		TestByDateWrapper* testByDateWrapper = new TestByDateWrapper(test->getData());
+		insert(testByDateWrapper);
+		delete test;
+
+		++count;
+	}
+	testsFile.close();
+
+	return std::make_pair("Data were loaded successfuly", count);
 }
 
 void Database::clear()

@@ -45,7 +45,7 @@ public:
 		std::ostringstream oss;
 		oss << m_testId << ";" << m_birthNumber << ";" << (m_result ? "0" : "1") << ";" << m_testValue << ";"
 			<< m_workplaceId << ";" << m_districtId << ";" << m_regionId << ";" << std::put_time(&tm, "%Y-%m-%d %H:%M:%S")
-			<< ";" << m_note << "\n";
+			<< ";" << (m_note.empty() ? ";" : m_note) << "\n";
 		return oss.str();
 	}
 

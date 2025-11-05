@@ -25,7 +25,33 @@ std::string TestWrapper::writeLine()
 	return m_pcrTest->toCsvFormat();
 }
 
-IStorable* TestWrapper::loadLine()
+IStorable* TestWrapper::loadLine(std::string line)
 {
-	return nullptr;
+	std::vector<std::string> attributes;
+	std::stringstream ss(line);
+	std::string token;
+
+	while (std::getline(ss, token, ';'))
+	{
+		attributes.push_back(token);
+	}
+
+	std::tm tm = {};
+	std::istringstream dateStream(attributes[7]);
+	dateStream >> std::get_time(&tm, "%Y-%m-%d %H:%M:%S");
+	std::chrono::system_clock::time_point testDate = std::chrono::system_clock::from_time_t(std::mktime(&tm));
+
+	PCRTest* test = new PCRTest(
+		std::stoul(attributes.at(0)),       // testId
+		std::stoul(attributes.at(4)),       // workplaceId
+		std::stoul(attributes.at(5)),       // districtId
+		std::stoul(attributes.at(6)),       // regionId
+		attributes[2] == "0",			    // result
+		std::stod(attributes.at(3)),        // testValue
+		attributes.at(8),                   // note
+		testDate,							// testDate
+		attributes.at(1)                    // birthNumber
+	);
+
+	return new TestWrapper(test);
 }

@@ -17,6 +17,6 @@ public:
 	inline PersonWrapper* person() { return m_person; }
 	int compare(IComparable* other) const override;
 	std::string writeLine() override;
-	IStorable* loadLine() override;
+	static IStorable* loadLine(std::string line);
 	~TestWrapper() = default;
 };

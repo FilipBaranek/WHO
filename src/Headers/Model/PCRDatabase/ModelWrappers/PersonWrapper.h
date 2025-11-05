@@ -1,4 +1,6 @@
 #pragma once
+#include <vector>
+#include <chrono>
 #include "../../Interfaces/IStorable.h"
 #include "../../Interfaces/IComparable.h"
 #include "../../Structures/AVL/AVLTree.h"
@@ -17,6 +19,6 @@ public:
 	inline AVLTree<TestByDateWrapper*>& tests() { return m_tests; }
 	int compare(IComparable* other) const override;
 	std::string writeLine() override;
-	IStorable* loadLine() override;
+	static IStorable* loadLine(std::string line);
 	~PersonWrapper() = default;
 };
