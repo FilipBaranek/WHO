@@ -69,10 +69,10 @@ void Presenter::insert(unsigned int testId, unsigned int workplaceId, unsigned i
 }
 
 //(2)
-void Presenter::findResultByPatientAndTestId(unsigned int testId, std::string birthNumber, bool printPerson)
+void Presenter::findResultByPatientAndTestId(unsigned int testId, std::string birthNumber)
 {
 	execute([=, this](std::string& output, std::string& recordCount) {
-		m_resultCommand.setParams(testId, birthNumber, printPerson);
+		m_resultCommand.setParams(testId, birthNumber);
 		m_resultCommand.execute(output, recordCount);
 	});
 }
@@ -227,7 +227,7 @@ void Presenter::findRegionsOrderedBySickPeopleCount(time_point<system_clock> fro
 void Presenter::findAllTestsAtWorkplace(int workplaceId, time_point<system_clock> from, time_point<system_clock> to)
 {
 	execute([=, this](std::string& output, std::string& recordCount) {
-		m_findAllTestsByLocationIdCommand.setParams(LOCATION::WORKPLACE, from, to);
+		m_findAllTestsByLocationIdCommand.setParams(LOCATION::WORKPLACE, from, to, workplaceId);
 		m_findAllTestsByLocationIdCommand.execute(output, recordCount);
 	});
 }

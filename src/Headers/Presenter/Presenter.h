@@ -62,7 +62,7 @@ public:
 				time_point<system_clock> testDate, std::string birthNumber);
 
 	//(2)
-	void findResultByPatientAndTestId(unsigned int testId, std::string birthNumber, bool printPerson);
+	void findResultByPatientAndTestId(unsigned int testId, std::string birthNumber);
 
 	//(3)
 	void findPatientTestOrderByDate(std::string birthNumber);

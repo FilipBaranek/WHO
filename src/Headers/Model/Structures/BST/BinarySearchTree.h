@@ -422,7 +422,7 @@ public:
 
 		if (current == nullptr || intervalMax == nullptr || intervalMax->getData()->compare(lowestKey) == 1 ||
 			current->getData()->compare(highestKey) == -1 || ((current->rightChild() == intervalMax ||
-				intervalMax->leftChild() == current) && current->getData()->compare(lowestKey) == 1 && intervalMax->getData()->compare(highestKey) == -1))
+			intervalMax->leftChild() == current) && current->getData()->compare(lowestKey) == 1 && intervalMax->getData()->compare(highestKey) == -1))
 		{
 			return;
 		}

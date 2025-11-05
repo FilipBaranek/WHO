@@ -46,9 +46,9 @@ public:
 
 		m_oss.str("");
 		m_oss.clear();
-		m_oss << "[" << m_testId << "]\nBirth number: " << m_birthNumber << "\nResult: " << m_result
-			<< "\nTest value: " << m_testValue << "\nWorkplace: " << m_workplaceId << "\nDistrict: "
-			<< m_districtId << "\nRegion: " << m_regionId << "\nDate: " << std::put_time(&tm, "%Y-%m-%d %H:%M:%S") << "\nNote: " << m_note << "\n";
+		m_oss << "[" << m_testId << "]\nBirth number: " << m_birthNumber << "\nResult: " << (m_result ? "Pozitivny" : "Negativny")
+			  << "\nTest value: " << m_testValue << "\nWorkplace: " << m_workplaceId << "\nDistrict: " << m_districtId << "\nRegion: "
+			  << m_regionId << "\nDate: " << std::put_time(&tm, "%Y-%m-%d %H:%M:%S") << "\nNote: " << m_note << "\n";
 		return m_oss.str();
 	}
 

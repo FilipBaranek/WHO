@@ -5,13 +5,12 @@
 class FindTestResultCommand : public Command
 {
 private:
-	bool m_printPerson;
 	unsigned int m_testId;
 	std::string m_birthNumber;
 
 public:
 	FindTestResultCommand(Database* database) : Command(database) {}
-	void setParams(unsigned int testId, std::string birthNumber, bool printPerson = true);
+	inline void setParams(unsigned int testId, std::string birthNumber) { m_testId = testId; m_birthNumber = birthNumber; };
 	void execute(std::string& output, std::string& recordCount) override;
 	~FindTestResultCommand() override = default;
 };

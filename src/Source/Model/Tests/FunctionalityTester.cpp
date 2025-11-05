@@ -185,8 +185,6 @@ void FunctionalityTester::testAVL()
 void FunctionalityTester::runTests()
 {
 	std::uniform_int_distribution<unsigned int> probability(0, 99);
-	m_oss.str("");
-	m_oss.clear();
 
 	int deletes = 0, inserts = 0;
 
@@ -194,9 +192,9 @@ void FunctionalityTester::runTests()
 	{
 		if (i % CHECKPOINT_INDEX == 0)
 		{
-			m_oss << "OPERATION N." << (i + 1) << "\n"
-				  << "BINARY TREE SIZE: " << m_bst.size() << "\n"
-				  << "AVL TREE SIZE: " << m_at.size() << "\n\n";
+			std::cout << "OPERATION N." << (i + 1) << "\n"
+					  << "BINARY TREE SIZE: " << m_bst.size() << "\n"
+					  << "AVL TREE SIZE: " << m_at.size() << "\n\n";
 
 			if (m_data.size() == 0)
 			{
@@ -246,13 +244,8 @@ void FunctionalityTester::runTests()
 		}
 	}
 
-	m_oss << "Inserts: " << inserts << " Deletes: " << deletes << "\n";
-	m_oss << "\nTest ran successfuly\n";
-}
-
-std::string FunctionalityTester::outputToString()
-{
-	return m_oss.str();
+	std::cout << "Inserts: " << inserts << " Deletes: " << deletes << "\n";
+	std::cout << "\nTest ran successfuly\n";
 }
 
 FunctionalityTester::~FunctionalityTester()

@@ -136,7 +136,7 @@ void OperationsWindow::displayTestIdPatientIdInputs()
     strncpy_s(birthBuf, sizeof(birthBuf), m_firstStringBuf.c_str(), _TRUNCATE);
 
     float windowHeight = ImGui::GetWindowSize().y;
-    float rowHeight = ImGui::GetTextLineHeight() + ImGui::GetStyle().FramePadding.y * 2; // height of one input row
+    float rowHeight = ImGui::GetTextLineHeight() + ImGui::GetStyle().FramePadding.y * 2;
     ImGui::SetCursorPosY((windowHeight - rowHeight) * 0.5f);
 
     ImGui::Columns(2, nullptr, false);
@@ -251,7 +251,7 @@ void OperationsWindow::printAllData()
 
 void OperationsWindow::findTestResultByPatientId()
 {
-    m_presenter->findResultByPatientAndTestId(m_firstNumInput, m_firstStringBuf, true);
+    m_presenter->findResultByPatientAndTestId(m_firstNumInput, m_firstStringBuf);
 }
 
 void OperationsWindow::findPatientsSortedTests()
@@ -352,7 +352,7 @@ void OperationsWindow::printAllRegionsOrderedBySickPeopleCount()
 
 void OperationsWindow::findAllTestsDoneAtWorkplaceByDate()
 {
-    auto dateInterval = getTimePointFormatSickDays();
+    auto dateInterval = getTimePointFormat();
 
     m_presenter->findAllTestsAtWorkplace(m_firstNumInput, dateInterval.first, dateInterval.second);
 }

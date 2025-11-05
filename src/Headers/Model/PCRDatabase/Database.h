@@ -61,7 +61,7 @@ public:
 	bool insert(TestByDateWrapper* pcrTest);
 	
 	//(2)
-	std::string findTestResultByIdAndPatientId(const unsigned int testId, const std::string birthBumber, bool printPerson = true);
+	std::string findTestResultByIdAndPatientId(const unsigned int testId, const std::string birthBumber);
 	
 	//(3)
 	std::pair<std::string, int> findPatientTestOrderByDate(std::string birthNumber);

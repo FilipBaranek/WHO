@@ -50,9 +50,6 @@ void OutputWindow::renderWindow()
     float footerHeight = 30.0f;
     ImGui::SetCursorPosY(ImGui::GetWindowHeight() - footerHeight);
 
-    ImGui::SetCursorPosX(10);
-    ImGui::Checkbox("Include person information", &m_printPerson);
-
     ImVec2 recordSize = ImGui::CalcTextSize(m_recordsCount.c_str());
     float recordX = ImGui::GetWindowSize().x - recordSize.x - 20.0f;
 

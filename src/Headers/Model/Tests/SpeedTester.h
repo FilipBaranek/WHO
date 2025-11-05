@@ -37,6 +37,5 @@ public:
 	void testIntervalSearch();
 	void testFindMinKey();
 	void testFindMaxKey();
-	std::string outputToString();
 	~SpeedTester();
 };

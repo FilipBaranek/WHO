@@ -18,7 +18,7 @@ private:
 public:
 	FindAllTestsByLocationIdCommand(Database* database) : Command(database), m_id(0) {}
 
-	inline void setParams(LOCATION location,time_point<system_clock> from, time_point<system_clock> to, int id = -1)
+	inline void setParams(LOCATION location, time_point<system_clock> from, time_point<system_clock> to, int id = -1)
 	{
 		m_location = location;
 		m_id = id;

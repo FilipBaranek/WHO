@@ -17,8 +17,6 @@ void testSpeed()
     tester.testIntervalSearch();
     tester.testFindMinKey();
     tester.testFindMaxKey();
-
-    std::cout << tester.outputToString() << "\n";
 }
 
 void testFunctionality()
@@ -27,8 +25,6 @@ void testFunctionality()
 
     FunctionalityTester tester(pregeneratedDataCount);
     tester.runTests();
-
-    std::cout << tester.outputToString() << "\n";
 }
 
 int main()

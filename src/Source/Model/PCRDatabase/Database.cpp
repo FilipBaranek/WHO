@@ -122,13 +122,16 @@ bool Database::insert(TestByDateWrapper* test)
 	{
 		delete test->getData();
 		delete test;
+		delete region;
+		delete district;
+		delete workplace;
 	}
 
 	return inserted;
 }
 
 //(2)
-std::string Database::findTestResultByIdAndPatientId(const unsigned int testId, const std::string birthBumber, bool printPerson)
+std::string Database::findTestResultByIdAndPatientId(const unsigned int testId, const std::string birthBumber)
 {
 	return findTest(testId);
 }
@@ -620,7 +623,7 @@ std::pair<std::string, int> Database::findMostSickPersonInDistrict(time_point<sy
 		district->positiveTests().find(&minKey, &maxKey, output);
 
 		++count;
-		oss << "District (" << district << "):\n";
+		oss << "\nDistrict (" << district->locationId() << "): ";
 		if (output.size() > 0)
 		{
 			TestByDateWrapper* mostSickPerson = nullptr;
@@ -631,7 +634,7 @@ std::pair<std::string, int> Database::findMostSickPersonInDistrict(time_point<sy
 					mostSickPerson = test;
 				}
 			}
-			oss << mostSickPerson->getData()->toString() << "\n";
+			oss << mostSickPerson->person()->getData()->toString() << "\n";
 		}
 		else
 		{
@@ -691,7 +694,7 @@ std::pair<std::string, int> Database::findDistrictsOrderedBySickPeopleCount(time
 	std::ostringstream oss;
 	for (auto& district : sickPeopleInDistrict)
 	{
-		oss << "District (" << district.first << "):\n";
+		oss << "\nDistrict (" << district.first << "): ";
 		oss << district.second << "sick people\n";
 		++count;
 	}
@@ -748,8 +751,8 @@ std::pair<std::string, int> Database::findRegionsOrderedBySickPeopleCount(time_p
 	std::ostringstream oss;
 	for (auto& region : sickPeopleInRegion)
 	{
-		oss << "District (" << region.first << "):\n";
-		oss << region.second << "sick people\n";
+		oss << "\nDistrict (" << region.first << "): ";
+		oss << region.second << " sick people\n";
 		++count;
 	}
 
@@ -760,11 +763,11 @@ std::pair<std::string, int> Database::findRegionsOrderedBySickPeopleCount(time_p
 std::pair<std::string, int> Database::findAllTestsAtWorkplace(int workplaceId, time_point<system_clock> from, time_point<system_clock> to)
 {
 	LocationWrapper workplace(workplaceId);
-	LocationWrapper* foundWorkplace = m_regions.find(&workplace);
+	LocationWrapper* foundWorkplace = m_workplaces.find(&workplace);
 
 	if (foundWorkplace == nullptr)
 	{
-		return std::make_pair("Region wasn't found", 0);
+		return std::make_pair("Workplace wasn't found", 0);
 	}
 
 	PCRTest minTest(
@@ -838,9 +841,11 @@ bool Database::insert(PersonWrapper* personWrapper)
 {
 	if (m_people.insert(personWrapper))
 	{
+		m_peopleList.push_back(personWrapper);
 		return true;
 	}
 
+	delete personWrapper->getData();
 	delete personWrapper;
 	return false;
 }
@@ -900,6 +905,7 @@ int Database::removeTest(int testId)
 		}
 		delete testWrapper->getData();
 		delete testWrapper;
+		++count;
 	}
 
 	return count;
@@ -916,14 +922,20 @@ int Database::removePerson(std::string birthNumber)
 	);
 	PersonWrapper key(&person);
 
-	PersonWrapper* foundPerson = m_people.find(&key);
+	PersonWrapper* foundPerson = m_people.remove(&key);
 	
 	int count = 0;
-	if (foundPerson->tests().size() > 0)
+	if (foundPerson != nullptr)
 	{
-		foundPerson->tests().processPostOrder([this, &count](TestByDateWrapper* test) {
-			count += removeTest(test->getData()->testId());
-		});
+		if (foundPerson->tests().size() > 0)
+		{
+			foundPerson->tests().processPostOrder([this, &count](TestByDateWrapper* test) {
+				count += removeTest(test->getData()->testId());
+			});
+		}
+		delete foundPerson->getData();
+		delete foundPerson;
+		++count;
 	}
 
 	return count;
@@ -952,13 +964,12 @@ std::pair<std::string, int> Database::printAllData()
 
 void Database::clear()
 {
-	if (m_peopleList.size() > 0)
+	if (m_people.size() > 0)
 	{
-		for (auto& person : m_peopleList)
-		{
+		m_people.processPostOrder([](PersonWrapper* person) {
 			delete person->getData();
 			delete person;
-		}
+		});
 		m_people.clear();
 		m_peopleList.clear();
 	}

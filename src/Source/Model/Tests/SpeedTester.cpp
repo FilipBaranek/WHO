@@ -2,9 +2,6 @@
 
 SpeedTester::SpeedTester(bool dataInOrder)
 {
-	m_oss.str("");
-	m_oss.clear();
-
 	for (int i = 1; i <= RANDOM_DATA_COUNT; ++i)
 	{
 		m_randomData.push_back(new Number(i));
@@ -18,7 +15,7 @@ SpeedTester::SpeedTester(bool dataInOrder)
 
 void SpeedTester::testInsertion()
 {
-	m_oss << "\nINSERTION\n";
+	std::cout << "\nINSERTION\n";
 	long long duration = 0;
 	long long durationAT = 0;
 	long long durationRB = 0;
@@ -41,7 +38,7 @@ void SpeedTester::testInsertion()
 		durationRB += duration_cast<nanoseconds>(endRB - startRB).count();
 	}
 
-	m_oss << "Binary search tree\n"
+	std::cout << "Binary search tree\n"
 		  << duration / 1000000.0 << " milliseconds\n"
 		  << "AVL tree\n"
 		  << durationAT / 1000000.0 << " milliseconds\n"
@@ -56,7 +53,7 @@ void SpeedTester::testRemoval()
 	int startIndex = m_randomData.size() - REMOVE_DATA_COUNT;
 	int endIndex = m_randomData.size();
 
-	m_oss << "\nREMOVAL\n";
+	std::cout << "\nREMOVAL\n";
 	long long duration = 0;
 	long long durationAT = 0;
 	long long durationRB = 0;
@@ -79,7 +76,7 @@ void SpeedTester::testRemoval()
 		durationRB += duration_cast<nanoseconds>(endRB - startRB).count();
 	}
 
-	m_oss << "Binary search tree\n"
+	std::cout << "Binary search tree\n"
 		  << duration / 1000000.0 << " milliseconds\n"
 		  << "AVL tree\n"
 		  << durationAT / 1000000.0 << " milliseconds\n"
@@ -98,7 +95,7 @@ void SpeedTester::testPointSearch()
 {
 	std::shuffle(m_randomData.begin(), m_randomData.end(), m_g);
 
-	m_oss << "\nPOINT SEARCH\n";
+	std::cout << "\nPOINT SEARCH\n";
 	long long duration = 0;
 	long long durationAT = 0;
 	long long durationRB = 0;
@@ -121,7 +118,7 @@ void SpeedTester::testPointSearch()
 		durationRB += duration_cast<nanoseconds>(endRB - startRB).count();
 	}
 
-	m_oss << "Binary search tree\n"
+	std::cout << "Binary search tree\n"
 		  << duration / 1000000.0 << " milliseconds\n"
 		  << "AVL tree\n"
 		  << durationAT / 1000000.0 << " milliseconds\n"
@@ -149,7 +146,7 @@ void SpeedTester::testIntervalSearch()
 	std::vector<Number*> interval;
 	interval.reserve(SEARCH_INTERVAL + SEARCH_INTERVAL_MAX_EXTENSION + 1);
 
-	m_oss << "\nINTERVAL SEARCH\n";
+	std::cout << "\nINTERVAL SEARCH\n";
 	long long duration = 0;
 	long long durationAT = 0;
 	long long durationRB = 0;
@@ -180,7 +177,7 @@ void SpeedTester::testIntervalSearch()
 		interval.clear();
 	}
 
-	m_oss << "Binary search tree\n"
+	std::cout << "Binary search tree\n"
 		  << duration / 1000000.0 << " milliseconds\n"
 		  << "AVL tree\n"
 		  << durationAT / 1000000.0 << " milliseconds\n"
@@ -196,7 +193,7 @@ void SpeedTester::testIntervalSearch()
 
 void SpeedTester::testFindMinKey()
 {
-	m_oss << "\nSEARCH FOR MIN KEY\n";
+	std::cout << "\nSEARCH FOR MIN KEY\n";
 	long long duration = 0;
 	long long durationAT = 0;
 	long long durationRB = 0;
@@ -219,7 +216,7 @@ void SpeedTester::testFindMinKey()
 		durationRB += duration_cast<nanoseconds>(endRB - startRB).count();
 	}
 
-	m_oss << "Binary search tree\n"
+	std::cout << "Binary search tree\n"
 		  << duration / 1000000.0 << " milliseconds\n"
 		  << "AVL tree\n"
 		  << durationAT / 1000000.0 << " milliseconds\n"
@@ -229,7 +226,7 @@ void SpeedTester::testFindMinKey()
 
 void SpeedTester::testFindMaxKey()
 {
-	m_oss << "\nSEARCH FOR MAX KEY\n";
+	std::cout << "\nSEARCH FOR MAX KEY\n";
 	long long duration = 0;
 	long long durationAT = 0;
 	long long durationRB = 0;
@@ -252,17 +249,12 @@ void SpeedTester::testFindMaxKey()
 		durationRB += duration_cast<nanoseconds>(endRB - startRB).count();
 	}
 
-	m_oss << "Binary search tree\n"
+	std::cout << "Binary search tree\n"
 		  << duration / 1000000.0 << " milliseconds\n"
 		  << "AVL tree\n"
 		  << durationAT / 1000000.0 << " milliseconds\n"
 		  << "RB tree\n"
 		  << durationRB / 1000000.0 << " milliseconds\n";
-}
-
-std::string SpeedTester::outputToString()
-{
-	return m_oss.str();
 }
 
 SpeedTester::~SpeedTester()

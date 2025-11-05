@@ -2,7 +2,6 @@
 #include <vector>
 #include <random>
 #include <string>
-#include <sstream>
 #include "../Structures/BST/BinarySearchTree.h"
 #include "../Structures/AVL/AVLTree.h"
 #include "./TestObjects/Number.h"
@@ -16,7 +15,6 @@ private:
 	static constexpr const unsigned int MAX_INTERVAL = 500;
 	int m_minimalKey;
 	int m_maximalKey;
-	std::ostringstream m_oss;
 	std::vector<Number*> m_data;
 	BinarySearchTree<Number*> m_bst;
 	AVLTree<Number*> m_at;
@@ -33,6 +31,5 @@ public:
 	void findMaxKey();
 	void testAVL();
 	void runTests();
-	std::string outputToString();
 	~FunctionalityTester();
 };
