@@ -952,6 +952,16 @@ std::pair<std::string, int> Database::printAllData()
 
 void Database::clear()
 {
+	if (m_peopleList.size() > 0)
+	{
+		for (auto& person : m_peopleList)
+		{
+			delete person->getData();
+			delete person;
+		}
+		m_people.clear();
+		m_peopleList.clear();
+	}
 	for (auto& location : m_locationStructures)
 	{
 		if (location->size() > 0)
@@ -960,21 +970,21 @@ void Database::clear()
 				delete location;
 			});
 		}
+		location->clear();
 	}
-
 	if (m_positiveTests.size() > 0)
 	{
 		m_positiveTests.processPostOrder([](TestByDateWrapper* test) {
-			delete test->getData();
 			delete test;
 		});
+		m_positiveTests.clear();
 	}
 	if (m_negativeTests.size() > 0)
 	{
 		m_negativeTests.processPostOrder([](TestByDateWrapper* test) {
-			delete test->getData();
 			delete test;
 		});
+		m_negativeTests.clear();
 	}
 	if (m_tests.size() > 0)
 	{
@@ -982,6 +992,7 @@ void Database::clear()
 			delete test->getData();
 			delete test;
 		});
+		m_tests.clear();
 	}
 }
 

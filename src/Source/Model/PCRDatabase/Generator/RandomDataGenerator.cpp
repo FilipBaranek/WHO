@@ -133,9 +133,9 @@ void RandomDataGenerator::generateTests(std::vector<PersonWrapper*>& peopleList,
         date,
         correspondingPerson->getData()->birthNumber()
     );
-    TestByDateWrapper key(&duplicityTest);
+    TestWrapper key(&duplicityTest);
 
-    while (testStructures.first->find(&key) != nullptr || testStructures.second->find(&key) != nullptr)
+    while (tests.find(&key) != nullptr)
     {
         duplicityTest.setTestId(testIdInterval(gen));
     }
@@ -175,8 +175,9 @@ void RandomDataGenerator::generateTests(std::vector<PersonWrapper*>& peopleList,
     }
 
     TestByDateWrapper* newTestByDateWrapper = new TestByDateWrapper(newTest, correspondingPerson);
+    TestWrapper* newTestWrapper = new TestWrapper(newTest, correspondingPerson);
 
-    tests.insert(new TestWrapper(newTest, correspondingPerson));
+    !tests.insert(newTestWrapper);
     correspondingPerson->tests().insert(newTestByDateWrapper);
     if (result)
     {
