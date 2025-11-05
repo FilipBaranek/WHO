@@ -13,7 +13,6 @@ private:
 	std::string m_firstName;
 	std::string m_lastName;
 	std::chrono::year_month_day m_birthDay;
-	std::ostringstream m_oss;
 
 public:
 	Person(std::string birthNumber, std::string firstName, std::string lastName, std::chrono::year_month_day birthDay) :
@@ -26,16 +25,26 @@ public:
 	inline std::string lastName() { return m_lastName; }
 	inline std::chrono::year_month_day birthDay() { return m_birthDay; }
 
+	inline std::string toCsvFormat()
+	{
+		std::ostringstream oss;
+		oss << m_birthNumber << ";" << m_firstName << ";" << m_lastName << ";" 
+			<< static_cast<int>(m_birthDay.year()) << "-"
+			<< std::setw(2) << std::setfill('0') << static_cast<unsigned>(m_birthDay.month()) << "-"
+			<< std::setw(2) << std::setfill('0') << static_cast<unsigned>(m_birthDay.day()) << "\n";
+		
+		return oss.str();
+	}
+
 	inline std::string toString()
 	{
-		m_oss.str("");
-		m_oss.clear();
-		m_oss << "\n[" << m_birthNumber << "] " << m_firstName << " " << m_lastName
-			  << " born " << static_cast<int>(m_birthDay.year()) << "-"
-		      << std::setw(2) << std::setfill('0') << static_cast<unsigned>(m_birthDay.month()) << "-"
-			  << std::setw(2) << std::setfill('0') << static_cast<unsigned>(m_birthDay.day());
+		std::ostringstream oss;
+		oss << "\n[" << m_birthNumber << "] " << m_firstName << " " << m_lastName
+			<< " born " << static_cast<int>(m_birthDay.year()) << "-"
+		    << std::setw(2) << std::setfill('0') << static_cast<unsigned>(m_birthDay.month()) << "-"
+		    << std::setw(2) << std::setfill('0') << static_cast<unsigned>(m_birthDay.day());
 		
-		return m_oss.str();
+		return oss.str();
 	}
 
 	~Person() = default;

@@ -274,5 +274,21 @@ void Presenter::printAllData()
 {
 	execute([=, this](std::string& output, std::string& recordCount) {
 		m_printAllDataCommand.execute(output, recordCount);
-		});
+	});
+}
+
+void Presenter::saveToFile()
+{
+	execute([=, this](std::string& output, std::string& recordCount) {
+		m_fileCommands.setParams(COMMANDTYPE::WRITE);
+		m_fileCommands.execute(output, recordCount);
+	});
+}
+
+void Presenter::loadFromFile()
+{
+	execute([=, this](std::string& output, std::string& recordCount) {
+		m_fileCommands.setParams(COMMANDTYPE::READ);
+		m_fileCommands.execute(output, recordCount);
+	});
 }

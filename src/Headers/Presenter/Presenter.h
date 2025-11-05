@@ -5,6 +5,7 @@
 #include "../Model/PCRDatabase/Database.h"
 #include "Enums/Location.h"
 #include "Enums/RemoveType.h"
+#include "Enums/FileCommandType.h"
 #include "Commands/FindTestResultCommand.h"
 #include "Commands/InsertCommand.h"
 #include "Commands/GenerateCommand.h"
@@ -14,6 +15,7 @@
 #include "Commands/FindPatientsTestsCommand.h"
 #include "Commands/FindPositiveTestsByLocationIdCommand.h"
 #include "Commands/FindAllTestsByLocationIdCommand.h"
+#include "Commands/FileCommands.h"
 
 using namespace std::chrono;
 
@@ -34,6 +36,7 @@ private:
 	FindPatientsTestsCommand m_findPatientsTestCommand;
 	FindPositiveTestsByLocationIdCommand m_findPositiveTestsByLocationIdCommand;
 	FindAllTestsByLocationIdCommand m_findAllTestsByLocationIdCommand;
+	FileCommands m_fileCommands;
 
 	std::string m_output;
 	std::string m_recordCount;
@@ -43,7 +46,7 @@ private:
 public:
 	Presenter() : m_resultCommand(&m_database), m_insertCommand(&m_database), m_generateCommand(&m_database), m_isExecuting(false),
 				  m_printAllDataCommand(&m_database), m_removeCommand(&m_database), m_findTestCommand(&m_database), m_findPatientsTestCommand(&m_database),
-				  m_findPositiveTestsByLocationIdCommand(&m_database), m_findAllTestsByLocationIdCommand(&m_database)
+				  m_findPositiveTestsByLocationIdCommand(&m_database), m_findAllTestsByLocationIdCommand(&m_database), m_fileCommands(&m_database)
 	{};
 	
 	inline bool isExecuting() { return m_isExecuting; }
@@ -122,6 +125,10 @@ public:
 	void removePerson(std::string birthNumber);
 	
 	void printAllData();
+
+	void saveToFile();
+
+	void loadFromFile();
 
 	~Presenter() = default;
 };

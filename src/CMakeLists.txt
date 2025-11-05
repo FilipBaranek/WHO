@@ -66,7 +66,7 @@ add_executable (
     "Source/Presenter/Commands/FindAllTestsByLocationIdCommand.cpp"
     "Headers/Model/PCRDatabase/ModelWrappers/LocationWrapper.h" 
     "Source/Model/PCRDatabase/ModelWrappers/LocationWrapper.cpp"
- "Headers/Presenter/Enums/Location.h" "Headers/Presenter/Commands/RemoveCommand.h" "Headers/Presenter/Enums/RemoveType.h" "Source/Presenter/Commands/RemoveCommand.cpp")
+ "Headers/Presenter/Enums/Location.h" "Headers/Presenter/Commands/RemoveCommand.h" "Headers/Presenter/Enums/RemoveType.h" "Source/Presenter/Commands/RemoveCommand.cpp" "Headers/Presenter/Commands/FileCommands.h" "Source/Presenter/Commands/FileCommands.cpp" "Headers/Presenter/Enums/FileCommandType.h")
 
 target_include_directories(BST PRIVATE ${glm_SOURCE_DIR})
 

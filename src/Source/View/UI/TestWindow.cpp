@@ -144,8 +144,15 @@ void TestWindow::renderWindow()
     ImGui::InputDouble("##testValue", &m_testValue, 0, 0, "%.3f");
     ImGui::NextColumn();
 
-    ImGui::Text("Result:");
+    static int year = 2025, month = 1, day = 1, hour = 12, minute = 0;
+    ImGui::Text("Res  Hr  Min");
+    ImGui::PushItemWidth(ImGui::GetColumnWidth() / 3.5f - 5.0f);
     ImGui::Checkbox("##result", &m_result);
+    ImGui::SameLine();
+    ImGui::InputInt("##hourh", &hour, 0, 0);
+    ImGui::SameLine();
+    ImGui::InputInt("##minute", &minute, 0, 0);
+    ImGui::PopItemWidth();
     ImGui::NextColumn();
 
     // Row 2
@@ -163,7 +170,6 @@ void TestWindow::renderWindow()
 	}
     ImGui::NextColumn();
 
-    static int year = 2025, month = 1, day = 1;
     ImGui::Text("Test Date (Y/M/D):");
     ImGui::PushItemWidth(ImGui::GetColumnWidth() / 3.5f - 5.0f);
     ImGui::InputInt("##year", &year, 0, 0);
@@ -174,7 +180,7 @@ void TestWindow::renderWindow()
     ImGui::PopItemWidth();
     ImGui::NextColumn();
 
-    //Row 3 (Region, District, Workplace)
+    //Row 3
     displayRegionCombobox();
     displayDistrictCombobox();
     displayWorkplaceCombobox();
@@ -185,6 +191,9 @@ void TestWindow::renderWindow()
     tm.tm_year = year - 1900;
     tm.tm_mon = month - 1;
     tm.tm_mday = day;
+    tm.tm_hour = hour;
+    tm.tm_min = minute;
+    tm.tm_sec = 0;
     m_testDate = std::chrono::system_clock::from_time_t(std::mktime(&tm));
 
     float buttonWidth = 100.0f;

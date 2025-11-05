@@ -16,7 +16,7 @@ public:
 	inline Person* getData() { return m_person; }
 	inline AVLTree<TestByDateWrapper*>& tests() { return m_tests; }
 	int compare(IComparable* other) const override;
-	void writeLine() override;
+	std::string writeLine() override;
 	IStorable* loadLine() override;
 	~PersonWrapper() = default;
 };

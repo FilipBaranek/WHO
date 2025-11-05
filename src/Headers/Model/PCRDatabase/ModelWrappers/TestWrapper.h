@@ -16,7 +16,7 @@ public:
 	inline PCRTest* getData() { return m_pcrTest; }
 	inline PersonWrapper* person() { return m_person; }
 	int compare(IComparable* other) const override;
-	void writeLine() override;
+	std::string writeLine() override;
 	IStorable* loadLine() override;
 	~TestWrapper() = default;
 };

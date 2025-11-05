@@ -4,6 +4,9 @@
 #include <vector>
 #include <utility>
 #include <chrono>
+#include <filesystem>
+#include <fstream>
+#include <iostream>
 #include "../Structures/AVL/AVLTree.h"
 #include "./Generator/RandomDataGenerator.h"
 #include "./ModelWrappers/PersonWrapper.h"
@@ -17,6 +20,9 @@ using namespace std::chrono;
 class Database
 {
 private:
+	static constexpr const char* PEOPLE_FILE_PATH = "../../../data/people.csv\0";
+	static constexpr const char* TESTS_FILE_PATH = "../../../data/tests.csv\0";
+
 	static constexpr const int MIN_ID = 0;
 	static constexpr const int MAX_ID = 99999999999999;
 	static constexpr const char* MIN_STRING_VAL = "\0";
@@ -121,6 +127,10 @@ public:
 	int removePerson(std::string birthNumber);
 	
 	std::pair<std::string, int> printAllData();
+
+	std::pair<std::string, int> saveToFile();
+
+	std::pair<std::string, int> loadFromFile();
 	
 	void clear();
 	

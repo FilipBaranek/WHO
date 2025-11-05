@@ -1,9 +1,8 @@
 #pragma once
 #include "../../Structures/AVL/AVLTree.h"
-#include "../../Interfaces/IStorable.h"
 #include "TestByDateWrapper.h"
 
-class LocationWrapper : public IComparable, public IStorable
+class LocationWrapper : public IComparable
 {
 private:
 	unsigned int m_locationId;
@@ -16,7 +15,5 @@ public:
 	inline AVLTree<TestByDateWrapper*>& positiveTests() { return m_positiveTests; }
 	inline AVLTree<TestByDateWrapper*>& negativeTests() { return m_negativeTests; }
 	int compare(IComparable* other) const override;
-	void writeLine() override;
-	IStorable* loadLine() override;
 	virtual ~LocationWrapper() = default;
 };

@@ -20,8 +20,9 @@ int TestWrapper::compare(IComparable* other) const
 	}
 }
 
-void TestWrapper::writeLine()
+std::string TestWrapper::writeLine()
 {
+	return m_pcrTest->toCsvFormat();
 }
 
 IStorable* TestWrapper::loadLine()

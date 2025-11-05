@@ -962,6 +962,59 @@ std::pair<std::string, int> Database::printAllData()
 	return std::make_pair(oss.str(), count);
 }
 
+std::pair<std::string, int> Database::saveToFile()
+{
+	namespace fs = std::filesystem;
+
+	fs::path peopleFilePath = PEOPLE_FILE_PATH;
+	fs::path testFilePath = TESTS_FILE_PATH;
+
+	if (!fs::exists(peopleFilePath))
+	{
+		std::ofstream file(peopleFilePath);
+	}
+	if (!fs::exists(testFilePath))
+	{
+		std::ofstream file(testFilePath);
+	}
+
+	int count = 0;
+	//People
+	std::ofstream peopleFile(peopleFilePath);
+	if (!peopleFile.is_open())
+	{
+		return std::make_pair("Couldn't open the people file", 0);
+	}
+
+	m_people.processLevelOrder([&peopleFile, &count](PersonWrapper* person) {
+		peopleFile << person->writeLine();
+		++count;
+	});
+
+	peopleFile.close();
+
+	//Tests
+	std::ofstream testFile(testFilePath);
+	if (!testFile.is_open())
+	{
+		return std::make_pair("Couldn't open the tests file", 0);
+	}
+
+	m_tests.processLevelOrder([&testFile, &count](TestWrapper* test) {
+		testFile << test->writeLine();
+		++count;
+	});
+
+	testFile.close();
+
+	return std::make_pair("All the data were saved to file located inside applications data folder", count);
+}
+
+std::pair<std::string, int> Database::loadFromFile()
+{
+	return std::make_pair("", 0);
+}
+
 void Database::clear()
 {
 	if (m_people.size() > 0)

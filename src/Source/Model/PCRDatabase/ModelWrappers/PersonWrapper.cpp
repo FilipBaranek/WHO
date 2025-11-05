@@ -21,8 +21,9 @@ int PersonWrapper::compare(IComparable* other) const
 	return 0;
 }
 
-void PersonWrapper::writeLine()
+std::string PersonWrapper::writeLine()
 {
+	return m_person->toCsvFormat();
 }
 
 IStorable* PersonWrapper::loadLine()

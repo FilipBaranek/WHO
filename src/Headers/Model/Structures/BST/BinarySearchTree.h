@@ -583,15 +583,6 @@ public:
 		}
 	}
 
-	void save()
-	{
-		static_assert(std::is_base_of_v<IStorable, std::remove_pointer_t<T>>, "T must inherit from IStorable");
-		
-		processLevelOrder([](T nodeData) {
-			nodeData->writeLine();
-		});
-	}
-
 	void clear()
 	{
 		if (m_size > 0)

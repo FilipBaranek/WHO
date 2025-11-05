@@ -30,12 +30,3 @@ int TestByDateWrapper::compare(IComparable* other) const
 		}
 	}
 }
-
-void TestByDateWrapper::writeLine()
-{
-}
-
-IStorable* TestByDateWrapper::loadLine()
-{
-	return nullptr;
-}

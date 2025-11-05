@@ -17,12 +17,3 @@ int LocationWrapper::compare(IComparable* other) const
 		return 0;
 	}
 }
-
-void LocationWrapper::writeLine()
-{
-}
-
-IStorable* LocationWrapper::loadLine()
-{
-	return nullptr;
-}

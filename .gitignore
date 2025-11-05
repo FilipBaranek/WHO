@@ -364,3 +364,6 @@ FodyWeavers.xsd
 
 # Ignore CMake build directory
 /build/
+
+# Ignore data directory
+/data/
