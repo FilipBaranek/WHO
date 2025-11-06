@@ -82,10 +82,17 @@ bool Database::insert(TestByDateWrapper* test)
 
 	if (inserted)
 	{
-		auto testData = test->getData();
-		m_tests.insert(new TestWrapper(test->getData(), test->person()));
-		findPerson(test->getData()->birthNumber())->tests().insert(test);
-
+		TestWrapper* testWrapper = new TestWrapper(test->getData(), test->person());
+		m_tests.insert(testWrapper);
+		
+		PersonWrapper* correspondingPerson = findPerson(test->getData()->birthNumber());
+		correspondingPerson->tests().insert(test);
+		
+		if (test->person() == nullptr)
+		{
+			test->setPerson(correspondingPerson);
+			testWrapper->setPerson(correspondingPerson);
+		}
 		if (!m_regions.insert(region))
 		{
 			LocationWrapper* foundRegion = m_regions.find(region);
