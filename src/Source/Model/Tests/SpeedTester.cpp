@@ -39,11 +39,11 @@ void SpeedTester::testInsertion()
 	}
 
 	std::cout << "Binary search tree\n"
-		  << duration / 1000000.0 << " milliseconds\n"
-		  << "AVL tree\n"
-		  << durationAT / 1000000.0 << " milliseconds\n"
-		  << "RB tree\n"
-		  << durationRB / 1000000.0 << " milliseconds\n";
+			  << duration / 1000000.0 << " milliseconds\n"
+			  << "AVL tree\n"
+			  << durationAT / 1000000.0 << " milliseconds\n"
+			  << "RB tree\n"
+			  << durationRB / 1000000.0 << " milliseconds\n";
 }
 
 void SpeedTester::testRemoval()
@@ -77,11 +77,11 @@ void SpeedTester::testRemoval()
 	}
 
 	std::cout << "Binary search tree\n"
-		  << duration / 1000000.0 << " milliseconds\n"
-		  << "AVL tree\n"
-		  << durationAT / 1000000.0 << " milliseconds\n"
-		  << "RB tree\n"
-		  << durationRB / 1000000.0 << " milliseconds\n";
+			  << duration / 1000000.0 << " milliseconds\n"
+			  << "AVL tree\n"
+			  << durationAT / 1000000.0 << " milliseconds\n"
+			  << "RB tree\n"
+			  << durationRB / 1000000.0 << " milliseconds\n";
 
 	for (int i{}; i < REMOVE_DATA_COUNT; ++i)
 	{
@@ -119,11 +119,11 @@ void SpeedTester::testPointSearch()
 	}
 
 	std::cout << "Binary search tree\n"
-		  << duration / 1000000.0 << " milliseconds\n"
-		  << "AVL tree\n"
-		  << durationAT / 1000000.0 << " milliseconds\n"
-		  << "RB tree\n"
-		  << durationRB / 1000000.0 << " milliseconds\n";
+			  << duration / 1000000.0 << " milliseconds\n"
+			  << "AVL tree\n"
+			  << durationAT / 1000000.0 << " milliseconds\n"
+			  << "RB tree\n"
+			  << durationRB / 1000000.0 << " milliseconds\n";
 }
 
 void SpeedTester::testIntervalSearch()
@@ -178,11 +178,11 @@ void SpeedTester::testIntervalSearch()
 	}
 
 	std::cout << "Binary search tree\n"
-		  << duration / 1000000.0 << " milliseconds\n"
-		  << "AVL tree\n"
-		  << durationAT / 1000000.0 << " milliseconds\n"
-		  << "RB tree\n"
-		  << durationRB / 1000000.0 << " milliseconds\n";
+			  << duration / 1000000.0 << " milliseconds\n"
+			  << "AVL tree\n"
+			  << durationAT / 1000000.0 << " milliseconds\n"
+			  << "RB tree\n"
+			  << durationRB / 1000000.0 << " milliseconds\n";
 
 	for (const auto& keyPair : keys)
 	{
@@ -217,11 +217,11 @@ void SpeedTester::testFindMinKey()
 	}
 
 	std::cout << "Binary search tree\n"
-		  << duration / 1000000.0 << " milliseconds\n"
-		  << "AVL tree\n"
-		  << durationAT / 1000000.0 << " milliseconds\n"
-		  << "RB tree\n"
-		  << durationRB / 1000000.0 << " milliseconds\n";
+			  << duration / 1000000.0 << " milliseconds\n"
+			  << "AVL tree\n"
+			  << durationAT / 1000000.0 << " milliseconds\n"
+			  << "RB tree\n"
+			  << durationRB / 1000000.0 << " milliseconds\n";
 }
 
 void SpeedTester::testFindMaxKey()
@@ -250,11 +250,11 @@ void SpeedTester::testFindMaxKey()
 	}
 
 	std::cout << "Binary search tree\n"
-		  << duration / 1000000.0 << " milliseconds\n"
-		  << "AVL tree\n"
-		  << durationAT / 1000000.0 << " milliseconds\n"
-		  << "RB tree\n"
-		  << durationRB / 1000000.0 << " milliseconds\n";
+			  << duration / 1000000.0 << " milliseconds\n"
+			  << "AVL tree\n"
+			  << durationAT / 1000000.0 << " milliseconds\n"
+			  << "RB tree\n"
+			  << durationRB / 1000000.0 << " milliseconds\n";
 }
 
 SpeedTester::~SpeedTester()

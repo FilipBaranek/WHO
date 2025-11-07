@@ -6,23 +6,37 @@
 #include <vector>
 #include "BSTNode.h"
 #include "../../Interfaces/IComparable.h"
-#include "../../Interfaces/IStorable.h"
 
+
+//!
+//! @brief Helper structure representing data returned during node removal
+//! Stores removed node’s ancestor and its data pointer.
+//! @tparam T - Type of the data stored in the node.
+//!
 template<typename T>
 struct RemoveData
 {
-	BSTNode<T>* m_removedNodeAncestor;
-	T m_data;
+	BSTNode<T>* m_removedNodeAncestor;	///< Pointer to the ancestor of the removed node
+	T m_data;							///< Pointer to the removed data
 };
 
+//!
+//! @brief Template class implementing a generic Binary Search Tree
+//! Provides the basic functionality of a Binary Search Tree, including insertion, removal, and multiple traversal algorithms
+//! @tparam T - The type of data stored in the tree nodes.
+//! Type T must implement the IComparable interface to ensure data comparability between nodes.
+//!
 template<typename T>
 class BinarySearchTree
 {
 private:
+	unsigned int m_size = 0;	///< Current number of elements in the tree
 
-	unsigned int m_size = 0;
-	unsigned int m_depth = 0;
-
+	//!
+	//! @brief Finds a node in the tree matching a given key
+	//! @param [in] key - Reference to the key to find
+	//! @return - Pointer to the node if found, otherwise nullptr
+	//! 
 	BSTNode<T>* findNode(T& key)
 	{
 		if (m_root == nullptr)
@@ -58,6 +72,11 @@ private:
 		}
 	}
 
+	//!
+	//! @brief Finds the node with the minimum key in a given subtree
+	//! @param [in] startingNode - Subtree root
+	//! @return - Pointer to the node with the smallest key
+	//! 
 	BSTNode<T>* findMinKeyNode(BSTNode<T>* startingNode)
 	{
 		BSTNode<T>* currentNode = startingNode;
@@ -69,6 +88,11 @@ private:
 		return currentNode;
 	}
 
+	//!
+	//! @brief Finds the node with the maximum key in a given subtree
+	//! @param [in] startingNode - Subtree root
+	//! @return - Pointer to the node with the largest key
+	//! 
 	BSTNode<T>* findMaxKeyNode(BSTNode<T>* startingNode)
 	{
 		BSTNode<T>* currentNode = startingNode;
@@ -80,6 +104,11 @@ private:
 		return currentNode;
 	}
 
+	//!
+	//! @brief Finds the minimum key node within a given key interval
+	//! Used in interval queries between two keys.
+	//! @return - Pointer to the node with smallest key in interval
+	//! 
 	BSTNode<T>* findIntervalMinKeyNode(T& key)
 	{
 		if (m_size == 1)
@@ -121,6 +150,11 @@ private:
 		}
 	}
 
+	//!
+	//! @brief Finds the maximum key node within a given key interval
+	//! Used in interval queries between two keys.
+	//! @return - Pointer to the node with largest key in interval
+	//! 
 	BSTNode<T>* findIntervalMaxKeyNode(T& key)
 	{
 		if (m_size == 1)
@@ -162,6 +196,12 @@ private:
 		}
 	}
 
+	//!
+	//! @brief Finds the next node in an in order query
+	//! @param [in] node - The current node
+	//! @param [out] lastAncestor - Reference to the last ancestor visited
+	//! @return - Pointer to the next node in sequence
+	//! 
 	BSTNode<T>* inorderNext(BSTNode<T>* node, BSTNode<T>*& lastAncestor)
 	{
 		BSTNode<T>* current = node;
@@ -188,6 +228,11 @@ private:
 		return current;
 	}
 
+	//!
+	//! @brief Performs a post-order traversal and applies a given function to each node
+	//! @param [in] process - Function to apply to each node
+	//! @throws std::runtime_error - If the tree is empty
+	//! 
 	void postOrderTraversal(std::function<void(BSTNode<T>*)> process)
 	{
 		if (m_root == nullptr)
@@ -225,8 +270,15 @@ private:
 	}
 
 protected:
-	BSTNode<T>* m_root;
+	BSTNode<T>* m_root;		///< Pointer to the root node of the tree
 
+	//!
+	//! @brief Inserts a new node of a given type into the tree
+	//! Used internally for both standard BST and derived tree types
+	//! @tparam Node - The node type (must inherit from BSTNode<T>)
+	//! @param [in] data - Pointer to the data to insert
+	//! @return - Pointer to the newly inserted node, or nullptr if a duplicate key was found
+	//! 
 	template<typename Node>
 	BSTNode<T>* insertNode(T data)
 	{
@@ -235,12 +287,10 @@ protected:
 		if (m_root == nullptr)
 		{
 			m_root = new Node(data, nullptr);
-			m_depth = 1;
 			++m_size;
 			return m_root;
 		}
 
-		unsigned int depth = 1;
 		BSTNode<T>* currentNode = m_root;
 		BSTNode<T>* newNode;
 		while (true)
@@ -248,7 +298,6 @@ protected:
 			int cmp = currentNode->getData()->compare(data);
 			if (cmp == -1)
 			{
-				++depth;
 				if (currentNode->leftChild() == nullptr)
 				{
 					newNode = new Node(data, currentNode);
@@ -259,7 +308,6 @@ protected:
 			}
 			else if (cmp == 1)
 			{
-				++depth;
 				if (currentNode->rightChild() == nullptr)
 				{
 					newNode = new Node(data, currentNode);
@@ -273,16 +321,17 @@ protected:
 				return nullptr;
 			}
 		}
-
-		if (depth > m_depth)
-		{
-			m_depth = depth;
-		}
 		++m_size;
 
 		return newNode;
 	}
 
+	//!
+	//! @brief Removes a node with a given key from the tree
+	//! Handles all three standard BST deletion cases
+	//! @param [in] key - Reference to the key to remove
+	//! @return - Structure containing the removed node’s ancestor and data
+	//! 
 	RemoveData<T> removeNode(T& key)
 	{
 		BSTNode<T>* currentNode = findNode(key);
@@ -363,27 +412,38 @@ protected:
 	}
 
 public:
+	//!
+	//! @brief Constructs an empty Binary Search Tree
+	//! 
 	BinarySearchTree()
 	{
 		m_root = nullptr;
-		m_depth = 0;
 	}
 
+	//!
+	//! @brief Returns the number of nodes currently stored in the tree
+	//! @return - The number of nodes in the tree
+	//! 
 	unsigned int size()
 	{
 		return m_size;
 	}
 
-	unsigned int depth()
-	{
-		return m_depth;
-	}
-
+	//!
+	//! @brief Inserts a new node with the given data into the tree
+	//! @param [in] data - Pointer to the data to insert
+	//! @return - True if the insertion succeeded, false if the key already exists
+	//! 
 	virtual bool insert(T data)
 	{
 		return insertNode<BSTNode<T>>(data) != nullptr;
 	}
 
+	//!
+	//! @brief Finds and returns data matching the given key
+	//! @param [in] key - Data key to find
+	//! @return - Pointer to the data if found, otherwise nullptr
+	//! 
 	T find(T key)
 	{
 		if (key == nullptr)
@@ -399,6 +459,12 @@ public:
 		return value->getData();
 	}
 
+	//!
+	//! @brief Finds all data within a specified key interval
+	//! @param [in] lowestKey - The lower bound key
+	//! @param [in] highestKey - The upper bound key
+	//! @param [out] outputInterval - Vector to store found data to
+	//! 
 	void find(T lowestKey, T highestKey, std::vector<T>& outputInterval)
 	{
 		if (m_root == nullptr || lowestKey->compare(highestKey) == -1)
@@ -439,6 +505,11 @@ public:
 		}
 	}
 
+	//!
+	//! @brief Finds the smallest key in the tree or a subtree
+	//! @param [in] key - Optional key to start the search from (nullptr for global minimum)
+	//! @return - Pointer to the smallest data element found, or nullptr if empty
+	//! 
 	T findMinKey(T key = nullptr)
 	{
 		if (key == nullptr)
@@ -458,6 +529,11 @@ public:
 		return findMinKeyNode(node)->getData();
 	}
 
+	//!
+	//! @brief Finds the largest key in the tree or a subtree
+	//! @param [in] key - Optional key to start the search from (nullptr for global maximum)
+	//! @return - Pointer to the largest data element found, or nullptr if empty
+	//! 
 	T findMaxKey(T key = nullptr)
 	{
 		if (key == nullptr)
@@ -477,11 +553,21 @@ public:
 		return findMaxKeyNode(node)->getData();
 	}
 
+	//!
+	//! @brief Removes a node from the tree by its key
+	//! @param [in] key - Key of the node to remove
+	//! @return - Pointer to the removed data, or nullptr if not found
+	//! 
 	virtual T remove(T key)
 	{
 		return removeNode(key).m_data;
 	}
 
+	//!
+	//! @brief Performs an in order traversal and applies a function to each data element
+	//! @param [in] process - Function to apply to each data element
+	//! @throws std::runtime_error - If the tree is empty
+	//! 
 	void processInOrder(std::function<void(T)> process)
 	{
 		if (m_root == nullptr)
@@ -520,6 +606,11 @@ public:
 		}
 	}
 
+	//!
+	//! @brief Performs a post order traversal and applies a function to each data element
+	//! @param [in] process - Function to apply to each data element
+	//! @throws std::runtime_error - If the tree is empty
+	//! 
 	void processPostOrder(std::function<void(T)> process)
 	{
 		postOrderTraversal([&](BSTNode<T>* node) {
@@ -527,6 +618,11 @@ public:
 			});
 	}
 
+	//!
+	//! @brief Performs a pre order traversal and applies a function to each data element
+	//! @param [in] process - Function to apply to each data element
+	//! @throws std::runtime_error - If the tree is empty
+	//! 
 	void processPreOrder(std::function<void(T)> process)
 	{
 		if (m_root == nullptr)
@@ -555,6 +651,11 @@ public:
 		}
 	}
 
+	//!
+	//! @brief Performs a level order traversal of the tree and applies a function to each data element
+	//! @param [in] process - Function to apply to each data element
+	//! @throws std::runtime_error - If the tree is empty
+	//! 
 	void processLevelOrder(std::function<void(T)> process)
 	{
 		if (m_root == nullptr)
@@ -583,6 +684,9 @@ public:
 		}
 	}
 
+	//!
+	//! @brief Removes all nodes from the tree and resets its size
+	//! 
 	void clear()
 	{
 		if (m_size > 0)
@@ -594,9 +698,11 @@ public:
 
 		m_root = nullptr;
 		m_size = 0;
-		m_depth = 0;
 	}
 
+	//!
+	//! @brief Destructor that clears the tree on destruction
+	//! 
 	~BinarySearchTree()
 	{
 		if (m_size > 0)

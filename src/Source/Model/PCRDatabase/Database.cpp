@@ -138,9 +138,15 @@ bool Database::insert(TestByDateWrapper* test)
 }
 
 //(2)
-std::string Database::findTestResultByIdAndPatientId(const unsigned int testId, const std::string birthBumber)
+std::pair<std::string, int> Database::findTestResultByIdAndPatientId(const unsigned int testId, const std::string birthBumber)
 {
-	return findTest(testId);
+	TestWrapper* test = findTestWrapper(testId);
+	if (test == nullptr || test->getData()->birthNumber() != birthBumber)
+	{
+		return std::make_pair("Test wasn't found", 0);
+	}
+
+	return std::make_pair(test->person()->getData()->toString() + "\n" + (test->getData()->result() ? "Vysledok: Pozitivny" : "Vysledok: Negativny"), 1);
 }
 
 //(3)
@@ -958,7 +964,7 @@ std::pair<std::string, int> Database::printAllData()
 	int count = 0;
 	std::ostringstream oss;
 
-	m_people.processPreOrder([this, &oss, &count](PersonWrapper* person) {
+	m_people.processInOrder([this, &oss, &count](PersonWrapper* person) {
 		oss << person->getData()->toString() << "\n";
 		++count;
 

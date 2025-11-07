@@ -4,8 +4,9 @@ void FindTestResultCommand::execute(std::string& output, std::string& recordCoun
 {
 	if (m_testId != -1)
 	{
-		output = m_database->findTestResultByIdAndPatientId(m_testId, m_birthNumber);
-		recordCount = "(1) record found";
+		auto result = m_database->findTestResultByIdAndPatientId(m_testId, m_birthNumber);
+		output = result.first;
+		recordCount = "(" + std::to_string(result.second) + ") record found";
 	}
 	m_testId = -1;
 	m_birthNumber = "";

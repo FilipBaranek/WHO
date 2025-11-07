@@ -2,12 +2,22 @@
 #include "../BST/BinarySearchTree.h"
 #include "AVLNode.h"
 
+//!
+//! @brief Template class representing an AVL Tree
+//! The AVLTree extends the basic functionality of a Binary Search Tree by maintaining
+//! balance after insertions and deletions through rotations.
+//! @tparam T - The type of data stored in the tree. Must inherit from IComparable to ensure node comparability.
+//!
 template<typename T>
 class AVLTree : public BinarySearchTree<T>
 {
-	//Destructor intentionaly inherited
-
 private:
+	//!
+	//! @brief Performs a left rotation around the given node.
+	//! Used to restore AVL balance when the right subtree of a node becomes too heavy.
+	//! Updates ancestor and child relationships, recalculates balance factors.
+	//! @param [in,out] a - The node around which the rotation is performed.
+	//!
 	void rotateLeft(AVLNode<T>* a)
 	{
 		AVLNode<T>* b = static_cast<AVLNode<T>*>(a->rightChild());
@@ -40,6 +50,12 @@ private:
 		b->updateBalanceFactor();
 	}
 
+	//!
+	//! @brief Performs a right rotation around the given node.
+	//! Used to restore AVL balance when the left subtree of a node becomes too heavy.
+	//! Updates ancestor and child relationships, recalculates balance factors.
+	//! @param [in,out] a - The node around which the rotation is performed.
+	//!
 	void rotateRight(AVLNode<T>* a)
 	{
 		AVLNode<T>* b = static_cast<AVLNode<T>*>(a->leftChild());
@@ -72,6 +88,13 @@ private:
 		b->updateBalanceFactor();
 	}
 
+	//!
+	//! @brief Rebalances the AVL tree starting from the given node upward.
+	//! Traverses from the specified node up until the tree is balanced, updating balance factors and
+	//! performing rotations when necessary to maintain AVL balance properties.
+	//! @param [in,out] node - The starting node for rebalancing.
+	//! @param [in] insert - Indicates whether the rebalance is triggered by an insertion
+	//!
 	void rebalance(AVLNode<T>* node, bool insert = false)
 	{
 		int beforeDeleteBalanceFactor;
@@ -140,6 +163,14 @@ private:
 		}
 	}
 
+	//!
+	//! @brief Recursively verifies AVL tree correctness.
+	//! Traverses the tree and validates each node’s height and balance factor
+	//! against expected values derived from its children.
+	//! @param [in] node - The node to test from
+	//! @return - The height of the current subtree.
+	//! @throws std::runtime_error - If any node violates AVL properties.
+	//!
 	int test(AVLNode<T>* node)
 	{
 		if (node == nullptr)
@@ -171,6 +202,12 @@ private:
 	}
 
 public:
+	//!
+	//! @brief Inserts a new element into the AVL tree.
+	//! If insertion is successful, the tree is automatically rebalanced.
+	//! @param [in] data - The value to insert.
+	//! @return - True if insertion succeeded, false if the element already exists.
+	//!
 	bool insert(T data) override
 	{
 		AVLNode<T>* insertedNode = static_cast<AVLNode<T>*>(this->insertNode<AVLNode<T>>(data));
@@ -183,6 +220,12 @@ public:
 		return true;
 	}
 
+	//!
+	//! @brief Removes an element from the AVL tree by key.
+	//! The tree is automatically rebalanced after deletion.
+	//! @param [in] key - The value to remove.
+	//! @return - The data stored from the removed node.
+	//!
 	T remove(T key) override
 	{
 		RemoveData<T> rd = this->removeNode(key);
@@ -192,6 +235,10 @@ public:
 		return rd.m_data;
 	}
 
+	//!
+	//! @brief Tests the entire tree for AVL property correctness.
+	//! @throws std::runtime_error - If any node is imbalanced or inconsistent.
+	//!
 	void testTree()
 	{
 		test(static_cast<AVLNode<T>*>(this->m_root));
