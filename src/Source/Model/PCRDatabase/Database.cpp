@@ -32,7 +32,7 @@ void Database::generateRandomPeople(int peopleCount)
 {
 	for (int i{}; i < peopleCount; ++i)
 	{
-		RandomDataGenerator::generatePeople(m_peopleList, m_people);
+		insert(RandomDataGenerator::generatePeople(m_peopleList, m_people));
 	}
 }
 
@@ -42,7 +42,7 @@ bool Database::generateRandomTests(int testCount)
 	{
 		for (int i{}; i < testCount; ++i)
 		{
-			RandomDataGenerator::generateTests(m_peopleList, m_testStructuresList, m_tests, m_locationStructures);
+			insert(RandomDataGenerator::generateTests(m_peopleList, m_tests));
 		}
 		return true;
 	}
@@ -63,35 +63,37 @@ PersonWrapper* Database::findPerson(std::string birthNumber)
 }
 
 //(1)
-bool Database::insert(TestByDateWrapper* test)
+bool Database::insert(TestWrapper* test)
 {
-	bool inserted;
-
-	if (test->getData()->result())
+	PersonWrapper* correspondingPerson = findPerson(test->getData()->birthNumber());
+	if (correspondingPerson == nullptr)
 	{
-		inserted = m_positiveTests.insert(test);
-	}
-	else
-	{
-		inserted = m_negativeTests.insert(test);
+		delete test->getData();
+		delete test;
+		return false;
 	}
 
-	LocationWrapper* region =  new LocationWrapper(test->getData()->regionId());
-	LocationWrapper* district = new LocationWrapper(test->getData()->districtId());
-	LocationWrapper* workplace = new LocationWrapper(test->getData()->workplaceId());
-
-	if (inserted)
+	if (m_tests.insert(test))
 	{
-		TestWrapper* testWrapper = new TestWrapper(test->getData(), test->person());
-		m_tests.insert(testWrapper);
-		
-		PersonWrapper* correspondingPerson = findPerson(test->getData()->birthNumber());
-		correspondingPerson->tests().insert(test);
+		TestByDateWrapper* testByDate = new TestByDateWrapper(test->getData(), test->person());
+		LocationWrapper* region = new LocationWrapper(test->getData()->regionId());
+		LocationWrapper* district = new LocationWrapper(test->getData()->districtId());
+		LocationWrapper* workplace = new LocationWrapper(test->getData()->workplaceId());
+
+		if (testByDate->getData()->result())
+		{
+			m_positiveTests.insert(testByDate);
+		}
+		else
+		{
+			m_negativeTests.insert(testByDate);
+		}
+		correspondingPerson->tests().insert(testByDate);
 		
 		if (test->person() == nullptr)
 		{
 			test->setPerson(correspondingPerson);
-			testWrapper->setPerson(correspondingPerson);
+			testByDate->setPerson(correspondingPerson);
 		}
 		if (!m_regions.insert(region))
 		{
@@ -114,27 +116,21 @@ bool Database::insert(TestByDateWrapper* test)
 
 		if (test->getData()->result())
 		{
-			region->positiveTests().insert(test);
-			district->positiveTests().insert(test);
-			workplace->positiveTests().insert(test);
+			region->positiveTests().insert(testByDate);
+			district->positiveTests().insert(testByDate);
+			workplace->positiveTests().insert(testByDate);
 		}
 		else
 		{
-			region->negativeTests().insert(test);
-			district->negativeTests().insert(test);
-			workplace->negativeTests().insert(test);
+			region->negativeTests().insert(testByDate);
+			district->negativeTests().insert(testByDate);
+			workplace->negativeTests().insert(testByDate);
 		}
+		return true;
 	}
-	else
-	{
-		delete test->getData();
-		delete test;
-		delete region;
-		delete district;
-		delete workplace;
-	}
-
-	return inserted;
+	delete test->getData();
+	delete test;
+	return false;
 }
 
 //(2)
@@ -1076,11 +1072,7 @@ std::pair<std::string, int> Database::loadFromFile()
 		{
 			continue;
 		}
-
-		TestWrapper* test = static_cast<TestWrapper*>(TestWrapper::loadLine(line));
-		TestByDateWrapper* testByDateWrapper = new TestByDateWrapper(test->getData());
-		insert(testByDateWrapper);
-		delete test;
+		insert(static_cast<TestWrapper*>(TestWrapper::loadLine(line)));
 
 		++count;
 	}

@@ -46,8 +46,8 @@ private:
 			ancestor->setRightChild(b);
 		}
 
-		a->updateBalanceFactor();
-		b->updateBalanceFactor();
+		a->updateHeight();
+		b->updateHeight();
 	}
 
 	//!
@@ -84,8 +84,8 @@ private:
 			ancestor->setRightChild(b);
 		}
 
-		a->updateBalanceFactor();
-		b->updateBalanceFactor();
+		a->updateHeight();
+		b->updateHeight();
 	}
 
 	//!
@@ -105,7 +105,7 @@ private:
 			{
 				beforeDeleteBalanceFactor = current->balanceFactor();
 			}
-			current->updateBalanceFactor();
+			current->updateHeight();
 
 			if (!current->isBalanced())
 			{
@@ -175,7 +175,7 @@ private:
 	{
 		if (node == nullptr)
 		{
-			return 0;
+			return -1;
 		}
 
 		int leftHeight = test(static_cast<AVLNode<T>*>(node->leftChild()));

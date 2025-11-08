@@ -13,8 +13,7 @@ template<typename T>
 class AVLNode : public BSTNode<T>
 {
 private:
-	int m_balanceFactor;		///< Difference in height between the left and right subtrees
-	unsigned int m_height;		///< Height of this node within the tree
+	int m_height;		///< Height of this node within the tree
 
 public:
 	//!
@@ -24,42 +23,7 @@ public:
 	//! 
 	AVLNode(T data, BSTNode<T>* ancestor) : BSTNode<T>(data, ancestor)
 	{
-		m_balanceFactor = 0;
-		m_height = 1;
-	}
-
-	//!
-	//! @brief Updates both the height and balance factor of this node
-	//! Calculates heights of the left and right subtrees, then updates the node’s own height and balance factor accordingly.
-	//! 
-	void updateBalanceFactor()
-	{
-		AVLNode<T>* left = static_cast<AVLNode<T>*>(this->leftChild());
-		AVLNode<T>* right = static_cast<AVLNode<T>*>(this->rightChild());
-
-		int leftHeight = left != nullptr ? left->height() : 0;
-		int rightHeight = right != nullptr ? right->height() : 0;
-
-		m_height = std::max(leftHeight, rightHeight) + 1;
-		m_balanceFactor = leftHeight - rightHeight;
-	}
-
-	//!
-	//! @brief Checks whether the node is balanced according to AVL rules
-	//! @return - True if the balance factor is between -1 and 1
-	//! 
-	inline bool isBalanced() const
-	{
-		return m_balanceFactor >= -1 && m_balanceFactor <= 1;
-	}
-
-	//!
-	//! @brief Retrieves the current balance factor of this node
-	//! @return - Balance factor
-	//! 
-	inline int balanceFactor() const
-	{
-		return m_balanceFactor;
+		m_height = 0;
 	}
 
 	//!
@@ -69,6 +33,56 @@ public:
 	inline int height() const
 	{
 		return m_height;
+	}
+
+	//!
+	//! @brief Updates height of the node
+	//! 
+	void updateHeight()
+	{
+		int left = leftHeight();
+		int right = rightHeight();
+
+		m_height = std::max(left, right) + 1;
+	}
+
+	//!
+	//! @brief Retrieves height of the left subtree
+	//! @return - Height of the left subtree
+	//! 
+	int leftHeight()
+	{
+		AVLNode<T>* left = static_cast<AVLNode<T>*>(this->leftChild());
+		return left != nullptr ? left->height() : -1;
+	}
+
+	//!
+	//! @brief Retrieves height of the right subtree
+	//! @return - Height of the right subtree
+	//! 
+	int rightHeight()
+	{
+		AVLNode<T>* right = static_cast<AVLNode<T>*>(this->rightChild());
+		return right != nullptr ? right->height() : -1;
+	}
+
+	//!
+	//! @brief Retrieves the current balance factor of this node
+	//! @return - Balance factor
+	//! 
+	inline int balanceFactor()
+	{
+		return leftHeight() - rightHeight();
+	}
+
+	//!
+	//! @brief Checks whether the node is balanced according to AVL rules
+	//! @return - True if the balance factor is between -1 and 1
+	//! 
+	inline bool isBalanced()
+	{
+		int balanceFact = balanceFactor();
+		return balanceFact >= -1 && balanceFact <= 1;
 	}
 
 	//!

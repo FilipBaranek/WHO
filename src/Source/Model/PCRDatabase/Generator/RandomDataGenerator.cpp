@@ -4,8 +4,8 @@ std::chrono::year_month_day RandomDataGenerator::generateRandomDate(std::mt19937
 {
     using namespace std::chrono;
 
-    year_month_day start{ year{MIN_YEAR}, month{1}, day{1} };
-    year_month_day end{ year{MAX_YEAR}, month{12}, day{31} };
+    year_month_day start{ year{MIN_YEAR}, month{MIN_MONTH}, day{MIN_DAY} };
+    year_month_day end{ year{MAX_YEAR}, month{MAX_MONTH}, day{MAX_DAY} };
 
     sys_days startDays = sys_days(start);
     sys_days endDays = sys_days(end);
@@ -22,12 +22,15 @@ std::chrono::time_point<std::chrono::system_clock> RandomDataGenerator::generate
 
     const year_month_day start = birthDate + years{ MIN_AGE };
 
-    const auto now = std::chrono::system_clock::now();
-    const auto currentYmd = floor<days>(now);
+    //year_month_day maxDateTime{ year{MAX_TEST_YEAR}, month{MAX_TEST_MONTH}, day{MAX_TEST_DAY} };
+    //sys_days maxDay = sys_days(maxDateTime);
+
+    const auto max = system_clock::now();       //maxDay + hours(23) + minutes(59) + seconds(59)
+    const auto currentYmd = floor<days>(max);
     const year_month_day end{ currentYmd };
 
     if (end < start) {
-        return std::chrono::system_clock::now();
+        return system_clock::now();
     }
 
     sys_days startDays = sys_days(start);
@@ -40,9 +43,9 @@ std::chrono::time_point<std::chrono::system_clock> RandomDataGenerator::generate
     std::uniform_int_distribution<int> min_dist(0, 59);
     std::uniform_int_distribution<int> sec_dist(0, 59);
 
-    auto randomTime = std::chrono::hours(hour_dist(generator)) +
-                      std::chrono::minutes(min_dist(generator)) +
-                      std::chrono::seconds(sec_dist(generator));
+    auto randomTime = hours(hour_dist(generator)) +
+                      minutes(min_dist(generator)) +
+                      seconds(sec_dist(generator));
 
     return randomDay + randomTime;
 }
@@ -75,7 +78,7 @@ void RandomDataGenerator::generateLocation(std::mt19937& generator, unsigned int
     region = (district * MAX_REGION_CODE) / MAX_DISTRICT_CODE;
 }
 
-void RandomDataGenerator::generatePeople(std::vector<PersonWrapper*>& peopleDuplicityList, AVLTree<PersonWrapper*>& output)
+PersonWrapper* RandomDataGenerator::generatePeople(std::vector<PersonWrapper*>& peopleDuplicityList, AVLTree<PersonWrapper*>& people)
 {
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -90,19 +93,15 @@ void RandomDataGenerator::generatePeople(std::vector<PersonWrapper*>& peopleDupl
     Person duplicitPerson(birthNumber, name, lastName, birthDay);
     PersonWrapper key(&duplicitPerson);
 
-    while (output.find(&key) != nullptr)
+    while (people.find(&key) != nullptr)
     {
         duplicitPerson.setBirthNumber(generateBirthNumber(gen, birthDay));
     }
 
-    PersonWrapper* newPerson = new PersonWrapper(new Person(duplicitPerson.birthNumber(), name, lastName, birthDay));
-	output.insert(newPerson);
-    peopleDuplicityList.push_back(newPerson);
+   return new PersonWrapper(new Person(duplicitPerson.birthNumber(), name, lastName, birthDay));
 }
 
-void RandomDataGenerator::generateTests(std::vector<PersonWrapper*>& peopleList,
-                                        std::pair<AVLTree<TestByDateWrapper*>*, AVLTree<TestByDateWrapper*>*>& testStructures,
-                                        AVLTree<TestWrapper*>& tests, std::vector<AVLTree<LocationWrapper*>*>& locationStructures)
+TestWrapper* RandomDataGenerator::generateTests(std::vector<PersonWrapper*>& peopleDuplicityList, AVLTree<TestWrapper*>& tests)
 {
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -111,14 +110,14 @@ void RandomDataGenerator::generateTests(std::vector<PersonWrapper*>& peopleList,
     std::uniform_int_distribution<unsigned int> testIdInterval(0, MAX_TEST_CODE - 1);
     std::uniform_int_distribution<unsigned int> resultInterval(0, 1);
     std::uniform_real_distribution<double> valueInterval(10.0, 40.0);
-    std::uniform_int_distribution<unsigned int> randomPersonInterval(0, peopleList.size() - 1);
+    std::uniform_int_distribution<unsigned int> randomPersonInterval(0, peopleDuplicityList.size() - 1);
 
+    PersonWrapper* correspondingPerson = peopleDuplicityList[randomPersonInterval(gen)];
     unsigned int workplace, district, region;
     generateLocation(gen, workplace, district, region);
     std::string note(s_notes[noteInterval(gen)]);
-    PersonWrapper* correspondingPerson = peopleList[randomPersonInterval(gen)];
     bool result = (bool)resultInterval(gen);
-    double testValue = valueInterval(gen);
+    double testValue = result ? valueInterval(gen) : 0;
     auto date = generateTime(gen, correspondingPerson->getData()->birthDay());
     unsigned int testId = testIdInterval(gen);
 
@@ -140,7 +139,7 @@ void RandomDataGenerator::generateTests(std::vector<PersonWrapper*>& peopleList,
         duplicityTest.setTestId(testIdInterval(gen));
     }
 
-    auto newTest = new PCRTest(
+    return new TestWrapper(new PCRTest(
         duplicityTest.testId(),
         workplace,
         district,
@@ -150,47 +149,5 @@ void RandomDataGenerator::generateTests(std::vector<PersonWrapper*>& peopleList,
         note,
         date,
         correspondingPerson->getData()->birthNumber()
-    );
-
-    LocationWrapper* regionWrapper = new LocationWrapper(region);
-    LocationWrapper* districtWrapper = new LocationWrapper(district);
-    LocationWrapper* workplaceWrapper = new LocationWrapper(workplace);
-    if (!locationStructures.at(LOCATIONS::REGION)->insert(regionWrapper))
-    {
-        LocationWrapper* foundRegion = locationStructures.at(LOCATIONS::REGION)->find(regionWrapper);
-        delete regionWrapper;
-        regionWrapper = foundRegion;
-    }
-    if (!locationStructures.at(LOCATIONS::DISTRICT)->insert(districtWrapper))
-    {
-        LocationWrapper* foundDistrict = locationStructures.at(LOCATIONS::DISTRICT)->find(districtWrapper);
-        delete districtWrapper;
-        districtWrapper = foundDistrict;
-    }
-    if (!locationStructures.at(LOCATIONS::WORKPLACE)->insert(workplaceWrapper))
-    {
-        LocationWrapper* foundWorkplace = locationStructures.at(LOCATIONS::WORKPLACE)->find(workplaceWrapper);
-        delete workplaceWrapper;
-        workplaceWrapper = foundWorkplace;
-    }
-
-    TestByDateWrapper* newTestByDateWrapper = new TestByDateWrapper(newTest, correspondingPerson);
-    TestWrapper* newTestWrapper = new TestWrapper(newTest, correspondingPerson);
-
-    !tests.insert(newTestWrapper);
-    correspondingPerson->tests().insert(newTestByDateWrapper);
-    if (result)
-    {
-        testStructures.first->insert(newTestByDateWrapper);
-        regionWrapper->positiveTests().insert(newTestByDateWrapper);
-        districtWrapper->positiveTests().insert(newTestByDateWrapper);
-        workplaceWrapper->positiveTests().insert(newTestByDateWrapper);
-    }
-    else
-    {
-        testStructures.second->insert(newTestByDateWrapper);
-        regionWrapper->negativeTests().insert(newTestByDateWrapper);
-        districtWrapper->negativeTests().insert(newTestByDateWrapper);
-        workplaceWrapper->negativeTests().insert(newTestByDateWrapper);
-    }
+    ));
 }

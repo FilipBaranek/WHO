@@ -46,7 +46,7 @@ IStorable* TestWrapper::loadLine(std::string line)
 		std::stoul(attributes.at(4)),       // workplaceId
 		std::stoul(attributes.at(5)),       // districtId
 		std::stoul(attributes.at(6)),       // regionId
-		attributes[2] == "0",			    // result
+		std::stoi(attributes[2]) == 1,		// result
 		std::stod(attributes.at(3)),        // testValue
 		attributes.at(8),                   // note
 		testDate,							// testDate

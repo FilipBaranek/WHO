@@ -6,10 +6,8 @@
 #include "./Headers/Presenter/Presenter.h"
 
 
-void testSpeed()
+void testSpeed(bool dataInOrder)
 {
-    bool dataInOrder = false;
-
     SpeedTester tester(dataInOrder);
     tester.testInsertion();
     tester.testRemoval();
@@ -33,7 +31,7 @@ int main()
 
     {
         //testFunctionality();
-        //testSpeed();
+        //testSpeed(false);
 
         Application app;
         app.run();

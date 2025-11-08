@@ -43,7 +43,7 @@ public:
 		std::time_t time = std::chrono::system_clock::to_time_t(m_testDate);
 		std::tm tm = *std::localtime(&time);
 		std::ostringstream oss;
-		oss << m_testId << ";" << m_birthNumber << ";" << (m_result ? "0" : "1") << ";" << m_testValue << ";"
+		oss << m_testId << ";" << m_birthNumber << ";" << (m_result ? 1 : 0) << ";" << m_testValue << ";"
 			<< m_workplaceId << ";" << m_districtId << ";" << m_regionId << ";" << std::put_time(&tm, "%Y-%m-%d %H:%M:%S")
 			<< ";" << (m_note.empty() ? ";" : m_note) << "\n";
 		return oss.str();

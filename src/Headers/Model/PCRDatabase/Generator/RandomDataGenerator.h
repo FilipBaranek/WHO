@@ -26,6 +26,13 @@ private:
 	//Date
 	static constexpr const unsigned int MIN_YEAR = 1970;
 	static constexpr const unsigned int MAX_YEAR = 2010;
+	static constexpr const unsigned int MIN_MONTH = 1;
+	static constexpr const unsigned int MAX_MONTH = 12;
+	static constexpr const unsigned int MIN_DAY = 1;
+	static constexpr const unsigned int MAX_DAY = 30;
+	static constexpr const unsigned int MAX_TEST_YEAR = 2025;
+	static constexpr const unsigned int MAX_TEST_MONTH = 11;
+	static constexpr const unsigned int MAX_TEST_DAY = 10;
 	static constexpr const unsigned int MIN_AGE = 15;
 
 	//Person
@@ -51,11 +58,9 @@ private:
 public:
 	RandomDataGenerator() = delete;
 
-	static void generatePeople(std::vector<PersonWrapper*>& peopleDuplicityList, AVLTree<PersonWrapper*>& output);
+	static PersonWrapper* generatePeople(std::vector<PersonWrapper*>& peopleDuplicityList, AVLTree<PersonWrapper*>& people);
 	
-	static void generateTests(std::vector<PersonWrapper*>& peopleList,
-							  std::pair<AVLTree<TestByDateWrapper*>*, AVLTree<TestByDateWrapper*>*>& testStructures,
-							  AVLTree<TestWrapper*>& tests, std::vector<AVLTree<LocationWrapper*>*>& locationStructures);
+	static TestWrapper* generateTests(std::vector<PersonWrapper*>& peopleList, AVLTree<TestWrapper*>& tests);
 	
 	~RandomDataGenerator() = delete;
 };

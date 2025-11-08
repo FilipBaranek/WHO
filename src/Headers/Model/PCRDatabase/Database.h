@@ -64,7 +64,7 @@ public:
 	PersonWrapper* findPerson(std::string birthNumber);
 
 	//(1)
-	bool insert(TestByDateWrapper* pcrTest);
+	bool insert(TestWrapper* pcrTest);
 	
 	//(2)
 	std::pair<std::string, int> findTestResultByIdAndPatientId(const unsigned int testId, const std::string birthBumber);

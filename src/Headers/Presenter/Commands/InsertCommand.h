@@ -8,7 +8,7 @@ class InsertCommand : public Command
 {
 private:
 	PersonWrapper* m_person;
-	TestByDateWrapper* m_test;
+	TestWrapper* m_test;
 
 public:
 	InsertCommand(Database* database) : Command(database), m_person(nullptr), m_test(nullptr) {}
