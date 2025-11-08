@@ -11,5 +11,5 @@ public:
 	FindPatientsTestsCommand(Database* database) : Command(database) {}
 	inline void setParams(std::string birthNumber) { m_birthNumber = birthNumber; };
 	void execute(std::string& output, std::string& recordCount) override;
-	~FindPatientsTestsCommand() override = default;
+	~FindPatientsTestsCommand() = default;
 };

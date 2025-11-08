@@ -23,5 +23,5 @@ private:
 public:
 	PersonWindow(Presenter* presenter) : Window(presenter) {}
 	void renderWindow() override;
-	~PersonWindow() override = default;
+	~PersonWindow() = default;
 };

@@ -39,5 +39,5 @@ private:
 public:
     TestWindow(Presenter* presenter) : Window(presenter) {};
     void renderWindow() override;
-    ~TestWindow() override = default;
+    ~TestWindow() = default;
 };

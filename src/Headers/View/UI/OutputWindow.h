@@ -12,5 +12,5 @@ private:
 public:
 	OutputWindow(Presenter* presenter) : Window(presenter) {};
 	void renderWindow() override;
-	~OutputWindow() override = default;
+	~OutputWindow() = default;
 };

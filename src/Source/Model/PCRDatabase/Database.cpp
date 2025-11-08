@@ -142,7 +142,7 @@ std::pair<std::string, int> Database::findTestResultByIdAndPatientId(const unsig
 		return std::make_pair("Test wasn't found", 0);
 	}
 
-	return std::make_pair(test->person()->getData()->toString() + "\n" + (test->getData()->result() ? "Vysledok: Pozitivny" : "Vysledok: Negativny"), 1);
+	return std::make_pair(test->person()->getData()->toString() + "\n" + test->getData()->toString(), 1);
 }
 
 //(3)
@@ -156,7 +156,7 @@ std::pair<std::string, int> Database::findPatientTestOrderByDate(std::string bir
 	auto output = m_people.find(&key);
 	if (output == nullptr)
 	{
-		return std::make_pair("", 0);
+		return std::make_pair("Person wasn't found", 0);
 	}
 
 	oss << output->getData()->toString() << "\n";
@@ -581,15 +581,7 @@ std::pair<std::string, int> Database::findSickPeople(time_point<system_clock> fr
 
 	m_positiveTests.find(&minKey, &maxKey, output);
 
-	int count = 0;
-	std::ostringstream oss;
-	for (auto& test : output)
-	{
-		oss << test->person()->getData()->toString() << "\n";
-		++count;
-	}
-
-	return std::make_pair(oss.str(), count);
+	return outputToString(output);
 }
 
 //(14)
@@ -643,7 +635,7 @@ std::pair<std::string, int> Database::findMostSickPersonInDistrict(time_point<sy
 					mostSickPerson = test;
 				}
 			}
-			oss << mostSickPerson->person()->getData()->toString() << "\n";
+			oss << mostSickPerson->person()->getData()->toString() << "\n" << mostSickPerson->getData()->toString();
 		}
 		else
 		{

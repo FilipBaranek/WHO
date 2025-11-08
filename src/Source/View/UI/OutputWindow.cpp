@@ -39,7 +39,10 @@ void OutputWindow::renderWindow()
 
     ImVec2 textSize = ImGui::CalcTextSize(m_output.c_str());
     float textX = (ImGui::GetWindowSize().x - textSize.x) * 0.5f;
-    if (textX < 0) textX = 0;
+    if (textX < 0)
+    {
+        textX = 0;
+    }
 
     ImGui::SetCursorPosX(textX);
     ImGui::TextUnformatted(m_output.c_str());

@@ -20,5 +20,5 @@ public:
 	
 	void execute(std::string& output, std::string& recordCount) override;
 	
-	~InsertCommand() override = default;
+	~InsertCommand() = default;
 };

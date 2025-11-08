@@ -13,13 +13,6 @@
 #include "../ModelWrappers/TestByDateWrapper.h"
 
 
-enum LOCATIONS
-{
-	REGION = 0,
-	DISTRICT = 1,
-	WORKPLACE = 2
-};
-
 class RandomDataGenerator
 {
 private:

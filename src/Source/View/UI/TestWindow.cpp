@@ -8,9 +8,9 @@ void TestWindow::displayRegionCombobox()
 
         if (ImGui::BeginCombo("##regionCombo", label.c_str()))
         {
-            for (unsigned int i = 1; i <= MAX_REGION_CODE; ++i)
+            for (int i = 1; i <= MAX_REGION_CODE; ++i)
             {
-                bool is_selected = (m_selectedRegion == (int)i);
+                bool is_selected = m_selectedRegion == i;
                 if (ImGui::Selectable(std::to_string(i).c_str(), is_selected))
                 {
                     m_selectedRegion = i;
@@ -46,9 +46,9 @@ void TestWindow::displayDistrictCombobox()
         {
             unsigned int start = (m_selectedRegion - 1) * 10 + 1;
             unsigned int end = m_selectedRegion * 10;
-            for (unsigned int i = start; i <= end && i <= MAX_DISTRICT_CODE; ++i)
+            for (int i = start; i <= end && i <= MAX_DISTRICT_CODE; ++i)
             {
-                bool is_selected = (m_selectedDistrict == (int)i);
+                bool is_selected = m_selectedDistrict == i;
                 if (ImGui::Selectable(std::to_string(i).c_str(), is_selected))
                 {
                     m_selectedDistrict = i;
@@ -83,7 +83,6 @@ void TestWindow::displayWorkplaceCombobox()
     if (ImGui::BeginCombo("##workplaceCombo", label.c_str()))
     {
         unsigned int workplacesPerDistrict = 2;
-
         unsigned int start = (m_selectedDistrict - 1) * workplacesPerDistrict + 1;
         unsigned int end = start + workplacesPerDistrict - 1;
 
@@ -92,9 +91,9 @@ void TestWindow::displayWorkplaceCombobox()
             end = MAX_WORKPLACE_CODE;
         }
 
-        for (unsigned int i = start; i <= end; ++i)
+        for (int i = start; i <= end; ++i)
         {
-            bool is_selected = (m_selectedWorkplace == (int)i);
+            bool is_selected = m_selectedWorkplace == i;
             if (ImGui::Selectable(std::to_string(i).c_str(), is_selected))
             {
                 m_selectedWorkplace = i;
@@ -205,8 +204,7 @@ void TestWindow::renderWindow()
 
     if (ImGui::Button("Insert", ImVec2(buttonWidth, buttonHeight)))
     {
-        if (m_testId >= 0 && m_workplaceId >= 0 && m_districtId >= 0 &&
-            m_regionId >= 0 && m_testValue >= 0 && m_birthNumber != "")
+        if (m_testId >= 0 && m_workplaceId >= 0 && m_districtId >= 0 && m_regionId >= 0 && m_testValue >= 0 && m_birthNumber != "")
         {
             m_presenter->insert(
                 m_testId,

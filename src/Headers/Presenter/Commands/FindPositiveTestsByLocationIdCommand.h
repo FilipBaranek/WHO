@@ -34,5 +34,5 @@ public:
 	
 	void execute(std::string& output, std::string& recordCount) override;
 	
-	~FindPositiveTestsByLocationIdCommand() override = default;
+	~FindPositiveTestsByLocationIdCommand() = default;
 };

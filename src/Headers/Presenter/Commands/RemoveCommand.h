@@ -16,5 +16,5 @@ public:
 	inline void setParams(int testId) { m_testId = testId; }
 	inline void setParams(std::string birthNumber) { m_birthNumber = birthNumber; }
 	void execute(std::string& output, std::string& recordCount) override;
-	~RemoveCommand() override = default;
+	~RemoveCommand() = default;
 };

@@ -15,5 +15,5 @@ public:
 	FileCommands(Database* database) : Command(database) {}
 	inline void setParams(COMMANDTYPE type) { m_type = type; }
 	void execute(std::string& output, std::string& recordCount) override;
-	~FileCommands() override = default;
+	~FileCommands() = default;
 };

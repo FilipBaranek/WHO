@@ -27,15 +27,20 @@ void testFunctionality()
 
 int main()
 {
-    _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+    //_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 
     {
         //testFunctionality();
         //testSpeed(false);
 
-        Application app;
-        app.run();
+        //Application app;
+        //app.run();
     }
+
+    //testSpeed(false);
+
+    Application app;
+    app.run();
 
     return 0;
 }

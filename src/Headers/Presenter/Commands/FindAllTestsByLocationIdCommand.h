@@ -28,5 +28,5 @@ public:
 
 	void execute(std::string& output, std::string& recordCount) override;
 
-	~FindAllTestsByLocationIdCommand() override = default;
+	~FindAllTestsByLocationIdCommand() = default;
 };

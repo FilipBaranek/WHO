@@ -66,8 +66,7 @@ void PersonWindow::renderWindow()
 
     if (ImGui::Button("Insert", ImVec2(buttonWidth, buttonHeight)))
     {
-        if (m_birthNumber != "" && m_lastName != "" && m_lastName != "" &&
-            m_year >= 0 && m_month >= 0 && m_day >= 0)
+        if (m_birthNumber != "" && m_firstName != "" && m_lastName != "" && m_year >= 0 && m_month >= 0 && m_day >= 0)
         {
             m_presenter->insert(m_birthNumber, m_firstName, m_lastName, m_birthDay);
         }

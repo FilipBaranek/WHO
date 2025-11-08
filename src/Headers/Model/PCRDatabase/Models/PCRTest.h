@@ -4,7 +4,7 @@
 #include <sstream>
 #include <iostream>
 
-//Forward deklaracia kvoli cyklickemu inlcudu
+//Forward declaration - cycle include
 class Person;
 
 class PCRTest

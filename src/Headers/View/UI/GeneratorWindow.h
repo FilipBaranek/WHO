@@ -11,5 +11,5 @@ private:
 public:
 	GeneratorWindow(Presenter* presenter) : Window(presenter) {}
 	void renderWindow() override;
-	~GeneratorWindow() override = default;
+	~GeneratorWindow() = default;
 };

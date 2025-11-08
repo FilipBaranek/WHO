@@ -13,5 +13,5 @@ public:
 	inline void setPeopleParams(int count) { m_peopleCount = count; };
 	inline void setTestParams(int count) { m_testCount = count; };
 	void execute(std::string& output, std::string& recordCount) override;
-	~GenerateCommand() override = default;
+	~GenerateCommand() = default;
 };

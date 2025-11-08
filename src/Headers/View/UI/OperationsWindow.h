@@ -70,5 +70,5 @@ private:
 public:
 	OperationsWindow(Presenter* presenter);
 	void renderWindow() override;
-	~OperationsWindow() override = default;
+	~OperationsWindow() = default;
 };
