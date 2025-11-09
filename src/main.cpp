@@ -1,5 +1,5 @@
-﻿#define _CRTDBG_MAP_ALLOC
-#include <crtdbg.h>
+﻿//#define _CRTDBG_MAP_ALLOC
+//#include <crtdbg.h>
 #include "./Headers/Model/Tests/FunctionalityTester.h"
 #include "./Headers/Model/Tests/SpeedTester.h"
 #include "./Headers/View/Application.h"

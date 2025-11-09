@@ -109,12 +109,11 @@ private:
 
 			if (!current->isBalanced())
 			{
-				AVLNode<T>* parent = static_cast<AVLNode<T>*>(current->getAncestor());
 				if (current->balanceFactor() < -1)
 				{
 					if (current->rightChild() == nullptr)
 					{
-						current = parent;
+						current = static_cast<AVLNode<T>*>(current->getAncestor());
 						continue;
 					}
 					if (static_cast<AVLNode<T>*>(current->rightChild())->balanceFactor() <= 0)
@@ -135,7 +134,7 @@ private:
 				{
 					if (static_cast<AVLNode<T>*>(current->leftChild()) == nullptr)
 					{
-						current = parent;
+						current = static_cast<AVLNode<T>*>(current->getAncestor());
 						continue;
 					}
 					if (static_cast<AVLNode<T>*>(current->leftChild())->balanceFactor() >= 0)
@@ -152,8 +151,6 @@ private:
 						return;
 					}
 				}
-				current = parent;
-				continue;
 			}
 			else if (insert && current != node && current->balanceFactor() == 0)
 			{
