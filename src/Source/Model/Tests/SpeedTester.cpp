@@ -2,12 +2,13 @@
 
 SpeedTester::SpeedTester(bool dataInOrder)
 {
+	m_orderedData = dataInOrder;
 	for (int i = 1; i <= RANDOM_DATA_COUNT; ++i)
 	{
 		m_randomData.push_back(new Number(i));
 	}
 
-	if (!dataInOrder)
+	if (!m_orderedData)
 	{
 		std::shuffle(m_randomData.begin(), m_randomData.end(), m_g);
 	}
@@ -48,7 +49,10 @@ void SpeedTester::testInsertion()
 
 void SpeedTester::testRemoval()
 {
-	std::shuffle(m_randomData.begin(), m_randomData.end(), m_g);
+	if (!m_orderedData)
+	{
+		std::shuffle(m_randomData.begin(), m_randomData.end(), m_g);
+	}
 
 	int startIndex = m_randomData.size() - REMOVE_DATA_COUNT;
 	int endIndex = m_randomData.size();
@@ -93,7 +97,10 @@ void SpeedTester::testRemoval()
 
 void SpeedTester::testPointSearch()
 {
-	std::shuffle(m_randomData.begin(), m_randomData.end(), m_g);
+	if (!m_orderedData)
+	{
+		std::shuffle(m_randomData.begin(), m_randomData.end(), m_g);
+	}
 
 	std::cout << "\nPOINT SEARCH\n";
 	long long duration = 0;

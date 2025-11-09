@@ -21,6 +21,7 @@ private:
 	static constexpr const unsigned int SEARCH_INTERVAL = 500;
 	static constexpr const unsigned int SEARCH_INTERVAL_MAX_EXTENSION = 200;
 	static constexpr const unsigned int KEY_SEARCH_COUNT = 2000000;
+	bool m_orderedData;
 	std::ostringstream m_oss;
 	std::random_device m_rd;
 	std::mt19937 m_g{ m_rd() };
