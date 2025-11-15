@@ -5,6 +5,7 @@
 #include "./Headers/Model/Tests/SpeedTester.h"
 #include "./Headers/View/Application.h"
 #include "./Headers/Presenter/Presenter.h"
+#include "Headers/Model/Factories/RecordFactory.h"
 
 
 void testSpeed(bool dataInOrder)
@@ -55,7 +56,8 @@ int main()
             std::cout << std::bitset<8>(byte) << "\n";
         }
 
-        Person* loadedPerson = static_cast<Person*>(person.fromBytes(byteBuffer.data()));
+
+        Person* loadedPerson = RecordFactory::createInstance<Person>(byteBuffer.data());
 
         std::cout << "\nPerson from bytes:" << loadedPerson->toString();
         

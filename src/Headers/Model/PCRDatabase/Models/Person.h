@@ -34,16 +34,28 @@ public:
 	{}
 	
 	inline void setBirthNumber(std::string birthNumber) { m_birthNumber = birthNumber; }
+	
 	inline std::string birthNumber() { return m_birthNumber; }
+	
 	inline std::string firstName() { return m_firstName; }
+	
 	inline std::string lastName() { return m_lastName; }
+	
 	inline std::chrono::year_month_day birthDay() { return m_birthDay; }
+	
 	std::string toCsvFormat();
+	
 	std::string toString();
+	
 	bool equals(IRecord* other) override;
+	
 	int getSize() override;
+	
 	bool toBytes(std::vector<uint8_t>& bytesOutput) override;
+	
 	IRecord* fromBytes(uint8_t* byteBuffer) override;
+
+	static Person* createInstance(uint8_t* byteBuffer);
 
 	~Person() = default;
 };

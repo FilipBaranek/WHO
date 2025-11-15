@@ -24,7 +24,7 @@ std::string Person::toString()
 
 bool Person::equals(IRecord* other)
 {
-	Person* otherPerson = static_cast<Person*>(other);
+	Person* otherPerson = dynamic_cast<Person*>(other);
 
 	if (m_firstName != otherPerson->firstName() || m_lastName != otherPerson->lastName() ||
 		m_birthNumber != otherPerson->birthNumber() || m_birthDay != otherPerson->birthDay())
@@ -84,4 +84,19 @@ IRecord* Person::fromBytes(uint8_t* byteBuffer)
 			day{ByteConverter::fromByteToPrimitive<unsigned>(index + sizeof(int) + sizeof(unsigned int))}
 		}
 	);
+}
+
+Person* Person::createInstance(uint8_t* buffer)
+{
+	std::string dummyString = "";
+	std::chrono::year_month_day dummyDate{};
+
+	Person dummy(
+		dummyString,
+		dummyString,
+		dummyString,
+		dummyDate
+	);
+
+	return dynamic_cast<Person*>(dummy.fromBytes(buffer));
 }
