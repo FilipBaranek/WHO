@@ -3,20 +3,34 @@
 #include <sstream>
 #include <chrono>
 #include <iostream>
+#include "../../Interfaces/IRecord.h"
+#include "../../HeapFile/Helpers/BinaryString.h"
 #include "../ModelWrappers/TestWrapper.h"
 #include "../../Structures/AVL/AVLTree.h"
+#include "../../HeapFile/Helpers/ByteConverter.h"
 
-class Person
+class Person : public IRecord
 {
 private:
+	static constexpr const int MAX_FIRST_NAME_SIZE = 15;
+	static constexpr const int MAX_LAST_NAME_SIZE = 14;
+	static constexpr const int MAX_BIRTHNUMBER_SIZE = 10;
+
 	std::string m_birthNumber;
 	std::string m_firstName;
 	std::string m_lastName;
 	std::chrono::year_month_day m_birthDay;
 
+	BinaryString m_birthNumberBin;
+	BinaryString m_firstNameBin;
+	BinaryString m_lastNameBin;
+
 public:
 	Person(std::string birthNumber, std::string firstName, std::string lastName, std::chrono::year_month_day birthDay) :
-		m_birthNumber(birthNumber), m_firstName(firstName), m_lastName(lastName), m_birthDay(birthDay)
+		m_birthNumber(birthNumber), m_firstName(firstName), m_lastName(lastName), m_birthDay(birthDay),
+		m_birthNumberBin{MAX_BIRTHNUMBER_SIZE, static_cast<int>(m_birthNumber.size()), m_birthNumber},
+		m_firstNameBin{MAX_FIRST_NAME_SIZE, static_cast<int>(m_firstName.size()), m_firstName},
+		m_lastNameBin{MAX_LAST_NAME_SIZE, static_cast<int>(m_lastName.size()), m_lastName}
 	{}
 	
 	inline void setBirthNumber(std::string birthNumber) { m_birthNumber = birthNumber; }
@@ -24,28 +38,12 @@ public:
 	inline std::string firstName() { return m_firstName; }
 	inline std::string lastName() { return m_lastName; }
 	inline std::chrono::year_month_day birthDay() { return m_birthDay; }
-
-	inline std::string toCsvFormat()
-	{
-		std::ostringstream oss;
-		oss << m_birthNumber << ";" << m_firstName << ";" << m_lastName << ";" 
-			<< static_cast<int>(m_birthDay.year()) << "-"
-			<< std::setw(2) << std::setfill('0') << static_cast<unsigned>(m_birthDay.month()) << "-"
-			<< std::setw(2) << std::setfill('0') << static_cast<unsigned>(m_birthDay.day()) << "\n";
-		
-		return oss.str();
-	}
-
-	inline std::string toString()
-	{
-		std::ostringstream oss;
-		oss << "\n[" << m_birthNumber << "] " << m_firstName << " " << m_lastName
-			<< " born " << static_cast<int>(m_birthDay.year()) << "-"
-		    << std::setw(2) << std::setfill('0') << static_cast<unsigned>(m_birthDay.month()) << "-"
-		    << std::setw(2) << std::setfill('0') << static_cast<unsigned>(m_birthDay.day());
-		
-		return oss.str();
-	}
+	std::string toCsvFormat();
+	std::string toString();
+	bool equals(IRecord* other) override;
+	int getSize() override;
+	bool toBytes(std::vector<uint8_t>& bytesOutput) override;
+	IRecord* fromBytes(uint8_t* byteBuffer) override;
 
 	~Person() = default;
 };

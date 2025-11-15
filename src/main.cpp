@@ -1,5 +1,6 @@
-﻿//#define _CRTDBG_MAP_ALLOC
-//#include <crtdbg.h>
+﻿#define _CRTDBG_MAP_ALLOC
+#include <crtdbg.h>
+#include <bitset>
 #include "./Headers/Model/Tests/FunctionalityTester.h"
 #include "./Headers/Model/Tests/SpeedTester.h"
 #include "./Headers/View/Application.h"
@@ -27,7 +28,7 @@ void testFunctionality()
 
 int main()
 {
-    //_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+    _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 
     {
         //testFunctionality();
@@ -35,12 +36,31 @@ int main()
 
         //Application app;
         //app.run();
+
+        Person person{
+            "01234",
+            "Filip",
+            "Nigga",
+            std::chrono::year_month_day{std::chrono::year{2002}, std::chrono::month{11}, std::chrono::day{18}}
+        };
+        std::vector<uint8_t> byteBuffer;
+
+        std::cout << "Person before converting:" << person.toString() << "\n";
+        
+        person.toBytes(byteBuffer);
+        
+        std::cout << "Person in binary:\n";
+        for (auto& byte : byteBuffer)
+        {
+            std::cout << std::bitset<8>(byte) << "\n";
+        }
+
+        Person* loadedPerson = static_cast<Person*>(person.fromBytes(byteBuffer.data()));
+
+        std::cout << "\nPerson from bytes:" << loadedPerson->toString();
+        
+        delete loadedPerson;
     }
-
-    //testSpeed(false);
-
-    Application app;
-    app.run();
 
     return 0;
 }
