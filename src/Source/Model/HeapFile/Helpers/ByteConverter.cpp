@@ -1,6 +1,6 @@
 #include "../../../../Headers/Model/HeapFile/Helpers/ByteConverter.h"
 
-void ByteConverter::toByteFromString(BinaryString& string, uint8_t* bytesOutput)
+uint8_t* ByteConverter::toByteFromString(BinaryString& string, uint8_t* bytesOutput)
 {
 	uint8_t* index = bytesOutput;
 
@@ -21,6 +21,8 @@ void ByteConverter::toByteFromString(BinaryString& string, uint8_t* bytesOutput)
 		toByteFromPrimitive<char>(padding, index);
 		++index;
 	}
+
+	return index;
 }
 
 BinaryString ByteConverter::fromByteToString(std::string& destString, uint8_t* byteBuffer)

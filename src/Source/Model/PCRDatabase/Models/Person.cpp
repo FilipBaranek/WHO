@@ -41,12 +41,7 @@ bool Person::is(IRecord* other)
 
 int Person::getSize()
 {
-	int birthNumberSize = sizeof(int) * 2 + m_birthNumberBin.m_capacity;
-	int firstNameSize = sizeof(int) * 2 + m_firstNameBin.m_capacity;
-	int lastNameSize = sizeof(int) * 2 + m_lastNameBin.m_capacity;
-	int birthDateSize = sizeof(int) + 2 * sizeof(unsigned int);
-
-	return birthNumberSize + firstNameSize + lastNameSize + birthDateSize;
+	return m_birthNumberBin.size() + m_firstNameBin.size() + m_lastNameBin.size() + sizeof(int) + (2 * sizeof(unsigned int));
 }
 
 bool Person::toBytes(uint8_t* bytesOutput)
@@ -56,23 +51,17 @@ bool Person::toBytes(uint8_t* bytesOutput)
 		return false;
 	}
 
-	uint8_t* index = bytesOutput;
-
 	int y = static_cast<int>(m_birthDay.year());
 	unsigned int m = static_cast<unsigned>(m_birthDay.month());
 	unsigned int d = static_cast<unsigned>(m_birthDay.day());
 
-	ByteConverter::toByteFromString(m_birthNumberBin, index);
-	index += m_birthNumberBin.size();
-	ByteConverter::toByteFromString(m_firstNameBin, index);
-	index += m_firstNameBin.size();
-	ByteConverter::toByteFromString(m_lastNameBin, index);
-	index += m_lastNameBin.size();
-	ByteConverter::toByteFromPrimitive(y, index);
-	index += sizeof(y);
-	ByteConverter::toByteFromPrimitive(m, index);
-	index += sizeof(m);
-	ByteConverter::toByteFromPrimitive(d, index);
+	uint8_t* index = bytesOutput;
+	index = ByteConverter::toByteFromString(m_birthNumberBin, index);
+	index = ByteConverter::toByteFromString(m_firstNameBin, index);
+	index = ByteConverter::toByteFromString(m_lastNameBin, index);
+	index = ByteConverter::toByteFromPrimitive(y, index);
+	index = ByteConverter::toByteFromPrimitive(m, index);
+	index = ByteConverter::toByteFromPrimitive(d, index);
 
 	return true;
 }
