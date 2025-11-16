@@ -9,11 +9,13 @@ public:
 
 	virtual bool equals(IRecord* other) = 0;
 
+	virtual bool is(IRecord* other) = 0;
+
 	virtual int getSize() = 0;
 
-	virtual bool toBytes(std::vector<uint8_t>& bytesOutput) = 0;
+	virtual bool toBytes(uint8_t* bytesOutput) = 0;
 
-	virtual IRecord* fromBytes(uint8_t* bytesInput) = 0;
+	virtual IRecord* fromBytes(uint8_t* byteBuffer) = 0;
 
 	virtual ~IRecord() = default;
 };

@@ -48,10 +48,12 @@ public:
 	std::string toString();
 	
 	bool equals(IRecord* other) override;
+
+	bool is(IRecord* other) override;
 	
 	int getSize() override;
 	
-	bool toBytes(std::vector<uint8_t>& bytesOutput) override;
+	bool toBytes(uint8_t* bytesOutput) override;
 	
 	IRecord* fromBytes(uint8_t* byteBuffer) override;
 

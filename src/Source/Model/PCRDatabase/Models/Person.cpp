@@ -34,28 +34,45 @@ bool Person::equals(IRecord* other)
 	return true;
 }
 
-int Person::getSize()
+bool Person::is(IRecord* other)
 {
-	return m_firstNameBin.size() + m_lastNameBin.size() + m_birthNumber.size() + sizeof(int) + (2 * sizeof(unsigned int));
+	return m_birthNumber == static_cast<Person*>(other)->birthNumber();
 }
 
-bool Person::toBytes(std::vector<uint8_t>& bytesOutput)
+int Person::getSize()
+{
+	int birthNumberSize = sizeof(int) * 2 + m_birthNumberBin.m_capacity;
+	int firstNameSize = sizeof(int) * 2 + m_firstNameBin.m_capacity;
+	int lastNameSize = sizeof(int) * 2 + m_lastNameBin.m_capacity;
+	int birthDateSize = sizeof(int) + 2 * sizeof(unsigned int);
+
+	return birthNumberSize + firstNameSize + lastNameSize + birthDateSize;
+}
+
+bool Person::toBytes(uint8_t* bytesOutput)
 {
 	if (m_firstName.size() > MAX_FIRST_NAME_SIZE || m_lastName.size() > MAX_LAST_NAME_SIZE || m_birthNumber.size() > MAX_BIRTHNUMBER_SIZE)
 	{
 		return false;
 	}
 
-	int y = static_cast<int>(m_birthDay.year());
-	int m = static_cast<unsigned>(m_birthDay.month());
-	int d = static_cast<unsigned>(m_birthDay.day());
+	uint8_t* index = bytesOutput;
 
-	ByteConverter::toByteFromString(m_birthNumberBin, bytesOutput);
-	ByteConverter::toByteFromString(m_firstNameBin, bytesOutput);
-	ByteConverter::toByteFromString(m_lastNameBin, bytesOutput);
-	ByteConverter::toByteFromPrimitive(y, bytesOutput);
-	ByteConverter::toByteFromPrimitive(m, bytesOutput);
-	ByteConverter::toByteFromPrimitive(d, bytesOutput);
+	int y = static_cast<int>(m_birthDay.year());
+	unsigned int m = static_cast<unsigned>(m_birthDay.month());
+	unsigned int d = static_cast<unsigned>(m_birthDay.day());
+
+	ByteConverter::toByteFromString(m_birthNumberBin, index);
+	index += m_birthNumberBin.size();
+	ByteConverter::toByteFromString(m_firstNameBin, index);
+	index += m_firstNameBin.size();
+	ByteConverter::toByteFromString(m_lastNameBin, index);
+	index += m_lastNameBin.size();
+	ByteConverter::toByteFromPrimitive(y, index);
+	index += sizeof(y);
+	ByteConverter::toByteFromPrimitive(m, index);
+	index += sizeof(m);
+	ByteConverter::toByteFromPrimitive(d, index);
 
 	return true;
 }
@@ -90,7 +107,7 @@ Person* Person::createInstance(uint8_t* buffer)
 {
 	std::string dummyString = "";
 	std::chrono::year_month_day dummyDate{};
-
+	 
 	Person dummy(
 		dummyString,
 		dummyString,

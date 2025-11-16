@@ -9,6 +9,6 @@ struct BinaryString
 
 	int size()
 	{
-		return sizeof(m_capacity) + sizeof(m_validBitCount) + m_capacity;
+		return 2 * sizeof(int) + m_capacity;
 	}
 };
