@@ -51,7 +51,7 @@ public:
 		{
 			if (m_data[i]->is(object))
 			{
-				return m_data[i];
+				return new T(m_data[i]);
 			}
 		}
 		return nullptr;
@@ -79,7 +79,7 @@ public:
 
 	void toBytes(uint8_t* outputBuffer)
 	{
-		if (validByteCount() == 0)
+		if (m_validBlockCount == 0)
 		{
 			return;
 		}
@@ -115,13 +115,15 @@ public:
 
 	inline T** objects() { return m_data; }
 
-	inline int validByteCount() { return m_validBlockCount; }
-
 	inline int getSize() { return sizeof(m_validBlockCount) + m_clusterSize; }
 
-	static Block<T>* createInstance()
-	{
+	inline bool isFull() { return m_validBlockCount == m_blockingFactor; }
 
+	inline bool isEmpty() { return m_validBlockCount == 0; }
+
+	static Block<T>* createInstance(int clusterSize, int objectSize)
+	{
+		return new Block<T>(clusterSize, objectSize);
 	}
 
 	void clear()

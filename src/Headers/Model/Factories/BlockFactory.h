@@ -5,9 +5,9 @@ class BlockFactory
 {
 public:
 	template<typename T>
-	static Block<T>* createInstance()
+	static Block<T>* createInstance(int clusterSize, int objectSize)
 	{
-
+		return Block<T>::createInstance(clusterSize, objectSize);
 	}
 
 	BlockFactory() = delete;

@@ -74,7 +74,7 @@ add_executable (
     "Headers/Model/HeapFile/Helpers/BinaryString.h"
     "Headers/Model/HeapFile/Helpers/ByteConverter.h" 
     "Source/Model/HeapFile/Helpers/ByteConverter.cpp"
- "Headers/Model/Factories/RecordFactory.h" "Headers/Model/HeapFile/Block.h" "Headers/Model/HeapFile/HeapFile.h" "Headers/Model/Factories/BlockFactory.h")
+ "Headers/Model/Factories/RecordFactory.h" "Headers/Model/HeapFile/Block.h" "Headers/Model/HeapFile/HeapFile.h"  "Headers/Model/Factories/BlockFactory.h")
 
 target_include_directories(BST PRIVATE ${glm_SOURCE_DIR})
 

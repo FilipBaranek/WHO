@@ -7,6 +7,7 @@
 
 #include "Headers/Model/Factories/RecordFactory.h"
 #include "Headers/Model/HeapFile/Block.h"
+#include "Headers/Model/HeapFile/HeapFile.h"
 
 void testSpeed(bool dataInOrder)
 {
@@ -33,52 +34,41 @@ int main()
 
     {
 		Person* person1 = new Person{
-	        "01234",
-	        "Filip",
-	        "Nigga",
-	        std::chrono::year_month_day{std::chrono::year{2002}, std::chrono::month{11}, std::chrono::day{18}}
+			"01234",
+			"Filip",
+			"Nigga",
+			std::chrono::year_month_day{std::chrono::year{2002}, std::chrono::month{11}, std::chrono::day{18}}
 		};
 
-        Person* person2 = new Person{
-            "01235",
-            "Nigga",
-            "Niggerska",
-            std::chrono::year_month_day{std::chrono::year{1999}, std::chrono::month{11}, std::chrono::day{7}}
-        };
+		Person* person2 = new Person{
+			"01235",
+			"Nigga",
+			"Niggerska",
+			std::chrono::year_month_day{std::chrono::year{1999}, std::chrono::month{11}, std::chrono::day{7}}
+		};
 
-        Person* person3 = new Person{
-            "01236",
-            "Tatko",
-            "Average",
-            std::chrono::year_month_day{std::chrono::year{1998}, std::chrono::month{6}, std::chrono::day{5}}
-        };
+		Person* person3 = new Person{
+			"01236",
+			"Tatko",
+			"Average",
+			std::chrono::year_month_day{std::chrono::year{1998}, std::chrono::month{6}, std::chrono::day{5}}
+		};
 
-        uint8_t buffer[1000];
-        Block<Person> block(person1->getSize() * 3, person1->getSize());
-        block.insert(person1);
-        block.insert(person2);
-        block.insert(person3);
+        Person* dummy = RecordFactory::createInstance<Person>();
 
-        std::cout << "People in block";
-        for (int i{}; i < block.validByteCount(); ++i)
-        {
-            std::cout << block.objects()[i]->toString() << "\n";
-        }
+        HeapFile<Person> heapFile("../../../data/", dummy->getSize() * 5);
+        heapFile.open();
+        int addr1 = heapFile.insert(person1);
+		int addr2 = heapFile.insert(person2);
+		int addr3 = heapFile.insert(person3);
+		
+		Person key("01235", "", "", dummy->birthDay());
+		
+		Person* foundPerson = heapFile.find(0, &key);
+		std::cout << foundPerson->toString();
 
-        block.toBytes(buffer);
-        std::cout << "People in binary:\n";
-        for (int i{}; i < person1->getSize() * 3; ++i)
-        {
-            std::cout << std::bitset<8>(buffer[i]) << "\n";
-        }
-
-        block.fromBytes(buffer);
-        std::cout << "People composed from binary";
-        for (int i{}; i < block.validByteCount(); ++i)
-        {
-            std::cout << block.objects()[i]->toString() << "\n";
-        }
-
+		delete foundPerson;
+        delete dummy;
     }
 
     return 0;

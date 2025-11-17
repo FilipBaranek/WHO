@@ -7,7 +7,7 @@ class ByteConverter
 {
 public:
 	template<typename T>
-	static uint8_t* toByteFromPrimitive(T& primitive, uint8_t* bytesOutput)
+	static uint8_t* toByteFromPrimitive(T primitive, uint8_t* bytesOutput)
 	{
 		std::memcpy(bytesOutput, &primitive, sizeof(primitive));
 		return bytesOutput + sizeof(primitive);

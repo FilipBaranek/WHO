@@ -92,17 +92,24 @@ IRecord* Person::fromBytes(uint8_t* byteBuffer)
 	);
 }
 
-Person* Person::createInstance(uint8_t* buffer)
+Person* Person::dummyInstance()
 {
 	std::string dummyString = "";
 	std::chrono::year_month_day dummyDate{};
-	 
-	Person dummy(
+
+	return new Person(
 		dummyString,
 		dummyString,
 		dummyString,
 		dummyDate
 	);
+}
 
-	return dynamic_cast<Person*>(dummy.fromBytes(buffer));
+Person* Person::createInstance(uint8_t* buffer)
+{
+	Person* dummy = dummyInstance();
+	Person* instance = dynamic_cast<Person*>(dummy->fromBytes(buffer));
+	delete dummy;
+
+	return instance;
 }
