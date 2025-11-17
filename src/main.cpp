@@ -32,37 +32,6 @@ int main()
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 
     {
-        //testFunctionality();
-        //testSpeed(false);
-
-        //Application app;
-        //app.run();
-
-        //Person person{
-        //    "01234",
-        //    "Filip",
-        //    "Nigga",
-        //    std::chrono::year_month_day{std::chrono::year{2002}, std::chrono::month{11}, std::chrono::day{18}}
-        //};
-        //uint8_t byteBuffer[500];
-
-        //std::cout << "Person before converting:" << person.toString() << "\n";
-        //
-        //person.toBytes(byteBuffer);
-        //
-        //std::cout << "Person in binary:\n";
-        //for (int i{}; i < person.getSize(); ++i)
-        //{
-        //    std::cout << std::bitset<8>(byteBuffer[i]) << "\n";
-        //}
-
-
-        //Person* loadedPerson = RecordFactory::createInstance<Person>(byteBuffer);
-
-        //std::cout << "\nPerson from bytes:" << loadedPerson->toString();
-        //
-        //delete loadedPerson;
-
 		Person* person1 = new Person{
 	        "01234",
 	        "Filip",
@@ -91,9 +60,9 @@ int main()
         block.insert(person3);
 
         std::cout << "People in block";
-        for (auto& person : block.objects())
+        for (int i{}; i < block.validByteCount(); ++i)
         {
-            std::cout << person->toString() << "\n";
+            std::cout << block.objects()[i]->toString() << "\n";
         }
 
         block.toBytes(buffer);
@@ -105,9 +74,9 @@ int main()
 
         block.fromBytes(buffer);
         std::cout << "People composed from binary";
-        for (auto& person : block.objects())
+        for (int i{}; i < block.validByteCount(); ++i)
         {
-            std::cout << person->toString() << "\n";
+            std::cout << block.objects()[i]->toString() << "\n";
         }
 
     }

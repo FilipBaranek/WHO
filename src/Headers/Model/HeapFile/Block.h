@@ -1,7 +1,5 @@
 #pragma once
 #include <iostream>
-#include <list>
-#include <algorithm>
 #include <cstdint>
 #include "Helpers/ByteConverter.h"
 #include "../Interfaces/IRecord.h"
@@ -14,8 +12,9 @@ class Block
 
 private:
 	int m_clusterSize;
+	int m_validBlockCount;
 	int m_blockingFactor;
-	std::list<T*> m_data;
+	T** m_data;
 
 public:
 	Block(int clusterSize, int objectSize)
@@ -30,14 +29,17 @@ public:
 			std::cout << "Cluster size was too low, size was adjusted to " << m_clusterSize << " as bare minimum\n";
 		}
 
+		m_validBlockCount = 0;
 		m_blockingFactor = m_clusterSize / objectSize;
+		m_data = new T*[m_blockingFactor];
 	}
 
 	bool insert(T* object)
 	{
-		if (m_data.size() < m_blockingFactor)
+		if (m_validBlockCount < m_blockingFactor)
 		{
-			m_data.push_back(object);
+			m_data[m_validBlockCount] = object;
+			++m_validBlockCount;
 			return true;
 		}
 		return false;
@@ -45,32 +47,34 @@ public:
 
 	T* find(T* object)
 	{
-		auto it = std::find_if(m_data.begin(), m_data.end(), [&object](T* data) {
-			return object->is(data);
-		});
-
-		if (it == m_data.end())
+		for (int i{}; i < m_validBlockCount; ++i)
 		{
-			return nullptr;
+			if (m_data[i]->is(object))
+			{
+				return m_data[i];
+			}
 		}
-		return *it;
+		return nullptr;
 	}
 
 	T* remove(T* object)
 	{
-		auto it = std::find_if(m_data.begin(), m_data.end(), [&object](T* data) {
-			return object->is(data);
-		});
-
-		if (it == m_data.end())
+		for (int i{}; i < m_validBlockCount; ++i)
 		{
-			return nullptr;
+			if (m_data[i]->is(object))
+			{
+				if (i < m_blockingFactor - 1)
+				{
+					std::swap(m_data[i], m_data[m_validBlockCount - 1]);
+				}
+				T* removedObject = m_data[m_validBlockCount - 1];
+				m_data[m_validBlockCount - 1] = nullptr;
+				--m_validBlockCount;
+				
+				return removedObject;
+			}
 		}
-
-		T* deletedObject = *it;
-		m_data.erase(it);
-		
-		return deletedObject;
+		return nullptr;
 	}
 
 	void toBytes(uint8_t* outputBuffer)
@@ -80,53 +84,59 @@ public:
 			return;
 		}
 
-		int validCount = validByteCount();
 		uint8_t* index = outputBuffer;
-		ByteConverter::toByteFromPrimitive<int>(validCount, index);
-		index += sizeof(validCount);
+		ByteConverter::toByteFromPrimitive<int>(m_validBlockCount, index);
+		index += sizeof(m_validBlockCount);
 		
-		for (auto& object : m_data)
+		for (int i{}; i < m_validBlockCount; ++i)
 		{
-			object->toBytes(index);
-			index += object->getSize();
+			m_data[i]->toBytes(index);
+			index += m_data[i]->getSize();
 		}
 	}
 
 	void fromBytes(uint8_t* buffer)
 	{
-		if (m_data.size() > 0)
+		if (m_validBlockCount > 0)
 		{
 			clear();
 		}
 
 		uint8_t* index = buffer;
-		int validCount = ByteConverter::fromByteToPrimitive<int>(index);
-		index += sizeof(validCount);
+		m_validBlockCount = ByteConverter::fromByteToPrimitive<int>(index);
+		index += sizeof(m_validBlockCount);
 		
-		for (int i{}; i < validCount; ++i)
+		for (int i{}; i < m_validBlockCount; ++i)
 		{
-			m_data.push_back(RecordFactory::createInstance<T>(index));
-			index += m_data.back()->getSize();
+			m_data[i] = RecordFactory::createInstance<T>(index);
+			index += m_data[i]->getSize();
 		}
 	}
 
-	inline std::list<T*>& objects() { return m_data; }
+	inline T** objects() { return m_data; }
 
-	inline int validByteCount() { return m_data.size(); }
+	inline int validByteCount() { return m_validBlockCount; }
 
-	inline int getSize() { return m_clusterSize; }
+	inline int getSize() { return sizeof(m_validBlockCount) + m_clusterSize; }
+
+	static Block<T>* createInstance()
+	{
+
+	}
 
 	void clear()
 	{
-		for (auto& object : m_data)
+		for (int i{}; i < m_validBlockCount; ++i)
 		{
-			delete object;
+			delete m_data[i];
+			m_data[i] = nullptr;
 		}
-		m_data.clear();
+		m_validBlockCount = 0;
 	}
 
 	~Block()
 	{
 		clear();
+		delete[] m_data;
 	}
 };

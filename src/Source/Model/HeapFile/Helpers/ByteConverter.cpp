@@ -15,14 +15,8 @@ uint8_t* ByteConverter::toByteFromString(BinaryString& string, uint8_t* bytesOut
 		toByteFromPrimitive<char>(string.m_str[i], index);
 		++index;
 	}
-	for (int i = string.m_validBitCount; i < string.m_capacity; ++i)
-	{
-		char padding;
-		toByteFromPrimitive<char>(padding, index);
-		++index;
-	}
 
-	return index;
+	return index + (string.m_capacity - string.m_validBitCount);
 }
 
 BinaryString ByteConverter::fromByteToString(std::string& destString, uint8_t* byteBuffer)
