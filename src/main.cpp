@@ -82,19 +82,30 @@ int main()
 			std::chrono::year_month_day{std::chrono::year{1998}, std::chrono::month{6}, std::chrono::day{5}}
 		};
 
+		Person* person8 = new Person{
+			"01240",
+			"zz",
+			"cc",
+			std::chrono::year_month_day{std::chrono::year{1998}, std::chrono::month{6}, std::chrono::day{5}}
+		};
+
         Person* dummy = RecordFactory::createInstance<Person>();
 
         HeapFile<Person> heapFile("../../../data/", dummy->getSize() * 5);
         heapFile.open();
         int addr1 = heapFile.insert(person1);
+		std::cout << addr1 << "\n";
 		int addr2 = heapFile.insert(person2);
+		std::cout << addr2 << "\n";
 		int addr3 = heapFile.insert(person3);
+		std::cout << addr3 << "\n";
 		
 		Person key("01235", "", "", dummy->birthDay());
 		
 		Person* foundPerson = heapFile.find(addr2, &key);
 		std::cout << foundPerson->toString();
 		Person* removedPerson = heapFile.remove(addr2, &key);
+		std::cout << heapFile.size() << "\n";
 
 		if (removedPerson != nullptr)
 		{
@@ -113,10 +124,16 @@ int main()
 			delete foundPerson;
 		}
 
-		heapFile.insert(person4);
-		heapFile.insert(person5);
-		heapFile.insert(person6);
+		int addr4 = heapFile.insert(person4);
+		std::cout << addr4 << "\n";
+		int addr5 = heapFile.insert(person5);
+		std::cout << addr5 << "\n";
+ 		int addr6 = heapFile.insert(person6);
+		std::cout << addr6 << "\n";
 		int addr7 = heapFile.insert(person7);
+		std::cout << addr7 << "\n";
+		int addr8 = heapFile.insert(person8);
+		std::cout << addr8 << "\n";
 
 		delete removedPerson;
         delete dummy;

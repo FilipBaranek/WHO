@@ -44,6 +44,10 @@ public:
 		{
 			readHeader();
 		}
+		else
+		{
+			m_emptyAddresses.push_back(0);
+		}
 	}
 
 	int size()
@@ -157,16 +161,10 @@ public:
 		if (m_partiallyEmptyAddresses.size() > 0)
 		{
 			address = *m_partiallyEmptyAddresses.begin();
-			m_partiallyEmptyAddresses.erase(m_partiallyEmptyAddresses.begin());
 		}
 		else if (m_emptyAddresses.size() > 0)
 		{
 			address = *m_emptyAddresses.begin();
-			m_emptyAddresses.erase(m_emptyAddresses.begin());
-		}
-		else
-		{
-			address = size();
 			newBlock = true;
 		}
 
@@ -183,23 +181,25 @@ public:
 
 		if (newBlock && inserted && !block.isFull())
 		{
+			std::swap(*m_emptyAddresses.begin(), *m_emptyAddresses.rbegin());
+			m_emptyAddresses.pop_back();
 			m_partiallyEmptyAddresses.push_back(address);
 		}
 		else if (inserted && block.isFull())
 		{
 			auto partiallyEmptyIt = std::find(m_partiallyEmptyAddresses.begin(), m_partiallyEmptyAddresses.end(), address);
-			auto emptyIt = std::find(m_emptyAddresses.begin(), m_emptyAddresses.end(), address);
 
-			if (emptyIt != m_emptyAddresses.end())
-			{
-				std::swap(*emptyIt, m_emptyAddresses.back());
-				m_emptyAddresses.pop_back();
-			}
-			else if (partiallyEmptyIt != m_partiallyEmptyAddresses.end())
+			if (partiallyEmptyIt != m_partiallyEmptyAddresses.end())
 			{
 				std::swap(*partiallyEmptyIt, m_partiallyEmptyAddresses.back());
 				m_partiallyEmptyAddresses.pop_back();
 			}
+
+			Block<T> newBlock(m_clusterSize, m_objectSize);
+			std::vector<uint8_t> newBuffer(newBlock.getSize());
+			int newAddress = size();
+			writeBlock(newAddress, newBuffer.data(), newBlock);
+			m_emptyAddresses.push_back(newAddress);
 		}
 		
 		return inserted ? address : -1;
@@ -250,7 +250,8 @@ public:
 
 	~HeapFile()
 	{
-		if (size() == 1 && m_partiallyEmptyAddresses.size() == 0 && m_emptyAddresses.size() == 1)
+		///TIETO IFY MAJU BYT PRE UNIVERZALNU VELKOST - MOZE BYT PRAZDNA/GARBAGE BLOK AJ NA KONCI
+		if (m_emptyAddresses.size() == 1 && *m_emptyAddresses.begin() == size() - 1)
 		{
 			Block<T> block(m_clusterSize, m_objectSize);
 			std::vector<uint8_t> buffer(block.getSize());
@@ -267,10 +268,8 @@ public:
 				headerFile.close();
 			}
 		}
-		else
-		{
-			writeHeader();
-		}
+		//K TOMUTO SA VRATIT
+		writeHeader();
 
 		std::cout << size() << "\n";
 		
