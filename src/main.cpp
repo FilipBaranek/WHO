@@ -54,6 +54,34 @@ int main()
 			std::chrono::year_month_day{std::chrono::year{1998}, std::chrono::month{6}, std::chrono::day{5}}
 		};
 
+		Person* person4 = new Person{
+			"01237",
+			"asdawda",
+			"Adsadsada",
+			std::chrono::year_month_day{std::chrono::year{1998}, std::chrono::month{6}, std::chrono::day{5}}
+		};
+
+		Person* person5 = new Person{
+			"01238",
+			"Netatko",
+			"NeAverage",
+			std::chrono::year_month_day{std::chrono::year{1998}, std::chrono::month{6}, std::chrono::day{5}}
+		};
+
+		Person* person6 = new Person{
+			"01239",
+			"jj",
+			"cc",
+			std::chrono::year_month_day{std::chrono::year{1998}, std::chrono::month{6}, std::chrono::day{5}}
+		};
+
+		Person* person7 = new Person{
+			"01240",
+			"nn",
+			"bb",
+			std::chrono::year_month_day{std::chrono::year{1998}, std::chrono::month{6}, std::chrono::day{5}}
+		};
+
         Person* dummy = RecordFactory::createInstance<Person>();
 
         HeapFile<Person> heapFile("../../../data/", dummy->getSize() * 5);
@@ -64,10 +92,33 @@ int main()
 		
 		Person key("01235", "", "", dummy->birthDay());
 		
-		Person* foundPerson = heapFile.find(0, &key);
+		Person* foundPerson = heapFile.find(addr2, &key);
 		std::cout << foundPerson->toString();
+		Person* removedPerson = heapFile.remove(addr2, &key);
+
+		if (removedPerson != nullptr)
+		{
+			std::cout << "Person was removed\n";
+		}
 
 		delete foundPerson;
+
+		foundPerson = heapFile.find(addr2, &key);
+		if (foundPerson == nullptr)
+		{
+			std::cout << "Person was realy removed\n";
+		}
+		else
+		{
+			delete foundPerson;
+		}
+
+		heapFile.insert(person4);
+		heapFile.insert(person5);
+		heapFile.insert(person6);
+		int addr7 = heapFile.insert(person7);
+
+		delete removedPerson;
         delete dummy;
     }
 

@@ -63,7 +63,7 @@ public:
 		{
 			if (m_data[i]->is(object))
 			{
-				if (i < m_blockingFactor - 1)
+				if (i != m_validBlockCount - 1)
 				{
 					std::swap(m_data[i], m_data[m_validBlockCount - 1]);
 				}

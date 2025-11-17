@@ -48,10 +48,16 @@ public:
 
 	int size()
 	{
+		m_file.clear();
 		m_file.seekg(0, std::ios::end);
+		std::streampos pos = m_file.tellg();
+		if (pos <= 0)
+		{
+			return 0;
+		}
 
 		auto block = BlockFactory::createInstance<T>(m_clusterSize, m_objectSize);
-		int size = m_file.tellg() / block->getSize();
+		int size = static_cast<int>(pos) / block->getSize();
 		delete block;
 
 		return size;
@@ -128,6 +134,21 @@ public:
 
 		headerFile.close();
 	}
+
+	void loadBlock(int& address, uint8_t* buffer, Block<T>& block)
+	{
+		m_file.seekg(address * block.getSize());
+		m_file.read(reinterpret_cast<char*>(buffer), block.getSize());
+		block.fromBytes(buffer);
+	}
+
+	void writeBlock(int& address, uint8_t* buffer, Block<T>& block)
+	{
+		block.toBytes(buffer);
+		m_file.seekp(address * block.getSize());
+		m_file.write(reinterpret_cast<char*>(buffer), block.getSize());
+		m_file.flush();
+	}
 	
 	int insert(T* object)
 	{
@@ -154,23 +175,34 @@ public:
 		
 		if (!newBlock)
 		{
-			m_file.seekg(address * block.getSize());
-			m_file.read(reinterpret_cast<char*>(buffer.data()), block.getSize());
-			block.fromBytes(buffer.data());
+			loadBlock(address, buffer.data(), block);
 		}
 
-		block.insert(object);
-		block.toBytes(buffer.data());
-		m_file.seekp(address * block.getSize());
-		m_file.write(reinterpret_cast<char*>(buffer.data()), block.getSize());
-		m_file.flush();
+		bool inserted = block.insert(object);
+		writeBlock(address, buffer.data(), block);
 
-		if (newBlock && !block.isFull())
+		if (newBlock && inserted && !block.isFull())
 		{
 			m_partiallyEmptyAddresses.push_back(address);
 		}
+		else if (inserted && block.isFull())
+		{
+			auto partiallyEmptyIt = std::find(m_partiallyEmptyAddresses.begin(), m_partiallyEmptyAddresses.end(), address);
+			auto emptyIt = std::find(m_emptyAddresses.begin(), m_emptyAddresses.end(), address);
+
+			if (emptyIt != m_emptyAddresses.end())
+			{
+				std::swap(*emptyIt, m_emptyAddresses.back());
+				m_emptyAddresses.pop_back();
+			}
+			else if (partiallyEmptyIt != m_partiallyEmptyAddresses.end())
+			{
+				std::swap(*partiallyEmptyIt, m_partiallyEmptyAddresses.back());
+				m_partiallyEmptyAddresses.pop_back();
+			}
+		}
 		
-		return address;
+		return inserted ? address : -1;
 	}
 
 	T* find(int address, T* key)
@@ -183,31 +215,65 @@ public:
 		Block<T> block(m_clusterSize, m_objectSize);
 		std::vector<uint8_t> buffer(block.getSize());
 
-		m_file.seekg(address * block.getSize());
-		m_file.read(reinterpret_cast<char*>(buffer.data()), block.getSize());
-		block.fromBytes(buffer.data());
+		loadBlock(address, buffer.data(), block);
 
 		return block.find(key);
 	}
 
 	T* remove(int address, T* key)
 	{
+		if (address < 0 || address >= size())
+		{
+			return nullptr;
+		}
 
-		//if (block.isEmpty())
-		//{
+		Block<T> block(m_clusterSize, m_objectSize);
+		std::vector<uint8_t> buffer(block.getSize());
 
-		//}
-		//else if (!block.isEmpty() && !block.isFull())
-		//{
+		loadBlock(address, buffer.data(), block);
 
-		//}
+		T* removedObject = block.remove(key);
+		writeBlock(address, buffer.data(), block);
 
-		return nullptr;
+		if (block.isEmpty() && removedObject != nullptr)
+		{
+			m_emptyAddresses.push_back(address);
+		}
+		else if (!block.isEmpty() && !block.isFull() && removedObject != nullptr &&
+				 std::find(m_partiallyEmptyAddresses.begin(), m_partiallyEmptyAddresses.end(), address) == m_partiallyEmptyAddresses.end())
+		{
+			m_partiallyEmptyAddresses.push_back(address);
+		}
+
+		return removedObject;
 	}
 
 	~HeapFile()
 	{
+		if (size() == 1 && m_partiallyEmptyAddresses.size() == 0 && m_emptyAddresses.size() == 1)
+		{
+			Block<T> block(m_clusterSize, m_objectSize);
+			std::vector<uint8_t> buffer(block.getSize());
+
+			int address = 0;
+			loadBlock(address, buffer.data(), block);
+
+			if (block.isEmpty())
+			{
+				m_file.close();
+				m_file.open(m_filePath + FILE_NAME, std::ios::out | std::ios::binary | std::ios::trunc);
+
+				std::fstream headerFile(m_filePath + HEADER_FILE_NAME, std::ios::out | std::ios::binary | std::ios::trunc);
+				headerFile.close();
+			}
+		}
+		else
+		{
+			writeHeader();
+		}
+
+		std::cout << size() << "\n";
+		
 		m_file.close();
-		writeHeader();
 	}
 };
