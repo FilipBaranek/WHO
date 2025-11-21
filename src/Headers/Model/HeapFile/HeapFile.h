@@ -215,20 +215,27 @@ public:
 
 		if (newBlock && inserted)
 		{
-			std::swap(*m_emptyAddresses.begin(), *m_emptyAddresses.rbegin());
+			if (m_emptyAddresses.size() > 1)
+			{
+				std::swap(*m_emptyAddresses.begin(), *m_emptyAddresses.rbegin());
+			}
 			m_emptyAddresses.pop_back();
 			m_partiallyEmptyAddresses.push_back(address);
 		}
 		if (inserted && block.isFull())
 		{
-			auto partiallyEmptyIt = std::find(m_partiallyEmptyAddresses.begin(), m_partiallyEmptyAddresses.end(), address);
-
-			if (partiallyEmptyIt != m_partiallyEmptyAddresses.end())
+			if (m_partiallyEmptyAddresses.size() > 0)
 			{
-				std::swap(*partiallyEmptyIt, m_partiallyEmptyAddresses.back());
+				if (m_partiallyEmptyAddresses.size() > 1)
+				{
+					auto partiallyEmptyIt = std::find(m_partiallyEmptyAddresses.begin(), m_partiallyEmptyAddresses.end(), address);
+					if (partiallyEmptyIt != m_partiallyEmptyAddresses.end() && *partiallyEmptyIt != *m_partiallyEmptyAddresses.rbegin())
+					{
+						std::swap(*partiallyEmptyIt, *m_partiallyEmptyAddresses.rbegin());
+					}
+				}
 				m_partiallyEmptyAddresses.pop_back();
 			}
-
 			Block<T> newBlock(m_clusterSize, m_objectSize);
 			std::vector<uint8_t> newBuffer(newBlock.getSize());
 			int newAddress = size();
@@ -271,11 +278,19 @@ public:
 		T* removedObject = block.remove(key);
 		writeBlock(address, buffer.data(), block);
 
-		if (block.isEmpty() && removedObject != nullptr)
+		if (removedObject != nullptr && block.isEmpty())
 		{
+			if (m_partiallyEmptyAddresses.size() > 0)
+			{
+				if (m_partiallyEmptyAddresses.size() > 1)
+				{
+					std::swap(*m_partiallyEmptyAddresses.begin(), *m_partiallyEmptyAddresses.rbegin());
+				}
+				m_partiallyEmptyAddresses.pop_back();
+			}
 			m_emptyAddresses.push_back(address);
 		}
-		else if (!block.isEmpty() && !block.isFull() && removedObject != nullptr &&
+		else if (removedObject != nullptr && !block.isEmpty() &&
 				 std::find(m_partiallyEmptyAddresses.begin(), m_partiallyEmptyAddresses.end(), address) == m_partiallyEmptyAddresses.end())
 		{
 			m_partiallyEmptyAddresses.push_back(address);

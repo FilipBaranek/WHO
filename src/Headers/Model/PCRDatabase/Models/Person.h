@@ -45,7 +45,7 @@ public:
 	
 	std::string toCsvFormat();
 	
-	std::string toString();
+	std::string toString() override;
 
 	IRecord* clone() override;
 	

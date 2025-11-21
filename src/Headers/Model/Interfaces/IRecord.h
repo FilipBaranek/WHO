@@ -1,6 +1,7 @@
 #pragma once
 #include <cstdint>
 #include <vector>
+#include <string>
 
 class IRecord
 {
@@ -14,6 +15,8 @@ public:
 	virtual bool is(IRecord* other) = 0;
 
 	virtual int getSize() = 0;
+
+	virtual std::string toString() = 0;
 
 	virtual bool toBytes(uint8_t* bytesOutput) = 0;
 

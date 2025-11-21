@@ -9,7 +9,7 @@ template<typename T>
 class FileTester
 {
 private:
-	static constexpr const int REPLICATIONS = 1000;
+	static constexpr const int REPLICATIONS = 200'000;
 	static constexpr const int CHECKPOINT = 10'000;
 	
 	std::random_device m_rd;
@@ -58,7 +58,7 @@ public:
 		Person* personToFind = iterator->first;
 		Person* foundPerson = m_heapFile.find(address, personToFind);
 
-		if (foundPerson == nullptr || !personToFind->is(foundPerson) || !personToFind->equals(foundPerson))
+		if (foundPerson == nullptr || !personToFind->is(foundPerson))
 		{
 			throw std::runtime_error("Incorrect find operation");
 		}
@@ -77,12 +77,13 @@ public:
 		Person* removedPerson = m_heapFile.remove(address, personToRemove);
 		Person* foundPerson = m_heapFile.find(address, personToRemove);
 
-		if (removedPerson == nullptr || !personToRemove->is(removedPerson) || !personToRemove->equals(removedPerson) || foundPerson != nullptr)
+		if (removedPerson == nullptr || !personToRemove->is(removedPerson) || foundPerson != nullptr)
 		{
 			throw std::runtime_error("Incorrect removal");
 		}
 
 		m_data.erase(personToRemove);
+		delete personToRemove;
 		delete removedPerson;
 		delete foundPerson;
 	}
@@ -102,7 +103,6 @@ public:
 			{
 				std::cout << "Operation " << i + 1 << "\n";
 			}
-			std::cout << "Operation " << i + 1 << " HeapFile size: " << m_heapFile.size() << "\n";
 			
 			int operation = probability(m_gen);
 

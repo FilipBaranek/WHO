@@ -47,32 +47,49 @@ public:
 
 	T* find(T* object)
 	{
+		T* foundObject = nullptr;
 		for (int i{}; i < m_validBlockCount; ++i)
 		{
-			if (m_data[i]->is(object))
+			if (m_data[i]->equals(object))
 			{
-				return dynamic_cast<T*>(m_data[i]->clone());
+				foundObject = m_data[i];
+				break;
+			}
+			else if (m_data[i]->is(object))
+			{
+				foundObject = m_data[i];
 			}
 		}
-		return nullptr;
+		return foundObject != nullptr ? dynamic_cast<T*>(foundObject->clone()) : nullptr;
 	}
 
 	T* remove(T* object)
 	{
+		int index = -1;
 		for (int i{}; i < m_validBlockCount; ++i)
 		{
-			if (m_data[i]->is(object))
+			if (m_data[i]->equals(object))
 			{
-				if (i != m_validBlockCount - 1)
-				{
-					std::swap(m_data[i], m_data[m_validBlockCount - 1]);
-				}
-				T* removedObject = m_data[m_validBlockCount - 1];
-				m_data[m_validBlockCount - 1] = nullptr;
-				--m_validBlockCount;
-				
-				return removedObject;
+				index = i;
+				break;
 			}
+			else if (m_data[i]->is(object))
+			{
+				index = i;
+			}
+		}
+		
+		if (index != -1)
+		{
+			if (index != m_validBlockCount - 1)
+			{
+				std::swap(m_data[index], m_data[m_validBlockCount - 1]);
+			}
+			T* removedObject = m_data[m_validBlockCount - 1];
+			m_data[m_validBlockCount - 1] = nullptr;
+			--m_validBlockCount;
+
+			return removedObject;
 		}
 		return nullptr;
 	}
