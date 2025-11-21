@@ -9,7 +9,7 @@ template<typename T>
 class FileTester
 {
 private:
-	static constexpr const int REPLICATIONS = 200'000;
+	static constexpr const int REPLICATIONS = 500'000;
 	static constexpr const int CHECKPOINT = 10'000;
 	
 	std::random_device m_rd;
@@ -90,7 +90,11 @@ public:
 	
 	void printOut()
 	{
-
+		m_heapFile.printFile();
+		m_heapFile.close();
+		m_heapFile.open();
+		m_heapFile.printAddresses();
+		std::cout << "\nActual size: " << m_heapFile.size() << "\n\n";
 	}
 	
 	void runTests()

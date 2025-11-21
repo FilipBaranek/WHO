@@ -1,6 +1,8 @@
 #pragma once
 #include <iostream>
 #include <cstdint>
+#include <string>
+#include <sstream>
 #include "Helpers/ByteConverter.h"
 #include "../Interfaces/IRecord.h"
 #include "../Factories/RecordFactory.h"
@@ -31,7 +33,7 @@ public:
 
 		m_validBlockCount = 0;
 		m_blockingFactor = m_clusterSize / objectSize;
-		m_data = new T*[m_blockingFactor];
+		m_data = new T * [m_blockingFactor];
 	}
 
 	bool insert(T* object)
@@ -78,7 +80,7 @@ public:
 				index = i;
 			}
 		}
-		
+
 		if (index != -1)
 		{
 			if (index != m_validBlockCount - 1)
@@ -99,7 +101,7 @@ public:
 		uint8_t* index = outputBuffer;
 		ByteConverter::toByteFromPrimitive<int>(m_validBlockCount, index);
 		index += sizeof(m_validBlockCount);
-		
+
 		for (int i{}; i < m_validBlockCount; ++i)
 		{
 			m_data[i]->toBytes(index);
@@ -117,7 +119,7 @@ public:
 		uint8_t* index = buffer;
 		m_validBlockCount = ByteConverter::fromByteToPrimitive<int>(index);
 		index += sizeof(m_validBlockCount);
-		
+
 		for (int i{}; i < m_validBlockCount; ++i)
 		{
 			m_data[i] = RecordFactory::createInstance<T>(index);
@@ -132,6 +134,19 @@ public:
 	inline bool isFull() { return m_validBlockCount == m_blockingFactor; }
 
 	inline bool isEmpty() { return m_validBlockCount == 0; }
+
+	std::string toString()
+	{
+		std::ostringstream oss;
+		oss << "Valid data:";
+		for (int i{}; i < m_validBlockCount; ++i)
+		{
+			oss << m_data[i]->toString();
+		}
+		oss << "\nCluster size: " << m_clusterSize << " Valid block count: " << m_validBlockCount << " Blocking factor: " << m_blockingFactor << "\n\n";
+
+		return oss.str();
+	}
 
 	static Block<T>* createInstance(int clusterSize, int objectSize)
 	{

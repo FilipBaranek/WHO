@@ -1,7 +1,10 @@
-#pragma once
+﻿#pragma once
+#define NOMINMAX
+#include <Windows.h>
 #include <string>
-#include <fstream>
+#include <list>
 #include <vector>
+#include <fstream>
 #include "Block.h"
 #include "Helpers/ByteConverter.h"
 #include "../Factories/RecordFactory.h"
@@ -18,8 +21,8 @@ private:
 	int m_objectSize;
 	std::string m_filePath;
 	std::fstream m_file;
-	std::vector<int> m_partiallyEmptyAddresses;
-	std::vector<int> m_emptyAddresses;
+	std::list<int> m_partiallyEmptyAddresses;
+	std::list<int> m_emptyAddresses;
 
 	void loadBlock(int& address, uint8_t* buffer, Block<T>& block)
 	{
@@ -35,6 +38,54 @@ private:
 		m_file.write(reinterpret_cast<char*>(buffer), block.getSize());
 		m_file.flush();
 	}
+
+	void insertEmptyAddress(int address)
+	{
+		auto iterator = m_emptyAddresses.begin();
+		while (iterator != m_emptyAddresses.end() && *iterator < address)
+		{
+			++iterator;
+		}
+		m_emptyAddresses.insert(iterator, address);
+	}
+
+	void truncateFile(std::string& filePath, int64_t newSize)
+	{
+		HANDLE hFile = CreateFileA(
+			filePath.c_str(),
+			GENERIC_WRITE,
+			0,
+			nullptr,
+			OPEN_ALWAYS,
+			FILE_ATTRIBUTE_NORMAL,
+			nullptr
+		);
+
+		if (hFile == INVALID_HANDLE_VALUE)
+		{
+			std::cerr << "\nFailed to open file\n";
+			return;
+		}
+
+		LARGE_INTEGER li;
+		li.QuadPart = newSize;
+		if (!SetFilePointerEx(hFile, li, nullptr, FILE_BEGIN))
+		{
+			std::cerr << "Failed to move file pointer\n";
+			CloseHandle(hFile);
+			return;
+		}
+
+		if (!SetEndOfFile(hFile))
+		{
+			std::cerr << "Failed to truncate file\n";
+			CloseHandle(hFile);
+			return;
+		}
+
+		CloseHandle(hFile);
+	}
+
 
 public:
 	HeapFile(std::string filePath, int clusterSize)
@@ -59,10 +110,6 @@ public:
 		{
 			readHeader();
 		}
-		else
-		{
-			m_emptyAddresses.push_back(0);
-		}
 	}
 
 	void close()
@@ -71,32 +118,34 @@ public:
 		{
 			throw std::runtime_error("Trying to close already closed file");
 		}
-		if (m_emptyAddresses.size() == 1 && *m_emptyAddresses.begin() == size() - 1)
+
+		int totalBlocks = size();
+		if (totalBlocks == 0)
+		{
+			return;
+		}
+
+		int lastValidBlock = totalBlocks - 1;
+		while (true)
 		{
 			Block<T> block(m_clusterSize, m_objectSize);
 			std::vector<uint8_t> buffer(block.getSize());
-
-			int address = 0;
-			loadBlock(address, buffer.data(), block);
-
-			if (block.isEmpty())
+			loadBlock(lastValidBlock, buffer.data(), block);
+			if (!block.isEmpty())
 			{
-				m_file.close();
-				m_file.open(m_filePath + FILE_NAME, std::ios::out | std::ios::binary | std::ios::trunc);
+				break;
+			}
+			m_emptyAddresses.remove(lastValidBlock);
+			--lastValidBlock;
+		}
 
-				std::fstream headerFile(m_filePath + HEADER_FILE_NAME, std::ios::out | std::ios::binary | std::ios::trunc);
-				headerFile.close();
-			}
-			else
-			{
-				writeHeader();
-			}
-		}
-		else
-		{
-			writeHeader();
-		}
+		Block<T> dummy(m_clusterSize, m_objectSize);
+		long long newFileSize = static_cast<long long>((lastValidBlock + 1) * dummy.getSize());
+		std::string filePath = m_filePath + FILE_NAME;
+			
 		m_file.close();
+		truncateFile(filePath, newFileSize);
+		writeHeader();
 	}
 
 	int size()
@@ -201,6 +250,12 @@ public:
 			address = *m_emptyAddresses.begin();
 			newBlock = true;
 		}
+		else
+		{
+			address = size();
+			insertEmptyAddress(address);
+			newBlock = true;
+		}
 
 		Block<T> block(m_clusterSize, m_objectSize);
 		std::vector<uint8_t> buffer(block.getSize());
@@ -215,32 +270,12 @@ public:
 
 		if (newBlock && inserted)
 		{
-			if (m_emptyAddresses.size() > 1)
-			{
-				std::swap(*m_emptyAddresses.begin(), *m_emptyAddresses.rbegin());
-			}
-			m_emptyAddresses.pop_back();
+			m_emptyAddresses.remove(address);
 			m_partiallyEmptyAddresses.push_back(address);
 		}
 		if (inserted && block.isFull())
 		{
-			if (m_partiallyEmptyAddresses.size() > 0)
-			{
-				if (m_partiallyEmptyAddresses.size() > 1)
-				{
-					auto partiallyEmptyIt = std::find(m_partiallyEmptyAddresses.begin(), m_partiallyEmptyAddresses.end(), address);
-					if (partiallyEmptyIt != m_partiallyEmptyAddresses.end() && *partiallyEmptyIt != *m_partiallyEmptyAddresses.rbegin())
-					{
-						std::swap(*partiallyEmptyIt, *m_partiallyEmptyAddresses.rbegin());
-					}
-				}
-				m_partiallyEmptyAddresses.pop_back();
-			}
-			Block<T> newBlock(m_clusterSize, m_objectSize);
-			std::vector<uint8_t> newBuffer(newBlock.getSize());
-			int newAddress = size();
-			writeBlock(newAddress, newBuffer.data(), newBlock);
-			m_emptyAddresses.push_back(newAddress);
+			m_partiallyEmptyAddresses.remove(address);
 		}
 		
 		return inserted ? address : -1;
@@ -280,15 +315,8 @@ public:
 
 		if (removedObject != nullptr && block.isEmpty())
 		{
-			if (m_partiallyEmptyAddresses.size() > 0)
-			{
-				if (m_partiallyEmptyAddresses.size() > 1)
-				{
-					std::swap(*m_partiallyEmptyAddresses.begin(), *m_partiallyEmptyAddresses.rbegin());
-				}
-				m_partiallyEmptyAddresses.pop_back();
-			}
-			m_emptyAddresses.push_back(address);
+			m_partiallyEmptyAddresses.remove(address);
+			insertEmptyAddress(address);
 		}
 		else if (removedObject != nullptr && !block.isEmpty() &&
 				 std::find(m_partiallyEmptyAddresses.begin(), m_partiallyEmptyAddresses.end(), address) == m_partiallyEmptyAddresses.end())
@@ -297,6 +325,48 @@ public:
 		}
 
 		return removedObject;
+	}
+
+	void printFile()
+	{
+		int fileSize = size();
+
+		for (int i{}; i < fileSize; ++i)
+		{
+			Block<T> block(m_clusterSize, m_objectSize);
+			std::vector<uint8_t> buffer(block.getSize());
+
+			loadBlock(i, buffer.data(), block);
+
+			std::cout << "Block[" << i << "]\n" << block.toString() << "\n";
+		}
+	}
+
+	void printAddresses()
+	{
+		std::cout << "Partially empty addresses:\n";
+		for (int address : m_partiallyEmptyAddresses)
+		{
+			std::cout << address << " ";
+		}
+		std::cout << "\n\nEmpty addresses:\n";
+		for (int address : m_emptyAddresses)
+		{
+			std::cout << address << " ";
+		}
+	}
+
+	void clear()
+	{
+		if (m_file.is_open())
+		{
+			m_file.close();
+		}
+		m_file.open(m_filePath + FILE_NAME, std::ios::out | std::ios::binary | std::ios::trunc);
+		m_emptyAddresses.clear();
+		m_partiallyEmptyAddresses.clear();
+
+		close();
 	}
 
 	~HeapFile()
