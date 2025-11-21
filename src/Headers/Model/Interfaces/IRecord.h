@@ -7,6 +7,8 @@ class IRecord
 public:
 	IRecord() = default;
 
+	virtual IRecord* clone() = 0;
+
 	virtual bool equals(IRecord* other) = 0;
 
 	virtual bool is(IRecord* other) = 0;

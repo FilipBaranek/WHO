@@ -38,7 +38,7 @@ public:
 	{
 		if (m_validBlockCount < m_blockingFactor)
 		{
-			m_data[m_validBlockCount] = object;
+			m_data[m_validBlockCount] = dynamic_cast<T*>(object->clone());
 			++m_validBlockCount;
 			return true;
 		}
@@ -51,7 +51,7 @@ public:
 		{
 			if (m_data[i]->is(object))
 			{
-				return new T(m_data[i]);
+				return dynamic_cast<T*>(m_data[i]->clone());
 			}
 		}
 		return nullptr;
@@ -79,11 +79,6 @@ public:
 
 	void toBytes(uint8_t* outputBuffer)
 	{
-		if (m_validBlockCount == 0)
-		{
-			return;
-		}
-
 		uint8_t* index = outputBuffer;
 		ByteConverter::toByteFromPrimitive<int>(m_validBlockCount, index);
 		index += sizeof(m_validBlockCount);

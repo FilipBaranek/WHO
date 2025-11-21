@@ -49,11 +49,12 @@ private:
 	static void generateLocation(std::mt19937& generator, unsigned int& workplace, unsigned int& district, unsigned int& region);
 
 public:
-	RandomDataGenerator() = delete;
+	static Person* generatePerson();
 
 	static PersonWrapper* generatePeople(std::vector<PersonWrapper*>& peopleDuplicityList, AVLTree<PersonWrapper*>& people);
 	
 	static TestWrapper* generateTests(std::vector<PersonWrapper*>& peopleList, AVLTree<TestWrapper*>& tests);
-	
+
+	RandomDataGenerator() = delete;
 	~RandomDataGenerator() = delete;
 };

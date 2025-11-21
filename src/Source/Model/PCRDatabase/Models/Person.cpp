@@ -22,6 +22,11 @@ std::string Person::toString()
 	return oss.str();
 }
 
+IRecord* Person::clone()
+{
+	return new Person(m_birthNumber, m_firstName, m_lastName, m_birthDay);
+}
+
 bool Person::equals(IRecord* other)
 {
 	Person* otherPerson = dynamic_cast<Person*>(other);

@@ -32,13 +32,6 @@ public:
 		m_firstNameBin{MAX_FIRST_NAME_SIZE, static_cast<int>(m_firstName.size()), m_firstName},
 		m_lastNameBin{MAX_LAST_NAME_SIZE, static_cast<int>(m_lastName.size()), m_lastName}
 	{}
-
-	Person(Person*& other) :
-		m_birthNumber(other->birthNumber()), m_firstName(other->firstName()), m_lastName(other->lastName()), m_birthDay(other->birthDay()),
-		m_birthNumberBin{ MAX_BIRTHNUMBER_SIZE, static_cast<int>(m_birthNumber.size()), m_birthNumber },
-		m_firstNameBin{ MAX_FIRST_NAME_SIZE, static_cast<int>(m_firstName.size()), m_firstName },
-		m_lastNameBin{ MAX_LAST_NAME_SIZE, static_cast<int>(m_lastName.size()), m_lastName }
-	{}
 	
 	inline void setBirthNumber(std::string birthNumber) { m_birthNumber = birthNumber; }
 	
@@ -53,6 +46,8 @@ public:
 	std::string toCsvFormat();
 	
 	std::string toString();
+
+	IRecord* clone() override;
 	
 	bool equals(IRecord* other) override;
 
