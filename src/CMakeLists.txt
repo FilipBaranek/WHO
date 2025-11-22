@@ -80,7 +80,7 @@ add_executable (
     "Headers/Model/Factories/BlockFactory.h"
     "Headers/Model/Tests/FileTester.h"
     
-)
+ "Source/Model/Tests/FileTester.cpp")
 
 target_include_directories(BST PRIVATE ${glm_SOURCE_DIR})
 

@@ -31,7 +31,7 @@ void testFile()
 {
     Person* dummy = RecordFactory::createInstance<Person>();
 
-    FileTester<Person> tester("../../../data/", dummy->getSize() * 5);
+    FileTester tester("../../../data/", (dummy->getSize() * 5) + 10);
     tester.runTests();
 
     delete dummy;

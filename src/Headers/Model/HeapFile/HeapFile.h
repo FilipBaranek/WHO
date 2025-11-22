@@ -58,11 +58,6 @@ private:
 
 		if (hFile == INVALID_HANDLE_VALUE)
 		{
-			std::cout << "Size before: " << sizeBefore << "\n";
-			printFile();
-			std::cout << "\n";
-			printAddresses();
-
 			throw std::runtime_error("Failed to open file");
 		}
 
@@ -390,6 +385,22 @@ public:
 		for (int address : m_emptyAddresses)
 		{
 			std::cout << address << " ";
+		}
+	}
+
+	void testSize()
+	{
+		Block<T> lastBlock(m_clusterSize, m_objectSize);
+		std::vector<uint8_t> buffer(lastBlock.getSize());
+		int lastAddress = size() - 1;
+
+		if (lastAddress >= 0)
+		{
+			loadBlock(lastAddress, buffer.data(), lastBlock);
+			if (lastBlock.validBlocks() == 0)
+			{
+				throw std::runtime_error("Invalid size - last empty block must be truncate");
+			}
 		}
 	}
 
