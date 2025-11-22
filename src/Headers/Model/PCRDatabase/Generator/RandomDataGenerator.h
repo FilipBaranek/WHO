@@ -49,7 +49,7 @@ private:
 	static void generateLocation(std::mt19937& generator, unsigned int& workplace, unsigned int& district, unsigned int& region);
 
 public:
-	static Person* generatePerson();
+	static Person* generatePerson(std::mt19937& gen);
 
 	static PersonWrapper* generatePeople(std::vector<PersonWrapper*>& peopleDuplicityList, AVLTree<PersonWrapper*>& people);
 	

@@ -1,6 +1,11 @@
 ﻿#pragma once
 #define NOMINMAX
-#include <Windows.h>
+#ifdef _WIN32
+	#include <Windows.h>
+#elif __linux__
+	#include <fcntl.h>
+	#include <unistd.h> 
+#endif
 #include <string>
 #include <list>
 #include <vector>
@@ -8,7 +13,6 @@
 #include "Block.h"
 #include "Helpers/ByteConverter.h"
 #include "../Factories/RecordFactory.h"
-#include "../Factories/BlockFactory.h"
 
 template<typename T>
 class HeapFile
@@ -39,53 +43,91 @@ private:
 		m_file.flush();
 	}
 
-	void insertEmptyAddress(int address)
-	{
-		auto iterator = m_emptyAddresses.begin();
-		while (iterator != m_emptyAddresses.end() && *iterator < address)
-		{
-			++iterator;
-		}
-		m_emptyAddresses.insert(iterator, address);
-	}
-
-	void truncateFile(std::string& filePath, int64_t newSize)
+#ifdef _WIN32
+	void truncateWindowsFile(std::string& filePath, int64_t& newSize, int& sizeBefore)
 	{
 		HANDLE hFile = CreateFileA(
 			filePath.c_str(),
 			GENERIC_WRITE,
 			0,
 			nullptr,
-			OPEN_ALWAYS,
+			OPEN_EXISTING,
 			FILE_ATTRIBUTE_NORMAL,
 			nullptr
 		);
 
 		if (hFile == INVALID_HANDLE_VALUE)
 		{
-			std::cerr << "\nFailed to open file\n";
-			return;
+			std::cout << "Size before: " << sizeBefore << "\n";
+			printFile();
+			std::cout << "\n";
+			printAddresses();
+
+			throw std::runtime_error("Failed to open file");
 		}
 
 		LARGE_INTEGER li;
 		li.QuadPart = newSize;
 		if (!SetFilePointerEx(hFile, li, nullptr, FILE_BEGIN))
 		{
-			std::cerr << "Failed to move file pointer\n";
 			CloseHandle(hFile);
-			return;
+			throw std::runtime_error("Failed to move file pointer");
 		}
 
 		if (!SetEndOfFile(hFile))
 		{
-			std::cerr << "Failed to truncate file\n";
 			CloseHandle(hFile);
-			return;
+			throw std::runtime_error("Failed to truncate file");
 		}
 
 		CloseHandle(hFile);
 	}
+#elif __linux__
+	void truncateLinuxFile(std::string& filePath, int64_t& newSize)
+	{
+		int fd = open(filePath.c_str(), O_WRONLY);
+		if (fd == -1)
+		{
+			throw std::runtime_error("Failed to open file");
+		}
+		
+		if (ftruncate(fd, newSize) != 0)
+		{
+			close(fd);
+			throw std::runtime_error("Failed to truncate file");
+		}
+		close(fd);
+	}
+#endif
 
+	void truncate()
+	{
+		int lastBlock = size() - 1;
+		int sizeBefore = lastBlock;
+
+		if (lastBlock == m_emptyAddresses.back())
+		{
+			while (lastBlock >= 0 && m_emptyAddresses.size() > 0 && lastBlock == m_emptyAddresses.back())
+			{
+				m_emptyAddresses.pop_back();
+				--lastBlock;
+			}
+
+			Block<T> dummy(m_clusterSize, m_objectSize);
+			int64_t newSize = (lastBlock + 1) * dummy.getSize();
+			std::string fileName = m_filePath + FILE_NAME;
+
+			m_file.close();
+#ifdef _WIN32
+			truncateWindowsFile(fileName, newSize, sizeBefore);
+#elif __linux__
+			truncateLinuxFile(fileName, newSize);
+#else
+			throw std::runtime_error("Unsupported OS");
+#endif
+			m_file.open(m_filePath + FILE_NAME, std::ios::in | std::ios::out | std::ios::binary);
+		}
+	}
 
 public:
 	HeapFile(std::string filePath, int clusterSize)
@@ -119,32 +161,10 @@ public:
 			throw std::runtime_error("Trying to close already closed file");
 		}
 
-		int totalBlocks = size();
-		if (totalBlocks == 0)
+		if (m_emptyAddresses.size() > 0)
 		{
-			return;
+			truncate();
 		}
-
-		int lastValidBlock = totalBlocks - 1;
-		while (true)
-		{
-			Block<T> block(m_clusterSize, m_objectSize);
-			std::vector<uint8_t> buffer(block.getSize());
-			loadBlock(lastValidBlock, buffer.data(), block);
-			if (!block.isEmpty())
-			{
-				break;
-			}
-			m_emptyAddresses.remove(lastValidBlock);
-			--lastValidBlock;
-		}
-
-		Block<T> dummy(m_clusterSize, m_objectSize);
-		long long newFileSize = static_cast<long long>((lastValidBlock + 1) * dummy.getSize());
-		std::string filePath = m_filePath + FILE_NAME;
-			
-		m_file.close();
-		truncateFile(filePath, newFileSize);
 		writeHeader();
 	}
 
@@ -158,9 +178,8 @@ public:
 			return 0;
 		}
 
-		auto block = BlockFactory::createInstance<T>(m_clusterSize, m_objectSize);
-		int size = static_cast<int>(pos) / block->getSize();
-		delete block;
+		auto block = Block<T>(m_clusterSize, m_objectSize);
+		int size = static_cast<int>(pos) / block.getSize();
 
 		return size;
 	}
@@ -253,7 +272,7 @@ public:
 		else
 		{
 			address = size();
-			insertEmptyAddress(address);
+			m_emptyAddresses.push_back(address);
 			newBlock = true;
 		}
 
@@ -270,12 +289,12 @@ public:
 
 		if (newBlock && inserted)
 		{
-			m_emptyAddresses.remove(address);
+			m_emptyAddresses.pop_front();
 			m_partiallyEmptyAddresses.push_back(address);
 		}
 		if (inserted && block.isFull())
 		{
-			m_partiallyEmptyAddresses.remove(address);
+			m_partiallyEmptyAddresses.pop_front();
 		}
 		
 		return inserted ? address : -1;
@@ -311,17 +330,35 @@ public:
 		loadBlock(address, buffer.data(), block);
 
 		T* removedObject = block.remove(key);
-		writeBlock(address, buffer.data(), block);
+		if (removedObject != nullptr)
+		{
+			writeBlock(address, buffer.data(), block);
+		}
 
 		if (removedObject != nullptr && block.isEmpty())
 		{
 			m_partiallyEmptyAddresses.remove(address);
-			insertEmptyAddress(address);
+			auto iterator = m_emptyAddresses.begin();
+			while (iterator != m_emptyAddresses.end() && *iterator < address + 1)
+			{
+				++iterator;
+			}
+			m_emptyAddresses.insert(iterator, address);
+
+			if (m_emptyAddresses.size() > 0 && address == m_emptyAddresses.back())
+			{
+				truncate();
+			}
 		}
 		else if (removedObject != nullptr && !block.isEmpty() &&
 				 std::find(m_partiallyEmptyAddresses.begin(), m_partiallyEmptyAddresses.end(), address) == m_partiallyEmptyAddresses.end())
 		{
-			m_partiallyEmptyAddresses.push_back(address);
+			auto iterator = m_partiallyEmptyAddresses.begin();
+			while (iterator != m_partiallyEmptyAddresses.end() && *iterator < address + 1)
+			{
+				++iterator;
+			}
+			m_partiallyEmptyAddresses.insert(iterator, address);
 		}
 
 		return removedObject;

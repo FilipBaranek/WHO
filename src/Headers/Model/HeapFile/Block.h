@@ -131,6 +131,8 @@ public:
 
 	inline int getSize() { return sizeof(m_validBlockCount) + m_clusterSize; }
 
+	inline int validBlocks() { return m_validBlockCount; }
+
 	inline bool isFull() { return m_validBlockCount == m_blockingFactor; }
 
 	inline bool isEmpty() { return m_validBlockCount == 0; }

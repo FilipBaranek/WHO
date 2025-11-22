@@ -78,11 +78,8 @@ void RandomDataGenerator::generateLocation(std::mt19937& generator, unsigned int
     region = (district * MAX_REGION_CODE) / MAX_DISTRICT_CODE;
 }
 
-Person* RandomDataGenerator::generatePerson()
+Person* RandomDataGenerator::generatePerson(std::mt19937& gen)
 {
-    std::random_device rd;
-    std::mt19937 gen(rd());
-
     std::uniform_int_distribution<unsigned int> names(0, NAMES_COUNT - 1);
 
     auto birthDay = generateRandomDate(gen);
@@ -98,7 +95,7 @@ PersonWrapper* RandomDataGenerator::generatePeople(std::vector<PersonWrapper*>& 
     std::random_device rd;
     std::mt19937 gen(rd());
 
-    Person* person = generatePerson();
+    Person* person = generatePerson(gen);
     PersonWrapper key(person);
 
     while (people.find(&key) != nullptr)

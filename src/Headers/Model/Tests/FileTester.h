@@ -9,11 +9,11 @@ template<typename T>
 class FileTester
 {
 private:
-	static constexpr const int REPLICATIONS = 500'000;
-	static constexpr const int CHECKPOINT = 10'000;
+	static constexpr const int REPLICATIONS = 1'000'000;
+	static constexpr const int CHECKPOINT = 50'000;
 	
 	std::random_device m_rd;
-	std::mt19937 m_gen{ m_rd() };
+	std::mt19937 m_gen{ m_rd()};
 	std::unordered_map<T*, int> m_data;
 	HeapFile<T> m_heapFile;
 
@@ -24,7 +24,7 @@ public:
 
 		for (int i{}; i < dataCount; ++i)
 		{
-			Person* person = RandomDataGenerator::generatePerson();
+			Person* person = RandomDataGenerator::generatePerson(m_gen);
 
 			int address = m_heapFile.insert(person);
 			m_data[person] = address;
@@ -33,7 +33,7 @@ public:
 
 	void insert()
 	{
-		Person* person = RandomDataGenerator::generatePerson();
+		Person* person = RandomDataGenerator::generatePerson(m_gen);
 
 		int address = m_heapFile.insert(person);
 		Person* foundPerson = m_heapFile.find(address, person);
@@ -88,32 +88,33 @@ public:
 		delete foundPerson;
 	}
 	
-	void printOut()
+	void printOut(int& inserts, int& deletes)
 	{
 		m_heapFile.printFile();
-		m_heapFile.close();
-		m_heapFile.open();
 		m_heapFile.printAddresses();
-		std::cout << "\nActual size: " << m_heapFile.size() << "\n\n";
+		std::cout << "\n\nFile size: " << m_heapFile.size() << "\n";
+		std::cout << "Inserts: " << inserts << " Deletes: " << deletes << "\n\n";
 	}
 	
 	void runTests()
 	{
 		std::uniform_int_distribution<unsigned int> probability(0, 2);
+		int inserts = 0, deletes = 0;
 
 		for (int i{}; i < REPLICATIONS; ++i)
 		{
-			if (i % CHECKPOINT == 0)
+			if (i % CHECKPOINT - 1 == 0)
 			{
-				std::cout << "Operation " << i + 1 << "\n";
+				std::cout << "Operation " << i - 1 << "/" << REPLICATIONS << "\n";
 			}
-			
+
 			int operation = probability(m_gen);
 
 			switch (operation)
 			{
 				case 0:
 					insert();
+					++inserts;
 					break;
 				case 1:
 					if (m_data.size() > 0)
@@ -126,12 +127,13 @@ public:
 					if (m_data.size() > 0)
 					{
 						remove();
+						++deletes;
 					}
 					break;
 			}
 		}
 
-		printOut();
+		printOut(inserts, deletes);
 	}
 	
 	~FileTester()
