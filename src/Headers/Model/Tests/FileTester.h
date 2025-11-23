@@ -14,7 +14,7 @@ private:
 	static constexpr const int CHECKPOINT = 50'000;
 	
 	std::random_device m_rd;
-	std::mt19937 m_gen{ m_rd()};
+	std::mt19937 m_gen{ 456 };
 
 	std::unordered_map<Person*, int> m_data;
 	HeapFile<Person> m_heapFile;
