@@ -4,7 +4,7 @@ void FindTestResultCommand::execute(std::string& output, std::string& recordCoun
 {
 	if (m_testId != -1)
 	{
-		auto result = m_database->findTestResultByIdAndPatientId(m_testId, m_birthNumber);
+		auto result = dynamic_cast<RamDatabase*>(m_database)->findTestResultByIdAndPatientId(m_testId, m_birthNumber);
 		output = result.first;
 		recordCount = "(" + std::to_string(result.second) + ") record found";
 	}

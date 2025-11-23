@@ -1,6 +1,6 @@
 #include "../../Headers/View/Application.h"
 
-Application::Application()
+Application::Application(APPLICATIONTYPE type)
 {
 	glfwInit();
     glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
@@ -16,14 +16,21 @@ Application::Application()
     ImGui_ImplGlfw_InitForOpenGL(m_mainWindow, true);
     ImGui_ImplOpenGL3_Init("#version 130");
 
-    m_presenter = new Presenter();
-
+    if (type == APPLICATIONTYPE::RAM)
+    {
+        m_presenter = new RamPresenter();
+        m_windows.push_back(new OperationsWindow(m_presenter));
+        m_windows.push_back(new FileWindow(m_presenter));
+    }
+    else if (type == APPLICATIONTYPE::DISK)
+    {
+        m_presenter = new DiskPresenter();
+        m_windows.push_back(new ReducedOperationsWindow(m_presenter));
+    }
     m_windows.push_back(new OutputWindow(m_presenter));
     m_windows.push_back(new PersonWindow(m_presenter));
     m_windows.push_back(new TestWindow(m_presenter));
     m_windows.push_back(new GeneratorWindow(m_presenter));
-    m_windows.push_back(new OperationsWindow(m_presenter));
-    m_windows.push_back(new FileWindow(m_presenter));
 }
 
 void Application::run()

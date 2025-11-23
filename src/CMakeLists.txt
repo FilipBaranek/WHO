@@ -19,7 +19,7 @@ add_executable (
     "Source/Model/Tests/FunctionalityTester.cpp" 
     "Source/Model/Tests/SpeedTester.cpp" 
     "Headers/Presenter/Commands/Command.h" 
-    "Source/Model/PCRDatabase/Database.cpp"
+    
     "Headers/Model/PCRDatabase/ModelWrappers/TestWrapper.h" 
     "Source/Model/PCRDatabase/ModelWrappers/TestWrapper.cpp"
     "Headers/Model/PCRDatabase/Generator/RandomDataGenerator.h" 
@@ -80,7 +80,7 @@ add_executable (
     "Headers/Model/Factories/BlockFactory.h"
     "Headers/Model/Tests/FileTester.h"
     
- "Source/Model/Tests/FileTester.cpp")
+ "Source/Model/Tests/FileTester.cpp" "Headers/Presenter/RamPresenter.h" "Source/Presenter/RamPresenter.cpp" "Headers/Presenter/DiskPresenter.h" "Source/Presenter/DiskPresenter.cpp" "Headers/View/UI/ReducedOperationsWindow.h" "Headers/View/Helpers/Operation.h" "Source/View/UI/ReducedOperationsWindow.cpp" "Headers/Model/PCRDatabase/RamDatabase.h" "Source/Model/PCRDatabase/RamDatabase.cpp" "Headers/Model/PCRDatabase/DiskDatabase.h" "Source/Model/PCRDatabase/DiskDatabase.cpp")
 
 target_include_directories(BST PRIVATE ${glm_SOURCE_DIR})
 

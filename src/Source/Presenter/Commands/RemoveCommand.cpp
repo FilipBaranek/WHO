@@ -4,7 +4,7 @@ void RemoveCommand::execute(std::string& output, std::string& recordCount)
 {
 	if (m_removeType == REMOVETYPE::TEST && m_testId >= 0)
 	{
-		int recordsRemoved = m_database->removeTest(m_testId);
+		int recordsRemoved = dynamic_cast<RamDatabase*>(m_database)->removeTest(m_testId);
 		if (recordsRemoved > 0)
 		{
 			output = "Test was removed successfuly";
@@ -17,7 +17,7 @@ void RemoveCommand::execute(std::string& output, std::string& recordCount)
 	}
 	else if (m_removeType == REMOVETYPE::PERSON && m_birthNumber != "")
 	{
-		int recordsRemoved = m_database->removePerson(m_birthNumber);
+		int recordsRemoved = dynamic_cast<RamDatabase*>(m_database)->removePerson(m_birthNumber);
 		if (recordsRemoved > 0)
 		{
 			output = "Person was removed successfuly";

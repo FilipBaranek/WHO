@@ -4,13 +4,8 @@
 #include <utility>
 #include "Window.h"
 #include "OutputWindow.h"
-
-
-struct Operation
-{
-	std::function<void()> display;
-	std::function<void()> execute;
-};
+#include "../../Presenter/RamPresenter.h"
+#include "../Helpers/Operation.h"
 
 class OperationsWindow : public Window
 {

@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
-#include "../../Model/PCRDatabase/Database.h"
+#include "../../Model/PCRDatabase/RamDatabase.h"
+#include "../../Model/PCRDatabase/DiskDatabase.h"
 
 class Command
 {

@@ -246,130 +246,130 @@ void OperationsWindow::displayTestIdInputs()
 //===============REQUESTS==============================
 void OperationsWindow::printAllData()
 {
-    m_presenter->printAllData();
+    dynamic_cast<RamPresenter*>(m_presenter)->printAllData();
 }
 
 void OperationsWindow::findTestResultByPatientId()
 {
-    m_presenter->findResultByPatientAndTestId(m_firstNumInput, m_firstStringBuf);
+    dynamic_cast<RamPresenter*>(m_presenter)->findResultByPatientAndTestId(m_firstNumInput, m_firstStringBuf);
 }
 
 void OperationsWindow::findPatientsSortedTests()
 {
-    m_presenter->findPatientTestOrderByDate(m_firstStringBuf);
+    dynamic_cast<RamPresenter*>(m_presenter)->findPatientTestOrderByDate(m_firstStringBuf);
 }
 
 void OperationsWindow::findPositiveTestsInDateRangeForDistrict()
 {
     auto dateInterval = getTimePointFormat();
 
-    m_presenter->findPositiveTestsInDistrict(m_firstNumInput, dateInterval.first, dateInterval.second);
+    dynamic_cast<RamPresenter*>(m_presenter)->findPositiveTestsInDistrict(m_firstNumInput, dateInterval.first, dateInterval.second);
 }
 
 void OperationsWindow::findAllTestsInDateRangeForDistrict()
 {
     auto dateInterval = getTimePointFormat();
 
-    m_presenter->findAllTestsInDistrict(m_firstNumInput, dateInterval.first, dateInterval.second);
+    dynamic_cast<RamPresenter*>(m_presenter)->findAllTestsInDistrict(m_firstNumInput, dateInterval.first, dateInterval.second);
 }
 
 void OperationsWindow::findPositiveTestsInDateRangeForRegion()
 {
     auto dateInterval = getTimePointFormat();
 
-    m_presenter->findPositiveTestsInRegion(m_firstNumInput, dateInterval.first, dateInterval.second);
+    dynamic_cast<RamPresenter*>(m_presenter)->findPositiveTestsInRegion(m_firstNumInput, dateInterval.first, dateInterval.second);
 }
 
 void OperationsWindow::findAllTestsInDateRangeForRegion()
 {
     auto dateInterval = getTimePointFormat();
 
-    m_presenter->findAllTestsInRegion(m_firstNumInput, dateInterval.first, dateInterval.second);
+    dynamic_cast<RamPresenter*>(m_presenter)->findAllTestsInRegion(m_firstNumInput, dateInterval.first, dateInterval.second);
 }
 
 void OperationsWindow::findPositiveTestsInDateRange()
 {
     auto dateInterval = getTimePointFormat();
 
-    m_presenter->findPositiveTests(dateInterval.first, dateInterval.second);
+    dynamic_cast<RamPresenter*>(m_presenter)->findPositiveTests(dateInterval.first, dateInterval.second);
 }
 
 void OperationsWindow::findAllTestsInDateRange()
 {
     auto dateInterval = getTimePointFormat();
 
-    m_presenter->findAllTests(dateInterval.first, dateInterval.second);
+    dynamic_cast<RamPresenter*>(m_presenter)->findAllTests(dateInterval.first, dateInterval.second);
 }
 
 void OperationsWindow::findSickPeopleInDistrictByDate()
 {
     auto dateInterval = getTimePointFormatSickDays();
 
-    m_presenter->findSickPeopleInDistrict(m_firstNumInput, dateInterval.first, dateInterval.second);
+    dynamic_cast<RamPresenter*>(m_presenter)->findSickPeopleInDistrict(m_firstNumInput, dateInterval.first, dateInterval.second);
 }
 
 void OperationsWindow::findSickPeopleInDistrictByDateSorted()
 {
     auto dateInterval = getTimePointFormatSickDays();
 
-    m_presenter->findSickPeopleInDistrictOrderByTestValue(m_firstNumInput, dateInterval.first, dateInterval.second);
+    dynamic_cast<RamPresenter*>(m_presenter)->findSickPeopleInDistrictOrderByTestValue(m_firstNumInput, dateInterval.first, dateInterval.second);
 }
 
 void OperationsWindow::findSickPeopleInRegionByDate()
 {
     auto dateInterval = getTimePointFormatSickDays();
 
-    m_presenter->findSickPeopleInRegion(m_firstNumInput, dateInterval.first, dateInterval.second);
+    dynamic_cast<RamPresenter*>(m_presenter)->findSickPeopleInRegion(m_firstNumInput, dateInterval.first, dateInterval.second);
 }
 
 void OperationsWindow::findSickPeopleByDate()
 {
     auto dateInterval = getTimePointFormatSickDays();
 
-    m_presenter->findSickPeople(dateInterval.first, dateInterval.second);
+    dynamic_cast<RamPresenter*>(m_presenter)->findSickPeople(dateInterval.first, dateInterval.second);
 }
 
 void OperationsWindow::findMostSickPersonInEveryDistrict()
 {
     auto dateInterval = getTimePointFormatSickDays();
 
-    m_presenter->findMostSickPersonInDistrict(dateInterval.first, dateInterval.second);
+    dynamic_cast<RamPresenter*>(m_presenter)->findMostSickPersonInDistrict(dateInterval.first, dateInterval.second);
 }
 
 void OperationsWindow::printAllDistrictsOrderedBySickPeopleCount()
 {
     auto dateInterval = getTimePointFormatSickDays();
 
-    m_presenter->findDistrictsOrderedBySickPeopleCount(dateInterval.first, dateInterval.second);
+    dynamic_cast<RamPresenter*>(m_presenter)->findDistrictsOrderedBySickPeopleCount(dateInterval.first, dateInterval.second);
 }
 
 void OperationsWindow::printAllRegionsOrderedBySickPeopleCount()
 {
     auto dateInterval = getTimePointFormatSickDays();
 
-    m_presenter->findRegionsOrderedBySickPeopleCount(dateInterval.first, dateInterval.second);
+    dynamic_cast<RamPresenter*>(m_presenter)->findRegionsOrderedBySickPeopleCount(dateInterval.first, dateInterval.second);
 }
 
 void OperationsWindow::findAllTestsDoneAtWorkplaceByDate()
 {
     auto dateInterval = getTimePointFormat();
 
-    m_presenter->findAllTestsAtWorkplace(m_firstNumInput, dateInterval.first, dateInterval.second);
+    dynamic_cast<RamPresenter*>(m_presenter)->findAllTestsAtWorkplace(m_firstNumInput, dateInterval.first, dateInterval.second);
 }
 
 void OperationsWindow::findTest()
 {
-    m_presenter->findTest(m_firstNumInput);
+    dynamic_cast<RamPresenter*>(m_presenter)->findTest(m_firstNumInput);
 }
 
 void OperationsWindow::removeTest()
 {
-    m_presenter->removeTest(m_firstNumInput);
+    dynamic_cast<RamPresenter*>(m_presenter)->removeTest(m_firstNumInput);
 }
 
 void OperationsWindow::removePerson()
 {
-    m_presenter->removePerson(m_firstStringBuf);
+    dynamic_cast<RamPresenter*>(m_presenter)->removePerson(m_firstStringBuf);
 }
 
 

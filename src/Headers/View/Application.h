@@ -12,7 +12,15 @@
 #include "UI/GeneratorWindow.h"
 #include "UI/FileWindow.h"
 #include "UI/OperationsWindow.h"
-#include "../Presenter/Presenter.h"
+#include "UI/ReducedOperationsWindow.h"
+#include "../Presenter/RamPresenter.h"
+#include "../Presenter/DiskPresenter.h"
+
+enum class APPLICATIONTYPE
+{
+	RAM,
+	DISK
+};
 
 class Application
 {
@@ -22,7 +30,7 @@ private:
 	Presenter* m_presenter;
 
 public:
-	Application();
+	Application(APPLICATIONTYPE type);
 	void run();
 	~Application();
 };

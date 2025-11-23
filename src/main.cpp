@@ -42,8 +42,11 @@ int main()
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 
     {
-        testFile();
+        Application app(APPLICATIONTYPE::RAM);
+        app.run();
     }
+
+    //PREROBIT REMOVE/INSERT COMMAND CLASSY Z DYNAMIC CASTU NA IBA DATABASE KED ZMENIM TYPY V PARAMETROCH
 
     return 0;
 }

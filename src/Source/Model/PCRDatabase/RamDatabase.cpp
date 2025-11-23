@@ -1,7 +1,6 @@
-#include "../../../Headers/Model/PCRDatabase/Database.h"
+#include "../../../Headers/Model/PCRDatabase/RamDatabase.h"
 
-
-Database::Database()
+RamDatabase::RamDatabase()
 {
 	m_testStructuresList = std::make_pair(&m_positiveTests, &m_negativeTests);
 	m_locationStructures.push_back(&m_regions);
@@ -9,7 +8,7 @@ Database::Database()
 	m_locationStructures.push_back(&m_workplaces);
 }
 
-std::pair<std::string, int> Database::outputToString(std::vector<TestByDateWrapper*>& output)
+std::pair<std::string, int> RamDatabase::outputToString(std::vector<TestByDateWrapper*>& output)
 {
 	if (output.size() <= 0)
 	{
@@ -28,7 +27,7 @@ std::pair<std::string, int> Database::outputToString(std::vector<TestByDateWrapp
 	return std::make_pair(oss.str(), count);
 }
 
-void Database::generateRandomPeople(int peopleCount)
+void RamDatabase::generateRandomPeople(int peopleCount)
 {
 	for (int i{}; i < peopleCount; ++i)
 	{
@@ -36,7 +35,7 @@ void Database::generateRandomPeople(int peopleCount)
 	}
 }
 
-bool Database::generateRandomTests(int testCount)
+bool RamDatabase::generateRandomTests(int testCount)
 {
 	if (m_people.size() > 0)
 	{
@@ -49,7 +48,7 @@ bool Database::generateRandomTests(int testCount)
 	return false;
 }
 
-PersonWrapper* Database::findPerson(std::string birthNumber)
+PersonWrapper* RamDatabase::findPerson(std::string birthNumber)
 {
 	Person person(
 		birthNumber,
@@ -63,7 +62,7 @@ PersonWrapper* Database::findPerson(std::string birthNumber)
 }
 
 //(1)
-bool Database::insert(TestWrapper* test)
+bool RamDatabase::insert(TestWrapper* test)
 {
 	PersonWrapper* correspondingPerson = findPerson(test->getData()->birthNumber());
 	if (correspondingPerson == nullptr)
@@ -89,7 +88,7 @@ bool Database::insert(TestWrapper* test)
 			m_negativeTests.insert(testByDate);
 		}
 		correspondingPerson->tests().insert(testByDate);
-		
+
 		if (test->person() == nullptr)
 		{
 			test->setPerson(correspondingPerson);
@@ -134,7 +133,7 @@ bool Database::insert(TestWrapper* test)
 }
 
 //(2)
-std::pair<std::string, int> Database::findTestResultByIdAndPatientId(const unsigned int testId, const std::string birthBumber)
+std::pair<std::string, int> RamDatabase::findTestResultByIdAndPatientId(const unsigned int testId, const std::string birthBumber)
 {
 	TestWrapper* test = findTestWrapper(testId);
 	if (test == nullptr || test->getData()->birthNumber() != birthBumber)
@@ -146,7 +145,7 @@ std::pair<std::string, int> Database::findTestResultByIdAndPatientId(const unsig
 }
 
 //(3)
-std::pair<std::string, int> Database::findPatientTestOrderByDate(std::string birthNumber)
+std::pair<std::string, int> RamDatabase::findPatientTestOrderByDate(std::string birthNumber)
 {
 	std::ostringstream oss;
 
@@ -167,14 +166,14 @@ std::pair<std::string, int> Database::findPatientTestOrderByDate(std::string bir
 		output->tests().processInOrder([&oss, &count](TestByDateWrapper* test) {
 			oss << test->getData()->toString() << "\n";
 			++count;
-		});
+			});
 	}
 
 	return std::make_pair(oss.str(), count);
 }
 
 //(4)
-std::pair<std::string, int> Database::findPositiveTestsInDistrict(const unsigned int districtId, time_point<system_clock> from, time_point<system_clock> to)
+std::pair<std::string, int> RamDatabase::findPositiveTestsInDistrict(const unsigned int districtId, time_point<system_clock> from, time_point<system_clock> to)
 {
 	LocationWrapper district(districtId);
 	LocationWrapper* foundDistrict = m_districts.find(&district);
@@ -216,7 +215,7 @@ std::pair<std::string, int> Database::findPositiveTestsInDistrict(const unsigned
 }
 
 //(5)
-std::pair<std::string, int> Database::findAllTestsInDistrict(const unsigned int districtId, time_point<system_clock> from, time_point<system_clock> to)
+std::pair<std::string, int> RamDatabase::findAllTestsInDistrict(const unsigned int districtId, time_point<system_clock> from, time_point<system_clock> to)
 {
 	LocationWrapper district(districtId);
 	LocationWrapper* foundDistrict = m_districts.find(&district);
@@ -264,7 +263,7 @@ std::pair<std::string, int> Database::findAllTestsInDistrict(const unsigned int 
 }
 
 //(6)
-std::pair<std::string, int> Database::findPositiveTestsInRegion(const unsigned int regionId, time_point<system_clock> from, time_point<system_clock> to)
+std::pair<std::string, int> RamDatabase::findPositiveTestsInRegion(const unsigned int regionId, time_point<system_clock> from, time_point<system_clock> to)
 {
 	LocationWrapper region(regionId);
 	LocationWrapper* foundRegion = m_regions.find(&region);
@@ -306,7 +305,7 @@ std::pair<std::string, int> Database::findPositiveTestsInRegion(const unsigned i
 }
 
 //(7)
-std::pair<std::string, int> Database::findAllTestsInRegion(const unsigned int regionId, time_point<system_clock> from, time_point<system_clock> to)
+std::pair<std::string, int> RamDatabase::findAllTestsInRegion(const unsigned int regionId, time_point<system_clock> from, time_point<system_clock> to)
 {
 	LocationWrapper region(regionId);
 	LocationWrapper* foundRegion = m_regions.find(&region);
@@ -354,7 +353,7 @@ std::pair<std::string, int> Database::findAllTestsInRegion(const unsigned int re
 }
 
 //(8)
-std::pair<std::string, int> Database::findPositiveTests(time_point<system_clock> from, time_point<system_clock> to)
+std::pair<std::string, int> RamDatabase::findPositiveTests(time_point<system_clock> from, time_point<system_clock> to)
 {
 	std::vector<TestByDateWrapper*> output;
 	PCRTest min(
@@ -388,7 +387,7 @@ std::pair<std::string, int> Database::findPositiveTests(time_point<system_clock>
 }
 
 //(9)
-std::pair<std::string, int> Database::findAllTests(time_point<system_clock> from, time_point<system_clock> to)
+std::pair<std::string, int> RamDatabase::findAllTests(time_point<system_clock> from, time_point<system_clock> to)
 {
 	PCRTest min(
 		MIN_ID,
@@ -427,8 +426,8 @@ std::pair<std::string, int> Database::findAllTests(time_point<system_clock> from
 	return std::make_pair(positiveResult.first + "\n" + negativeResult.first, positiveResult.second + negativeResult.second);
 }
 
-void Database::sickPeopleInDistrict(const unsigned int& districtId, time_point<system_clock>& from, time_point<system_clock>& to,
-									LocationWrapper*& foundDistrict, std::vector<TestByDateWrapper*>& output)
+void RamDatabase::sickPeopleInDistrict(const unsigned int& districtId, time_point<system_clock>& from, time_point<system_clock>& to,
+	LocationWrapper*& foundDistrict, std::vector<TestByDateWrapper*>& output)
 {
 	LocationWrapper location(districtId);
 	foundDistrict = m_districts.find(&location);
@@ -467,7 +466,7 @@ void Database::sickPeopleInDistrict(const unsigned int& districtId, time_point<s
 }
 
 //(10)
-std::pair<std::string, int> Database::findSickPeopleInDistrict(const unsigned int districtId, time_point<system_clock> from, time_point<system_clock> to)
+std::pair<std::string, int> RamDatabase::findSickPeopleInDistrict(const unsigned int districtId, time_point<system_clock> from, time_point<system_clock> to)
 {
 	LocationWrapper* foundDistrict;
 	std::vector<TestByDateWrapper*> output;
@@ -486,7 +485,7 @@ std::pair<std::string, int> Database::findSickPeopleInDistrict(const unsigned in
 }
 
 //(11)
-std::pair<std::string, int> Database::findSickPeopleInDistrictOrderedByTestValue(const unsigned int districtId, time_point<system_clock> from, time_point<system_clock> to)
+std::pair<std::string, int> RamDatabase::findSickPeopleInDistrictOrderedByTestValue(const unsigned int districtId, time_point<system_clock> from, time_point<system_clock> to)
 {
 	LocationWrapper* foundDistrict;
 	std::vector<TestByDateWrapper*> output;
@@ -503,13 +502,13 @@ std::pair<std::string, int> Database::findSickPeopleInDistrictOrderedByTestValue
 
 	std::sort(output.begin(), output.end(), [](TestByDateWrapper* a, TestByDateWrapper* b) {
 		return a->getData()->testValue() > b->getData()->testValue();
-	});
+		});
 
 	return outputToString(output);
 }
 
 //(12)
-std::pair<std::string, int> Database::findSickPeopleInRegion(const unsigned int regionId, time_point<system_clock> from, time_point<system_clock> to)
+std::pair<std::string, int> RamDatabase::findSickPeopleInRegion(const unsigned int regionId, time_point<system_clock> from, time_point<system_clock> to)
 {
 	LocationWrapper region(regionId);
 	LocationWrapper* foundRegion = m_regions.find(&region);
@@ -551,7 +550,7 @@ std::pair<std::string, int> Database::findSickPeopleInRegion(const unsigned int 
 }
 
 //(13)
-std::pair<std::string, int> Database::findSickPeople(time_point<system_clock> from, time_point<system_clock> to)
+std::pair<std::string, int> RamDatabase::findSickPeople(time_point<system_clock> from, time_point<system_clock> to)
 {
 	std::vector<TestByDateWrapper*> output;
 	PCRTest minTest(
@@ -585,7 +584,7 @@ std::pair<std::string, int> Database::findSickPeople(time_point<system_clock> fr
 }
 
 //(14)
-std::pair<std::string, int> Database::findMostSickPersonInDistrict(time_point<system_clock> from, time_point<system_clock> to)
+std::pair<std::string, int> RamDatabase::findMostSickPersonInDistrict(time_point<system_clock> from, time_point<system_clock> to)
 {
 	if (m_districts.size() == 0)
 	{
@@ -641,13 +640,13 @@ std::pair<std::string, int> Database::findMostSickPersonInDistrict(time_point<sy
 		{
 			oss << "District has no sick people to this date\n";
 		}
-	});
+		});
 
 	return std::make_pair(oss.str(), count);
 }
 
 //(15)
-std::pair<std::string, int> Database::findDistrictsOrderedBySickPeopleCount(time_point<system_clock> from, time_point<system_clock> to)
+std::pair<std::string, int> RamDatabase::findDistrictsOrderedBySickPeopleCount(time_point<system_clock> from, time_point<system_clock> to)
 {
 	if (m_districts.size() == 0)
 	{
@@ -685,11 +684,11 @@ std::pair<std::string, int> Database::findDistrictsOrderedBySickPeopleCount(time
 
 		district->positiveTests().find(&minKey, &maxKey, output);
 		sickPeopleInDistrict.push_back(std::make_pair(district->locationId(), output.size()));
-	});
+		});
 
 	std::sort(sickPeopleInDistrict.begin(), sickPeopleInDistrict.end(), [](auto& a, auto& b) {
 		return a.second > b.second;
-	});
+		});
 
 	int count = 0;
 	std::ostringstream oss;
@@ -704,7 +703,7 @@ std::pair<std::string, int> Database::findDistrictsOrderedBySickPeopleCount(time
 }
 
 //(16)
-std::pair<std::string, int> Database::findRegionsOrderedBySickPeopleCount(time_point<system_clock> from, time_point<system_clock> to)
+std::pair<std::string, int> RamDatabase::findRegionsOrderedBySickPeopleCount(time_point<system_clock> from, time_point<system_clock> to)
 {
 	if (m_regions.size() == 0)
 	{
@@ -746,7 +745,7 @@ std::pair<std::string, int> Database::findRegionsOrderedBySickPeopleCount(time_p
 
 	std::sort(sickPeopleInRegion.begin(), sickPeopleInRegion.end(), [](auto& a, auto& b) {
 		return a.second > b.second;
-	});
+		});
 
 	int count = 0;
 	std::ostringstream oss;
@@ -761,7 +760,7 @@ std::pair<std::string, int> Database::findRegionsOrderedBySickPeopleCount(time_p
 }
 
 //(17)
-std::pair<std::string, int> Database::findAllTestsAtWorkplace(int workplaceId, time_point<system_clock> from, time_point<system_clock> to)
+std::pair<std::string, int> RamDatabase::findAllTestsAtWorkplace(int workplaceId, time_point<system_clock> from, time_point<system_clock> to)
 {
 	LocationWrapper workplace(workplaceId);
 	LocationWrapper* foundWorkplace = m_workplaces.find(&workplace);
@@ -808,7 +807,7 @@ std::pair<std::string, int> Database::findAllTestsAtWorkplace(int workplaceId, t
 	return std::make_pair(positiveResult.first + "\n" + negativeResult.first, positiveResult.second + negativeResult.second);
 }
 
-TestWrapper* Database::findTestWrapper(int testId)
+TestWrapper* RamDatabase::findTestWrapper(int testId)
 {
 	PCRTest test(
 		testId,
@@ -827,7 +826,7 @@ TestWrapper* Database::findTestWrapper(int testId)
 }
 
 //(18)
-std::string Database::findTest(const unsigned int testId)
+std::string RamDatabase::findTest(const unsigned int testId)
 {
 	auto output = findTestWrapper(testId);
 	if (output != nullptr)
@@ -838,7 +837,7 @@ std::string Database::findTest(const unsigned int testId)
 }
 
 //(19)
-bool Database::insert(PersonWrapper* personWrapper)
+bool RamDatabase::insert(PersonWrapper* personWrapper)
 {
 	if (m_people.insert(personWrapper))
 	{
@@ -852,7 +851,7 @@ bool Database::insert(PersonWrapper* personWrapper)
 }
 
 //(20)
-int Database::removeTest(int testId)
+int RamDatabase::removeTest(int testId)
 {
 	PCRTest testDummy(
 		testId,
@@ -913,7 +912,7 @@ int Database::removeTest(int testId)
 }
 
 //(21)
-int Database::removePerson(std::string birthNumber)
+int RamDatabase::removePerson(std::string birthNumber)
 {
 	Person person(
 		birthNumber,
@@ -924,7 +923,7 @@ int Database::removePerson(std::string birthNumber)
 	PersonWrapper key(&person);
 
 	PersonWrapper* foundPerson = m_people.remove(&key);
-	
+
 	int count = 0;
 	if (foundPerson != nullptr)
 	{
@@ -932,7 +931,7 @@ int Database::removePerson(std::string birthNumber)
 		{
 			foundPerson->tests().processPostOrder([this, &count](TestByDateWrapper* test) {
 				count += removeTest(test->getData()->testId());
-			});
+				});
 		}
 		delete foundPerson->getData();
 		delete foundPerson;
@@ -942,7 +941,7 @@ int Database::removePerson(std::string birthNumber)
 	return count;
 }
 
-std::pair<std::string, int> Database::printAllData()
+std::pair<std::string, int> RamDatabase::printAllData()
 {
 	if (m_people.size() == 0)
 	{
@@ -961,14 +960,14 @@ std::pair<std::string, int> Database::printAllData()
 			person->tests().processInOrder([&oss, &count](TestByDateWrapper* test) {
 				oss << test->getData()->toString() << "\n";
 				++count;
-			});
+				});
 		}
-	});
+		});
 
 	return std::make_pair(oss.str(), count);
 }
 
-std::pair<std::string, int> Database::saveToFile()
+std::pair<std::string, int> RamDatabase::saveToFile()
 {
 	namespace fs = std::filesystem;
 
@@ -997,7 +996,7 @@ std::pair<std::string, int> Database::saveToFile()
 		m_people.processLevelOrder([&peopleFile, &count](PersonWrapper* person) {
 			peopleFile << person->writeLine();
 			++count;
-		});
+			});
 
 		peopleFile.close();
 	}
@@ -1014,7 +1013,7 @@ std::pair<std::string, int> Database::saveToFile()
 		m_tests.processLevelOrder([&testFile, &count](TestWrapper* test) {
 			testFile << test->writeLine();
 			++count;
-		});
+			});
 
 		testFile.close();
 	}
@@ -1022,7 +1021,7 @@ std::pair<std::string, int> Database::saveToFile()
 	return std::make_pair("All the data were saved to file located inside applications data folder", count);
 }
 
-std::pair<std::string, int> Database::loadFromFile()
+std::pair<std::string, int> RamDatabase::loadFromFile()
 {
 	namespace fs = std::filesystem;
 
@@ -1073,14 +1072,14 @@ std::pair<std::string, int> Database::loadFromFile()
 	return std::make_pair("Data were loaded successfuly", count);
 }
 
-void Database::clear()
+void RamDatabase::clear()
 {
 	if (m_people.size() > 0)
 	{
 		m_people.processPostOrder([](PersonWrapper* person) {
 			delete person->getData();
 			delete person;
-		});
+			});
 		m_people.clear();
 		m_peopleList.clear();
 	}
@@ -1090,7 +1089,7 @@ void Database::clear()
 		{
 			location->processPostOrder([](LocationWrapper* location) {
 				delete location;
-			});
+				});
 		}
 		location->clear();
 	}
@@ -1098,14 +1097,14 @@ void Database::clear()
 	{
 		m_positiveTests.processPostOrder([](TestByDateWrapper* test) {
 			delete test;
-		});
+			});
 		m_positiveTests.clear();
 	}
 	if (m_negativeTests.size() > 0)
 	{
 		m_negativeTests.processPostOrder([](TestByDateWrapper* test) {
 			delete test;
-		});
+			});
 		m_negativeTests.clear();
 	}
 	if (m_tests.size() > 0)
@@ -1113,12 +1112,12 @@ void Database::clear()
 		m_tests.processPostOrder([](TestWrapper* test) {
 			delete test->getData();
 			delete test;
-		});
+			});
 		m_tests.clear();
 	}
 }
 
-Database::~Database()
+RamDatabase::~RamDatabase()
 {
 	clear();
 }

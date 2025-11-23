@@ -20,13 +20,13 @@ void FileWindow::renderWindow()
 
     if (ImGui::Button("Save", ImVec2(-FLT_MIN, 30.0f)))
     {
-        m_presenter->saveToFile();
+        dynamic_cast<RamPresenter*>(m_presenter)->saveToFile();
     }
     ImGui::NextColumn();
 
     if (ImGui::Button("Load", ImVec2(-FLT_MIN, 30.0f)))
     {
-        m_presenter->loadFromFile();
+        dynamic_cast<RamPresenter*>(m_presenter)->loadFromFile();
     }
 
     ImGui::Columns(1);

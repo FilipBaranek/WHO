@@ -30,7 +30,7 @@ void InsertCommand::execute(std::string& output, std::string& recordCount)
 {
 	if (m_person != nullptr)
 	{
-		if (m_database->insert(m_person))
+		if (dynamic_cast<RamDatabase*>(m_database)->insert(m_person))
 		{
 			output = "Person was registered to the database";
 			recordCount = "(1) record inserted";
@@ -43,7 +43,7 @@ void InsertCommand::execute(std::string& output, std::string& recordCount)
 	}
 	else
 	{
-		if (m_database->insert(m_test))
+		if (dynamic_cast<RamDatabase*>(m_database)->insert(m_test))
 		{
 			output = "Test was registered to the database";
 			recordCount = "(1) record inserted";
