@@ -4,22 +4,31 @@
 #include <mutex>
 #include <functional>
 #include <chrono>
+#include "Commands/GenerateCommand.h"
+#include "Commands/PrintAllDataCommand.h"
 
 using namespace std::chrono;
 
 class Presenter
 {
+protected:
+	Database* m_database;
+
 private:
 	bool m_isExecuting;
 	std::mutex m_outputMutex;
 	std::string m_output;
 	std::string m_recordCount;
 
+	GenerateCommand m_generateCommand;
+	PrintAllDataCommand m_printAllDataCommand;
+
 protected:
 	void execute(std::function<void(std::string& output, std::string& recordCount)> callback);
 
 public:
-	Presenter() : m_isExecuting(false) {}
+	Presenter(Database* database) : m_isExecuting(false), m_database(database), m_generateCommand(database), m_printAllDataCommand(database)
+	{}
 	
 	inline bool isExecuting() { return m_isExecuting; }
 
@@ -27,9 +36,9 @@ public:
 	
 	std::pair<std::string, std::string> output();
 
-	virtual void generatePeople(int count) = 0;
+	void generatePeople(int count);
 
-	virtual void generateTests(int count) = 0;
+	void generateTests(int count);
 	
 	virtual void insert(unsigned int testId, unsigned int workplaceId, unsigned int districtId,
 						unsigned int regionId, bool result, double testValue, std::string note,
@@ -37,7 +46,7 @@ public:
 
 	virtual void insert(std::string birthNumber, std::string firstName, std::string lastName, year_month_day birthDay) = 0;
 
-	virtual void printAllData() = 0;
+	void printAllData();
 
 	virtual ~Presenter() = default;
 };

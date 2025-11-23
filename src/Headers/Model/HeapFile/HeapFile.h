@@ -7,6 +7,7 @@
 	#include <unistd.h> 
 #endif
 #include <string>
+#include <sstream>
 #include <list>
 #include <vector>
 #include <fstream>
@@ -58,6 +59,11 @@ private:
 
 		if (hFile == INVALID_HANDLE_VALUE)
 		{
+			std::cout << "Size before: " << sizeBefore << "\n";
+			printFile();
+			printAddresses();
+			std::cout << "Size after: " << size() << "\n";
+
 			throw std::runtime_error("Failed to open file");
 		}
 
@@ -161,6 +167,7 @@ public:
 			truncate();
 		}
 		writeHeader();
+		m_file.close();
 	}
 
 	int size()
@@ -359,8 +366,9 @@ public:
 		return removedObject;
 	}
 
-	void printFile()
+	std::string printFile()
 	{
+		std::ostringstream oss;
 		int fileSize = size();
 
 		for (int i{}; i < fileSize; ++i)
@@ -370,22 +378,28 @@ public:
 
 			loadBlock(i, buffer.data(), block);
 
-			std::cout << "Block[" << i << "]\n" << block.toString() << "\n";
+			oss << "Block[" << i << "]\n" << block.toString() << "\n";
 		}
+
+		return oss.str();
 	}
 
-	void printAddresses()
+	std::string printAddresses()
 	{
-		std::cout << "Partially empty addresses:\n";
+		std::ostringstream oss;
+
+		oss << "Partially empty addresses:\n";
 		for (int address : m_partiallyEmptyAddresses)
 		{
-			std::cout << address << " ";
+			oss << address << " ";
 		}
-		std::cout << "\n\nEmpty addresses:\n";
+		oss << "\n\nEmpty addresses:\n";
 		for (int address : m_emptyAddresses)
 		{
-			std::cout << address << " ";
+			oss << address << " ";
 		}
+
+		return oss.str();
 	}
 
 	void testSize()

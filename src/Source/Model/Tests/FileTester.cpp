@@ -128,8 +128,8 @@ void FileTester::duplicityTest()
 
 void FileTester::printOut(int& inserts, int& deletes)
 {
-	m_heapFile.printFile();
-	m_heapFile.printAddresses();
+	std::cout << m_heapFile.printFile();
+	std::cout << m_heapFile.printAddresses();
 	std::cout << "\n\nFile size: " << m_heapFile.size() << "\n";
 	std::cout << "Inserts: " << inserts << " Deletes: " << deletes << "\n\n";
 }

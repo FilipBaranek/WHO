@@ -1,12 +1,5 @@
 #include "../../Headers/Presenter/DiskPresenter.h"
 
-void DiskPresenter::generatePeople(int count)
-{
-}
-
-void DiskPresenter::generateTests(int count)
-{
-}
 
 void DiskPresenter::insert(
 	unsigned int testId, unsigned int workplaceId, unsigned int districtId, unsigned int regionId,
@@ -18,6 +11,3 @@ void DiskPresenter::insert(std::string birthNumber, std::string firstName, std::
 {
 }
 
-void DiskPresenter::printAllData()
-{
-}

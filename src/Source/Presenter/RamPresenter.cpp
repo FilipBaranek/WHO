@@ -1,21 +1,5 @@
 #include "../../Headers/Presenter/RamPresenter.h"
 
-void RamPresenter::generatePeople(int count)
-{
-	execute([=, this](std::string& output, std::string& recordCount) {
-		m_generateCommand.setPeopleParams(count);
-		m_generateCommand.execute(output, recordCount);
-		});
-}
-
-void RamPresenter::generateTests(int count)
-{
-	execute([=, this](std::string& output, std::string& recordCount) {
-		m_generateCommand.setTestParams(count);
-		m_generateCommand.execute(output, recordCount);
-		});
-}
-
 //(1)
 void RamPresenter::insert(
 	unsigned int testId, unsigned int workplaceId, unsigned int districtId, unsigned int regionId, bool result,
@@ -236,13 +220,6 @@ void RamPresenter::removePerson(std::string birthNumber)
 		m_removeCommand.setParams(REMOVETYPE::PERSON);
 		m_removeCommand.setParams(birthNumber);
 		m_removeCommand.execute(output, recordCount);
-		});
-}
-
-void RamPresenter::printAllData()
-{
-	execute([=, this](std::string& output, std::string& recordCount) {
-		m_printAllDataCommand.execute(output, recordCount);
 		});
 }
 
