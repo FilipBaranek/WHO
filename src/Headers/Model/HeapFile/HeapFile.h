@@ -59,12 +59,8 @@ private:
 
 		if (hFile == INVALID_HANDLE_VALUE)
 		{
-			std::cout << "Size before: " << sizeBefore << "\n";
-			printFile();
-			printAddresses();
-			std::cout << "Size after: " << size() << "\n";
-
-			throw std::runtime_error("Failed to open file");
+			CloseHandle(hFile);
+			return;
 		}
 
 		LARGE_INTEGER li;
@@ -72,13 +68,13 @@ private:
 		if (!SetFilePointerEx(hFile, li, nullptr, FILE_BEGIN))
 		{
 			CloseHandle(hFile);
-			throw std::runtime_error("Failed to move file pointer");
+			return;
 		}
 
 		if (!SetEndOfFile(hFile))
 		{
 			CloseHandle(hFile);
-			throw std::runtime_error("Failed to truncate file");
+			return;
 		}
 
 		CloseHandle(hFile);
