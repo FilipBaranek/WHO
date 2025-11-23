@@ -9,5 +9,9 @@ void DiskPresenter::insert(
 
 void DiskPresenter::insert(std::string birthNumber, std::string firstName, std::string lastName, year_month_day birthDay)
 {
+	execute([=, this](std::string& output, std::string& recordCount) {
+		m_insertCommand.setParams(birthNumber, firstName, lastName, birthDay);
+		m_insertCommand.execute(output, recordCount);
+		});
 }
 

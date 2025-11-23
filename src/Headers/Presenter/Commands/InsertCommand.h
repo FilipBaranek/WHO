@@ -7,11 +7,14 @@
 class InsertCommand : public Command
 {
 private:
-	PersonWrapper* m_person;
-	TestWrapper* m_test;
+	bool m_wrap;
+	Person* m_person;
+	PCRTest* m_test;
 
 public:
-	InsertCommand(Database* database) : Command(database), m_person(nullptr), m_test(nullptr) {}
+	InsertCommand(Database* database) : Command(database), m_wrap(false), m_person(nullptr), m_test(nullptr) {}
+
+	void wrapObject() { m_wrap = true; }
 
 	void setParams(std::string birthNumber, std::string firstName, std::string lastName, std::chrono::year_month_day birthDay);
 	

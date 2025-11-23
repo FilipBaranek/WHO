@@ -6,6 +6,7 @@
 #include <chrono>
 #include "Commands/GenerateCommand.h"
 #include "Commands/PrintAllDataCommand.h"
+#include "Commands/InsertCommand.h"
 
 using namespace std::chrono;
 
@@ -13,6 +14,7 @@ class Presenter
 {
 protected:
 	Database* m_database;
+	InsertCommand m_insertCommand;
 
 private:
 	bool m_isExecuting;
@@ -27,7 +29,8 @@ protected:
 	void execute(std::function<void(std::string& output, std::string& recordCount)> callback);
 
 public:
-	Presenter(Database* database) : m_isExecuting(false), m_database(database), m_generateCommand(database), m_printAllDataCommand(database)
+	Presenter(Database* database) : m_isExecuting(false), m_database(database),
+		m_generateCommand(database), m_printAllDataCommand(database), m_insertCommand(database)
 	{}
 	
 	inline bool isExecuting() { return m_isExecuting; }

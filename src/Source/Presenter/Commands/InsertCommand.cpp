@@ -2,18 +2,18 @@
 
 void InsertCommand::setParams(std::string birthNumber, std::string firstName, std::string lastName, std::chrono::year_month_day birthDay)
 {
-	m_person = new PersonWrapper(new Person(
+	m_person = new Person(
 		birthNumber,
 		firstName,
 		lastName,
 		birthDay
-	));
+	);
 }
 
 void InsertCommand::setParams(unsigned int testId, unsigned int workplaceId, unsigned int districtId, unsigned int regionId, bool result, double testValue,
 							  std::string note, std::chrono::time_point<std::chrono::system_clock> testDate, std::string birthNumber)
 {
-	m_test = new TestWrapper(new PCRTest(
+	m_test = new PCRTest(
 		testId,
 		workplaceId,
 		districtId,
@@ -23,14 +23,29 @@ void InsertCommand::setParams(unsigned int testId, unsigned int workplaceId, uns
 		note,
 		testDate,
 		birthNumber
-	));
+	);
 }
 
 void InsertCommand::execute(std::string& output, std::string& recordCount)
 {
 	if (m_person != nullptr)
 	{
-		if (dynamic_cast<RamDatabase*>(m_database)->insert(m_person))
+		bool inserted = false;
+		if (m_wrap)
+		{
+			if (dynamic_cast<RamDatabase*>(m_database)->insert(new PersonWrapper(m_person)))
+			{
+				inserted = true;
+			}
+		}
+		else
+		{
+			if (dynamic_cast<DiskDatabase*>(m_database)->insert(m_person))
+			{
+				inserted = true;
+			}
+		}
+		if (inserted)
 		{
 			output = "Person was registered to the database";
 			recordCount = "(1) record inserted";
@@ -43,7 +58,19 @@ void InsertCommand::execute(std::string& output, std::string& recordCount)
 	}
 	else
 	{
-		if (dynamic_cast<RamDatabase*>(m_database)->insert(m_test))
+		bool inserted = false;
+		if (m_wrap)
+		{
+			if (dynamic_cast<RamDatabase*>(m_database)->insert(new TestWrapper(m_test)))
+			{
+				inserted = true;
+			}
+		}
+		else
+		{
+			//TODO
+		}
+		if (inserted)
 		{
 			output = "Test was registered to the database";
 			recordCount = "(1) record inserted";
@@ -55,6 +82,7 @@ void InsertCommand::execute(std::string& output, std::string& recordCount)
 		}
 	}
 	
+	m_wrap = false;
 	m_person = nullptr;
 	m_test = nullptr;
 }

@@ -31,7 +31,7 @@ void testFile()
 {
     Person* dummy = RecordFactory::createInstance<Person>();
 
-    FileTester tester("../../../data/", (dummy->getSize() * 5) + 10);
+    FileTester tester("../../../data/", 400);
     tester.runTests();
 
     delete dummy;
@@ -42,12 +42,11 @@ int main()
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 
     {
-        //testFile();
+        testFile();
+
         Application app(APPLICATIONTYPE::DISK);
         app.run();
     }
-
-    //PREROBIT REMOVE/INSERT COMMAND CLASSY Z DYNAMIC CASTU NA IBA DATABASE KED ZMENIM TYPY V PARAMETROCH
 
     return 0;
 }

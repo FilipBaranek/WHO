@@ -6,6 +6,7 @@ void RamPresenter::insert(
 	double testValue, std::string note, time_point<system_clock> testDate, std::string birthNumber)
 {
 	execute([=, this](std::string& output, std::string& recordCount) {
+		m_insertCommand.wrapObject();
 		m_insertCommand.setParams(
 			testId,
 			workplaceId,
@@ -198,6 +199,7 @@ void RamPresenter::findTest(unsigned int testId)
 void RamPresenter::insert(std::string birthNumber, std::string firstName, std::string lastName, year_month_day birthDay)
 {
 	execute([=, this](std::string& output, std::string& recordCount) {
+		m_insertCommand.wrapObject();
 		m_insertCommand.setParams(birthNumber, firstName, lastName, birthDay);
 		m_insertCommand.execute(output, recordCount);
 		});

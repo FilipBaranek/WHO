@@ -21,6 +21,16 @@ bool DiskDatabase::generateRandomTests(int testCount)
 	return false;
 }
 
+bool DiskDatabase::insert(Person* person)
+{
+	if (m_people.insert(person) != -1)
+	{
+		delete person;
+		return true;
+	}
+	return false;
+}
+
 std::pair<std::string, int> DiskDatabase::printAllData()
 {
 	//TODO TESTY

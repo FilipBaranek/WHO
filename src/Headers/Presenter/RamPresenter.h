@@ -5,7 +5,6 @@
 #include "Enums/RemoveType.h"
 #include "Enums/FileCommandType.h"
 #include "Commands/FindTestResultCommand.h"
-#include "Commands/InsertCommand.h"
 #include "Commands/FindTestCommand.h"
 #include "Commands/RemoveCommand.h"
 #include "Commands/FindPatientsTestsCommand.h"
@@ -17,7 +16,6 @@ class RamPresenter : public Presenter
 {
 private:
 	FindTestResultCommand m_resultCommand;
-	InsertCommand m_insertCommand;
 	FindTestCommand m_findTestCommand;
 	RemoveCommand m_removeCommand;
 	FindPatientsTestsCommand m_findPatientsTestCommand;
@@ -27,7 +25,7 @@ private:
 
 public:
 	RamPresenter() : 
-		Presenter(new RamDatabase()), m_resultCommand(m_database), m_insertCommand(m_database),
+		Presenter(new RamDatabase()), m_resultCommand(m_database),
 		m_removeCommand(m_database), m_findTestCommand(m_database), m_findPatientsTestCommand(m_database),
 		m_findPositiveTestsByLocationIdCommand(m_database), m_findAllTestsByLocationIdCommand(m_database), m_fileCommands(m_database)
 	{}

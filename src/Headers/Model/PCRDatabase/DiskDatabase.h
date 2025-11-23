@@ -25,6 +25,8 @@ public:
 
 	bool generateRandomTests(int testCount) override;
 
+	bool insert(Person* person);
+
 	std::pair<std::string, int> printAllData() override;
 
 	void clear() override;
