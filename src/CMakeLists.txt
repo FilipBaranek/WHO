@@ -80,7 +80,7 @@ add_executable (
     "Headers/Model/Factories/BlockFactory.h"
     "Headers/Model/Tests/FileTester.h"
     
- "Source/Model/Tests/FileTester.cpp" "Headers/Presenter/RamPresenter.h" "Source/Presenter/RamPresenter.cpp" "Headers/Presenter/DiskPresenter.h" "Source/Presenter/DiskPresenter.cpp" "Headers/View/UI/ReducedOperationsWindow.h" "Headers/View/Helpers/Operation.h" "Source/View/UI/ReducedOperationsWindow.cpp" "Headers/Model/PCRDatabase/RamDatabase.h" "Source/Model/PCRDatabase/RamDatabase.cpp" "Headers/Model/PCRDatabase/DiskDatabase.h" "Source/Model/PCRDatabase/DiskDatabase.cpp")
+ "Source/Model/Tests/FileTester.cpp" "Headers/Presenter/RamPresenter.h" "Source/Presenter/RamPresenter.cpp" "Headers/Presenter/DiskPresenter.h" "Source/Presenter/DiskPresenter.cpp" "Headers/View/UI/ReducedOperationsWindow.h" "Headers/View/Helpers/Operation.h" "Source/View/UI/ReducedOperationsWindow.cpp" "Headers/Model/PCRDatabase/RamDatabase.h" "Source/Model/PCRDatabase/RamDatabase.cpp" "Headers/Model/PCRDatabase/DiskDatabase.h" "Source/Model/PCRDatabase/DiskDatabase.cpp" "Headers/Model/HashFile/HashFile.h")
 
 target_include_directories(BST PRIVATE ${glm_SOURCE_DIR})
 
