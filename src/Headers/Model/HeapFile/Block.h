@@ -96,7 +96,7 @@ public:
 		return nullptr;
 	}
 
-	void toBytes(uint8_t* outputBuffer)
+	virtual void toBytes(uint8_t* outputBuffer)
 	{
 		uint8_t* index = outputBuffer;
 		ByteConverter::toByteFromPrimitive<int>(m_validBlockCount, index);
@@ -107,9 +107,16 @@ public:
 			m_data[i]->toBytes(index);
 			index += m_data[i]->getSize();
 		}
+		T* dummy = RecordFactory::createInstance<T>();
+		for (int i = m_validBlockCount; i < m_blockingFactor; ++i)
+		{
+			dummy->toBytes(index);
+			index += dummy->getSize();
+		}
+		delete dummy;
 	}
 
-	void fromBytes(uint8_t* buffer)
+	virtual void fromBytes(uint8_t* buffer)
 	{
 		if (m_validBlockCount > 0)
 		{
@@ -127,15 +134,15 @@ public:
 		}
 	}
 
-	inline T** objects() { return m_data; }
-
-	inline int getSize() { return sizeof(m_validBlockCount) + m_clusterSize; }
+	virtual inline int getSize() { return sizeof(m_validBlockCount) + m_clusterSize; }
 
 	inline int validBlocks() { return m_validBlockCount; }
 
 	inline bool isFull() { return m_validBlockCount == m_blockingFactor; }
 
 	inline bool isEmpty() { return m_validBlockCount == 0; }
+
+	inline T** objects() { return m_data; }
 
 	std::string toString()
 	{

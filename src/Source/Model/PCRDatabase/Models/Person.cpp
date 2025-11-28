@@ -97,6 +97,18 @@ IRecord* Person::fromBytes(uint8_t* byteBuffer)
 	);
 }
 
+int Person::hash()
+{
+	//return Hash::hash<std::string>(m_birthNumber);
+
+	int hash = 0;
+	for (char c : m_birthNumber)
+	{
+		hash += static_cast<uint8_t>(c);
+	}
+	return hash % 100;
+}
+
 Person* Person::dummyInstance()
 {
 	std::string dummyString = "";

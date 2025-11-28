@@ -6,6 +6,7 @@
 	#include <fcntl.h>
 	#include <unistd.h> 
 #endif
+#include <memory>
 #include <string>
 #include <sstream>
 #include <list>
@@ -19,29 +20,37 @@ template<typename T>
 class HeapFile
 {
 private:
-	static constexpr const char* FILE_NAME = "data.bin";
-	static constexpr const char* HEADER_FILE_NAME = "header.bin";
+	static constexpr const char* FILE_SUFFIX = ".bin";
+	static constexpr const char* HEADER_SUFFIX = "_header.bin";
 
-	int m_clusterSize;
-	int m_objectSize;
 	std::string m_filePath;
-	std::fstream m_file;
 	std::list<int> m_partiallyEmptyAddresses;
 	std::list<int> m_emptyAddresses;
 
-	void loadBlock(int& address, uint8_t* buffer, Block<T>& block)
+protected:
+	std::fstream m_file;
+	int m_clusterSize;
+	int m_objectSize;
+
+protected:
+	void loadBlock(int& address, uint8_t* buffer, Block<T>* block)
 	{
-		m_file.seekg(address * block.getSize());
-		m_file.read(reinterpret_cast<char*>(buffer), block.getSize());
-		block.fromBytes(buffer);
+		m_file.seekg(address * block->getSize());
+		m_file.read(reinterpret_cast<char*>(buffer), block->getSize());
+		block->fromBytes(buffer);
 	}
 
-	void writeBlock(int& address, uint8_t* buffer, Block<T>& block)
+	void writeBlock(int& address, uint8_t* buffer, Block<T>* block)
 	{
-		block.toBytes(buffer);
-		m_file.seekp(address * block.getSize());
-		m_file.write(reinterpret_cast<char*>(buffer), block.getSize());
+		block->toBytes(buffer);
+		m_file.seekp(address * block->getSize());
+		m_file.write(reinterpret_cast<char*>(buffer), block->getSize());
 		m_file.flush();
+	}
+
+	virtual std::unique_ptr<Block<T>> getBlock()
+	{
+		return std::make_unique<Block<T>>(m_clusterSize, m_objectSize);
 	}
 
 #ifdef _WIN32
@@ -110,9 +119,9 @@ private:
 				--lastBlock;
 			}
 
-			Block<T> dummy(m_clusterSize, m_objectSize);
-			int64_t newSize = (lastBlock + 1) * dummy.getSize();
-			std::string fileName = m_filePath + FILE_NAME;
+			auto dummy = getBlock();
+			int64_t newSize = (lastBlock + 1) * dummy->getSize();
+			std::string fileName = m_filePath + FILE_SUFFIX;
 
 			m_file.close();
 #ifdef _WIN32
@@ -122,7 +131,7 @@ private:
 #else
 			throw std::runtime_error("Unsupported OS");
 #endif
-			m_file.open(m_filePath + FILE_NAME, std::ios::in | std::ios::out | std::ios::binary);
+			m_file.open(m_filePath + FILE_SUFFIX, std::ios::in | std::ios::out | std::ios::binary);
 		}
 	}
 
@@ -137,9 +146,9 @@ public:
 		delete dummy;
 	}
 
-	void open()
+	virtual void open()
 	{
-		m_file.open(m_filePath + FILE_NAME, std::ios::in | std::ios::out | std::ios::binary);
+		m_file.open(m_filePath + FILE_SUFFIX, std::ios::in | std::ios::out | std::ios::binary);
 		if (!m_file.is_open())
 		{
 			throw std::runtime_error("Failed to open binary file");
@@ -176,8 +185,8 @@ public:
 			return 0;
 		}
 
-		auto block = Block<T>(m_clusterSize, m_objectSize);
-		int size = static_cast<int>(pos) / block.getSize();
+		auto dummy = getBlock();
+		int size = static_cast<int>(pos) / dummy->getSize();
 
 		return size;
 	}
@@ -189,7 +198,7 @@ public:
 
 	void writeHeader()
 	{
-		std::fstream headerFile(m_filePath + HEADER_FILE_NAME, std::ios::out | std::ios::binary | std::ios::trunc);
+		std::fstream headerFile(m_filePath + HEADER_SUFFIX, std::ios::out | std::ios::binary | std::ios::trunc);
 		if (!headerFile.is_open())
 		{
 			throw std::runtime_error("Failed to open binary header file");
@@ -217,7 +226,7 @@ public:
 
 	void readHeader()
 	{
-		std::fstream headerFile(m_filePath + HEADER_FILE_NAME, std::ios::in | std::ios::binary);
+		std::fstream headerFile(m_filePath + HEADER_SUFFIX, std::ios::in | std::ios::binary);
 		if (!headerFile.is_open())
 		{
 			throw std::runtime_error("Failed to open binary header file");
@@ -274,23 +283,23 @@ public:
 			newBlock = true;
 		}
 
-		Block<T> block(m_clusterSize, m_objectSize);
-		std::vector<uint8_t> buffer(block.getSize());
+		auto block = getBlock();
+		std::vector<uint8_t> buffer(block->getSize());
 		
 		if (!newBlock)
 		{
-			loadBlock(address, buffer.data(), block);
+			loadBlock(address, buffer.data(), block.get());
 		}
 
-		bool inserted = block.insert(object);
-		writeBlock(address, buffer.data(), block);
+		bool inserted = block->insert(object);
+		writeBlock(address, buffer.data(), block.get());
 
 		if (newBlock && inserted)
 		{
 			m_emptyAddresses.pop_front();
 			m_partiallyEmptyAddresses.push_back(address);
 		}
-		if (inserted && block.isFull())
+		if (inserted && block->isFull())
 		{
 			m_partiallyEmptyAddresses.pop_front();
 		}
@@ -306,12 +315,12 @@ public:
 			return nullptr;
 		}
 
-		Block<T> block(m_clusterSize, m_objectSize);
-		std::vector<uint8_t> buffer(block.getSize());
+		auto block = getBlock();
+		std::vector<uint8_t> buffer(block->getSize());
 
-		loadBlock(address, buffer.data(), block);
+		loadBlock(address, buffer.data(), block.get());
 
-		return block.find(key);
+		return block->find(key);
 	}
 
 	T* remove(int address, T* key)
@@ -322,18 +331,18 @@ public:
 			return nullptr;
 		}
 
-		Block<T> block(m_clusterSize, m_objectSize);
-		std::vector<uint8_t> buffer(block.getSize());
+		auto block = getBlock();
+		std::vector<uint8_t> buffer(block->getSize());
 
-		loadBlock(address, buffer.data(), block);
+		loadBlock(address, buffer.data(), block.get());
 
-		T* removedObject = block.remove(key);
+		T* removedObject = block->remove(key);
 		if (removedObject != nullptr)
 		{
-			writeBlock(address, buffer.data(), block);
+			writeBlock(address, buffer.data(), block.get());
 		}
 
-		if (removedObject != nullptr && block.isEmpty())
+		if (removedObject != nullptr && block->isEmpty())
 		{
 			m_partiallyEmptyAddresses.remove(address);
 			auto iterator = m_emptyAddresses.begin();
@@ -348,7 +357,7 @@ public:
 				truncate();
 			}
 		}
-		else if (removedObject != nullptr && !block.isEmpty() &&
+		else if (removedObject != nullptr && !block->isEmpty() &&
 				 std::find(m_partiallyEmptyAddresses.begin(), m_partiallyEmptyAddresses.end(), address) == m_partiallyEmptyAddresses.end())
 		{
 			auto iterator = m_partiallyEmptyAddresses.begin();
@@ -369,12 +378,12 @@ public:
 
 		for (int i{}; i < fileSize; ++i)
 		{
-			Block<T> block(m_clusterSize, m_objectSize);
-			std::vector<uint8_t> buffer(block.getSize());
+			auto block = getBlock();
+			std::vector<uint8_t> buffer(block->getSize());
 
-			loadBlock(i, buffer.data(), block);
+			loadBlock(i, buffer.data(), block.get());
 
-			oss << "Block[" << i << "]\n" << block.toString() << "\n";
+			oss << "Block[" << i << "]\n" << block->toString() << "\n";
 		}
 
 		return oss.str();
@@ -400,14 +409,14 @@ public:
 
 	void testSize()
 	{
-		Block<T> lastBlock(m_clusterSize, m_objectSize);
-		std::vector<uint8_t> buffer(lastBlock.getSize());
+		auto lastBlock = getBlock();
+		std::vector<uint8_t> buffer(lastBlock->getSize());
 		int lastAddress = size() - 1;
 
 		if (lastAddress >= 0)
 		{
-			loadBlock(lastAddress, buffer.data(), lastBlock);
-			if (lastBlock.validBlocks() == 0)
+			loadBlock(lastAddress, buffer.data(), lastBlock.get());
+			if (lastBlock->validBlocks() == 0)
 			{
 				throw std::runtime_error("Invalid size - last empty block must be truncate");
 			}
@@ -420,7 +429,7 @@ public:
 		{
 			m_file.close();
 		}
-		m_file.open(m_filePath + FILE_NAME, std::ios::out | std::ios::binary | std::ios::trunc);
+		m_file.open(m_filePath + FILE_SUFFIX, std::ios::out | std::ios::binary | std::ios::trunc);
 		m_emptyAddresses.clear();
 		m_partiallyEmptyAddresses.clear();
 

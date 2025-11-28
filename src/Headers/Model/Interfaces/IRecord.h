@@ -22,5 +22,7 @@ public:
 
 	virtual IRecord* fromBytes(uint8_t* byteBuffer) = 0;
 
+	virtual int hash() = 0;
+
 	virtual ~IRecord() = default;
 };

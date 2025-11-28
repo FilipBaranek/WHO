@@ -8,6 +8,7 @@
 #include "../ModelWrappers/TestWrapper.h"
 #include "../../Structures/AVL/AVLTree.h"
 #include "../../HeapFile/Helpers/ByteConverter.h"
+#include "../../HashFile/Hash.h"
 
 class Person : public IRecord
 {
@@ -58,6 +59,8 @@ public:
 	bool toBytes(uint8_t* bytesOutput) override;
 	
 	IRecord* fromBytes(uint8_t* byteBuffer) override;
+
+	int hash() override;
 
 	static Person* dummyInstance();
 
