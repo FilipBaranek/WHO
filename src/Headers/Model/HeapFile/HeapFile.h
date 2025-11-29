@@ -20,15 +20,15 @@ template<typename T>
 class HeapFile
 {
 private:
+	std::list<int> m_partiallyEmptyAddresses;
+
+protected:
 	static constexpr const char* FILE_SUFFIX = ".bin";
 	static constexpr const char* HEADER_SUFFIX = "_header.bin";
 
 	std::string m_filePath;
-	std::list<int> m_partiallyEmptyAddresses;
-	std::list<int> m_emptyAddresses;
-
-protected:
 	std::fstream m_file;
+	std::list<int> m_emptyAddresses;
 	int m_clusterSize;
 	int m_objectSize;
 
@@ -405,6 +405,12 @@ public:
 		}
 
 		return oss.str();
+	}
+
+	int blockingFactor()
+	{
+		auto block = getBlock();
+		return block->blockingFactor();
 	}
 
 	void testSize()

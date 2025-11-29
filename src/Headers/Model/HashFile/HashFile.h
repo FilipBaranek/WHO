@@ -1,6 +1,8 @@
 #pragma once
+#include <iostream>
 #include "Hash.h"
 #include "PrimaryHeapFile.h"
+#include "OverFlowHeapFile.h"
 #include "../Factories/RecordFactory.h"
 
 template<typename T>
@@ -16,7 +18,7 @@ private:
 	static constexpr const float MIN_DENSITY = 0.64;
 
 	PrimaryHeapFile<T> m_primaryFile;
-	HeapFile<T> m_overFlowFile;
+	OverflowHeapFile<T> m_overFlowFile;
 
 	int m_level;
 	int m_splitPointer;
@@ -46,6 +48,7 @@ public:
 	{
 		m_primaryFile.open();
 		m_overFlowFile.open();
+		m_capacity = GROUP_SIZE * m_primaryFile.blockingFactor();
 	}
 
 	void close()
@@ -57,41 +60,62 @@ public:
 	void insert(T* record)
 	{
 		int addr = address(record);
+		int possibleOverflowAddress = m_overFlowFile.nextAddress();
 		int nextBlock;
+		bool newBlock = false;
 
-		bool inserted = m_primaryFile.insert(addr, record, nextBlock);
+		bool inserted = m_primaryFile.insert(addr, record, nextBlock, newBlock, possibleOverflowAddress);
+		if (inserted)
+		{
+			++m_recordCount;
+		}
 
 		double density = static_cast<double>(m_recordCount) / static_cast<double>(m_capacity);
 		while (m_capacity > 0 && density > MAX_DENSITY)
 		{
-			m_primaryFile.split(m_splitPointer, GROUP_SIZE, m_level, [this](T* record) {
+			m_primaryFile.split(m_splitPointer, GROUP_SIZE, m_level,
+			[this](T* record) {
 				int hashValue = record->hash();
 				return hashValue % (GROUP_SIZE * (static_cast<int>(std::pow(2, m_level + 1))));
+			}, [this](int address) {
+				return std::move(m_overFlowFile.blockAt(address));
+			}, [this](int address, HashBlock<T>* block) {
+				return m_overFlowFile.writeAt(address, block);
 			});
-			
+
+			int removedBlocks = m_overFlowFile.truncate();
+			m_capacity -= removedBlocks * m_overFlowFile.blockingFactor();
+
 			++m_splitPointer;
 			if (m_splitPointer >= GROUP_SIZE * (static_cast<int>(std::pow(2, m_level))))
 			{
 				m_splitPointer = 0;
 				++m_level;
 			}
-
-			T* dummy = RecordFactory::createInstance<T>();
-			m_capacity += dummy->getSize();
-			delete dummy;
+			m_capacity += m_primaryFile.blockingFactor();
 
 			density = static_cast<double>(m_recordCount) / static_cast<double>(m_capacity);
+			//
+			printOut();
 		}
-
-		if (inserted)
+		
+		if (!inserted)
 		{
-			
+			m_overFlowFile.insert(nextBlock, record, newBlock);
+			m_capacity += m_overFlowFile.blockingFactor();
 			++m_recordCount;
 		}
-		else
-		{
-			//TODO - INSERT TO OVERFLOW BUFF
-		}
+	}
+
+	void printOut()
+	{
+		std::cout << "PRIMARY FILE:\n";
+		std::cout << m_primaryFile.printFile();
+		//std::cout << m_primaryFile.printAddresses();
+		std::cout << "\nOVERFLOW FILE:\n";
+		std::cout << m_overFlowFile.printFile();
+		//std::cout << m_overFlowFile.printAddresses();
+		std::cout << "===========================================\n";
 	}
 
 	~HashFile()

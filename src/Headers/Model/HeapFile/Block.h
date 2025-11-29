@@ -138,6 +138,8 @@ public:
 
 	inline int validBlocks() { return m_validBlockCount; }
 
+	inline int blockingFactor() { return m_blockingFactor; }
+
 	inline bool isFull() { return m_validBlockCount == m_blockingFactor; }
 
 	inline bool isEmpty() { return m_validBlockCount == 0; }

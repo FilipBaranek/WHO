@@ -22,7 +22,7 @@ public:
 	{
 		uint8_t* index = outputBuffer;
 		index = ByteConverter::toByteFromPrimitive<int>(m_nextBlockAddress, index);
-		Block<T>::toBytes(outputBuffer);
+		Block<T>::toBytes(index);
 	}
 
 	void fromBytes(uint8_t* buffer) override
@@ -32,6 +32,4 @@ public:
 		index += sizeof(m_nextBlockAddress);
 		Block<T>::fromBytes(index);
 	}
-
-	~HashBlock() = default;
 };
