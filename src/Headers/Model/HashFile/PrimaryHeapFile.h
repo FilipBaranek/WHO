@@ -42,6 +42,7 @@ private:
 			{
 				splitBlock->remove(record);
 				primaryBlock->insert(record);
+				delete record;
 			}
 		}
 	}
@@ -62,7 +63,7 @@ public:
 
 	void split(
 		int splitAddressPointer, int groupSize, int level,
-		std::function<int(T*)> hash, 
+		std::function<int(T*)> hash,
 		std::function<std::unique_ptr<HashBlock<T>>(int)> nextOverflowedBlock,
 		std::function<void(int, HashBlock<T>*)> writeOverflowBlock
 	)
@@ -106,5 +107,25 @@ public:
 		nextBlock = hashBlock->nextBlock();
 
 		return inserted;
+	}
+
+	T* find(int address, T* key, std::function<std::unique_ptr<HashBlock<T>>(int)> nextOverflowedBlock)
+	{
+		auto block = getBlock();
+		std::vector<uint8_t> buffer(block->getSize());
+		this->loadBlock(address, buffer.data(), block.get());
+
+		T* record = block->find(key);
+		if (record == nullptr)
+		{
+			int overflowPtr = dynamic_cast<HashBlock<T>*>(block.get())->nextBlock();
+			while (record == nullptr && overflowPtr != -1)
+			{
+				std::unique_ptr<HashBlock<T>> overflowBlock = nextOverflowedBlock(overflowPtr);
+				record = overflowBlock->find(key);
+				overflowPtr = overflowBlock->nextBlock();
+			}
+		}
+		return record;
 	}
 };

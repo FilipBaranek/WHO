@@ -59,6 +59,8 @@ int main()
         Person* person5 = new Person("zu", "39", "39", std::chrono::year_month_day{});
         Person* person6 = new Person("q", "13", "13", std::chrono::year_month_day{});
         Person* person7 = new Person("t", "16", "16", std::chrono::year_month_day{});
+        Person* person8 = new Person("3", "51", "51", std::chrono::year_month_day{});
+        Person* person9 = new Person("w", "19", "19", std::chrono::year_month_day{});
 
         HashFile<Person> hashFile(dummy->getSize() * 2, dummy->getSize());
         hashFile.open();
@@ -77,6 +79,24 @@ int main()
         hashFile.printOut();
         hashFile.insert(person7);
         hashFile.printOut();
+        hashFile.insert(person8);
+        hashFile.printOut();
+        hashFile.insert(person9);
+        hashFile.printOut();
+
+        std::cout << "FIND METHOD:\n";
+        Person* foundPerson = hashFile.find(person2);
+        if (foundPerson != nullptr)
+        {
+            std::cout << foundPerson->toString();
+            delete foundPerson;
+        }
+        Person* foundPerson2 = hashFile.find(person9);
+        if (foundPerson2 != nullptr)
+        {
+            std::cout << foundPerson2->toString();
+            delete foundPerson2;
+        }
 
         delete person1;
         delete person2;
@@ -85,11 +105,9 @@ int main()
         delete person5;
         delete person6;
         delete person7;
+        delete person8;
+        delete person9;
         delete dummy;
-
-
-        //SKUSIT DAT CELE INICIALIZOVANIE BLOKU OD GETBLOCK PO VYTVARANIE BUFFRU DO LOADBLOCK METODY - MOZNO TO NEPOJDE LEBO NIEKEDY TREBA BUFFER ABY OSTAL V METODE
-        //TRUNCATE PRE OVERFLOW FILE URCITE OPRAVIT
     }
 
     return 0;

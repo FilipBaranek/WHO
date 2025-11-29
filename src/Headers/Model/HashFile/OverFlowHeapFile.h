@@ -27,7 +27,7 @@ public:
 		this->loadBlock(lastBlock, buffer.data(), block.get());
 
 		int sizeBefore = lastBlock + 1;
-		int64_t newSize = 0;
+		int64_t newSize = sizeBefore;
 
 		if (lastBlock > 0 && block->isEmpty())
 		{

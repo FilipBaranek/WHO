@@ -74,13 +74,13 @@ public:
 		while (m_capacity > 0 && density > MAX_DENSITY)
 		{
 			m_primaryFile.split(m_splitPointer, GROUP_SIZE, m_level,
-			[this](T* record) {
-				int hashValue = record->hash();
-				return hashValue % (GROUP_SIZE * (static_cast<int>(std::pow(2, m_level + 1))));
-			}, [this](int address) {
-				return std::move(m_overFlowFile.blockAt(address));
-			}, [this](int address, HashBlock<T>* block) {
-				return m_overFlowFile.writeAt(address, block);
+				[this](T* record) {
+					int hashValue = record->hash();
+					return hashValue % (GROUP_SIZE * (static_cast<int>(std::pow(2, m_level + 1))));
+				}, [this](int address) {
+					return m_overFlowFile.blockAt(address);
+				}, [this](int address, HashBlock<T>* block) {
+					return m_overFlowFile.writeAt(address, block);
 			});
 
 			int removedBlocks = m_overFlowFile.truncate();
@@ -95,8 +95,6 @@ public:
 			m_capacity += m_primaryFile.blockingFactor();
 
 			density = static_cast<double>(m_recordCount) / static_cast<double>(m_capacity);
-			//
-			printOut();
 		}
 		
 		if (!inserted)
@@ -107,15 +105,21 @@ public:
 		}
 	}
 
+	T* find(T* key)
+	{
+		int addr = address(key);
+		return m_primaryFile.find(addr, key,
+			[this](int address) {
+				return m_overFlowFile.blockAt(address);
+		});
+	}
+
 	void printOut()
 	{
 		std::cout << "PRIMARY FILE:\n";
 		std::cout << m_primaryFile.printFile();
-		//std::cout << m_primaryFile.printAddresses();
 		std::cout << "\nOVERFLOW FILE:\n";
 		std::cout << m_overFlowFile.printFile();
-		//std::cout << m_overFlowFile.printAddresses();
-		std::cout << "===========================================\n";
 	}
 
 	~HashFile()
