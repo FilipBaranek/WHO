@@ -7,12 +7,12 @@
 class Hash
 {
 private:
-	static constexpr const int32_t FNV_PRIME = 16777619;
-	static constexpr const int32_t OFFSET = 2166136261;
+	static constexpr const uint32_t FNV_PRIME = 16777619;
+	static constexpr const uint32_t OFFSET = 2166136261;
 
 public:
 	template<typename T>
-	static int hash(T& key)
+	static uint32_t hash(T& key)
 	{
 		std::vector<uint8_t> buffer;
 		if constexpr (std::is_same<T, std::string>::value)
@@ -31,7 +31,7 @@ public:
 			ByteConverter::toByteFromPrimitive<T>(key, buffer.data());
 		}
 
-		int hash = OFFSET;
+		uint32_t hash = OFFSET;
 		for (auto& byte : buffer)
 		{
 			hash ^= byte;

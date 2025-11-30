@@ -438,8 +438,6 @@ public:
 		m_file.open(m_filePath + FILE_SUFFIX, std::ios::out | std::ios::binary | std::ios::trunc);
 		m_emptyAddresses.clear();
 		m_partiallyEmptyAddresses.clear();
-
-		close();
 	}
 
 	~HeapFile()

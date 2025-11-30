@@ -60,7 +60,7 @@ public:
 	
 	IRecord* fromBytes(uint8_t* byteBuffer) override;
 
-	int hash() override;
+	uint32_t hash() override;
 
 	static Person* dummyInstance();
 

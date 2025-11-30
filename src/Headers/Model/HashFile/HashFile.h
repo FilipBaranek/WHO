@@ -5,6 +5,7 @@
 #include "OverFlowHeapFile.h"
 #include "../Factories/RecordFactory.h"
 
+
 template<typename T>
 class HashFile
 {
@@ -28,13 +29,19 @@ private:
 private:
 	int address(T* record)
 	{
-		int hashValue = record->hash();
+		uint32_t hashValue = record->hash();
 		int addr = hashValue % (GROUP_SIZE * (static_cast<int>(std::pow(2, m_level))));
 
 		if (addr < m_splitPointer)
 		{
 			addr = hashValue % (GROUP_SIZE * (static_cast<int>(std::pow(2, m_level + 1))));
 		}
+
+		if (addr < 0)
+		{
+			std::cout << "INCORRECT ADDRESS\n";
+		}
+
 		return addr;
 	}
 
@@ -120,6 +127,12 @@ public:
 		std::cout << m_primaryFile.printFile();
 		std::cout << "\nOVERFLOW FILE:\n";
 		std::cout << m_overFlowFile.printFile();
+	}
+
+	void clear()
+	{
+		m_primaryFile.clear();
+		m_overFlowFile.clear();
 	}
 
 	~HashFile()
