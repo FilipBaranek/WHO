@@ -47,7 +47,7 @@ void HashFileTester::find()
 
 void HashFileTester::remove()
 {
-	//TODO
+	//TODO//
 }
 
 void HashFileTester::runTests()
