@@ -17,12 +17,19 @@ void HashFileTester::insert(int operation)
 {
 	Person* person = RandomDataGenerator::generatePerson(m_gen);
 
-	if (person->birthNumber() == "9602240505")
+	if (operation == 334)
 	{
-		std::cout << "INCORRECT INSERT\n";
+		Person peter("9702082012", "peter", "Horvat", {});
+		m_hashFile.find(&peter);
 	}
 
 	m_hashFile.insert(person);
+
+	if (operation == 334)
+	{
+		Person peter("9702082012", "peter", "Horvat", {});
+		m_hashFile.find(&peter);
+	}
 	
 	Person* foundPerson = m_hashFile.find(person);
 	if (foundPerson == nullptr || !foundPerson->is(person) || !foundPerson->equals(person))
@@ -39,11 +46,6 @@ void HashFileTester::insert(int operation)
 void HashFileTester::find(int operation)
 {
 	std::uniform_int_distribution<unsigned int> names(0, m_data.size() - 1);
-
-	if (operation == 95)
-	{
-		std::cout << "";
-	}
 
 	Person* person = m_data[names(m_gen)];
 	Person* foundPerson = m_hashFile.find(person);
@@ -74,12 +76,6 @@ void HashFileTester::runTests()
 			std::cout << "Operation " << i - 1 << "/" << REPLICATIONS << "\n";
 		}
 
-		//if (i == 15)
-		//{
-		//	std::cout << "aaa\n";
-		//}
-
-		std::cout << "Operation " << i - 1 << "/" << REPLICATIONS << "\n";
 		int operation = probability(m_gen);
 
 		if (operation == 0)
@@ -101,7 +97,7 @@ void HashFileTester::runTests()
 				remove();
 			}
 		}
-		m_hashFile.printOut();
+		//m_hashFile.printOut();
 	}
 
 	m_hashFile.printOut();

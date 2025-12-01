@@ -36,6 +36,12 @@ private:
 		{
 			bool inserted = false;
 			T* record = records[i];
+		
+			if (record->birthNumber() == "9702082012")
+			{
+				std::cout << "";
+			}
+
 			if (hash(record) != splitAddressPointer)
 			{
 				inserted = newBlock->insert(record);
@@ -86,11 +92,11 @@ public:
 		std::vector<uint8_t> splitBlockBuffer(splitBlock->getSize());
 		this->loadBlock(splitAddressPointer, splitBlockBuffer.data(), splitBlock.get());
 
-		int newBlockLastPtr = -1;
 		bool dummy;
 		rearrange(splitAddressPointer, splitBlock.get(), newBlock.get(), hash, dummy);
 
 		HashBlock<T>* prevBlock = dynamic_cast<HashBlock<T>*>(splitBlock.get());
+		int newBlockLastPtr = -1;
 		int overflowPtr = prevBlock->nextBlock();
 		int prevAddress = splitAddressPointer;
 		while (overflowPtr != -1)
@@ -124,20 +130,28 @@ public:
 					newBlockLast->nextBlock(overflowPtr);
 					writeOverflowBlock(newBlockLastPtr, newBlockLast.get());
 				}
+				skip = true;
+				prevBlock->nextBlock(overflowBlock->nextBlock());
+				overflowBlock->nextBlock(-1);
+				if (prevBlock != splitBlock.get())
+				{
+					writeOverflowBlock(prevAddress, prevBlock);
+				}
 				newBlockLastPtr = overflowPtr;
 			}
 
 			writeOverflowBlock(overflowPtr, overflowBlock.get());
-			prevAddress = overflowPtr;
-			overflowPtr = next;
+
 			if (prevBlock != splitBlock.get() && !skip)
 			{
 				delete prevBlock;
 			}
 			if (!skip)
 			{
+				prevAddress = overflowPtr;
 				prevBlock = overflowBlock.release();
 			}
+			overflowPtr = next;
 
 		}
 		if (prevBlock != splitBlock.get())
