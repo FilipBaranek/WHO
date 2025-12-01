@@ -26,22 +26,31 @@ private:
 		return std::move(block);
 	}
 
-	void rearrange(int& splitAddressPointer, Block<T>* splitBlock, Block<T>* newBlock, std::function<int(T*)>& hash, Block<T>* primaryBlock = nullptr)
+	void rearrange(
+		int& splitAddressPointer, Block<T>* splitBlock, Block<T>* newBlock,
+		std::function<int(T*)>& hash, bool& redirect, Block<T>* primaryBlock = nullptr
+	)
 	{
 		T** records = splitBlock->objects();
 		for (int i = splitBlock->validBlocks() - 1; i >= 0; --i)
 		{
+			bool inserted = false;
 			T* record = records[i];
 			if (hash(record) != splitAddressPointer)
 			{
-				splitBlock->remove(record);
-				newBlock->insert(record);
-				delete record;
+				inserted = newBlock->insert(record);
+				if (!inserted)
+				{
+					redirect = true;
+				}
 			}
 			else if (primaryBlock != nullptr)
 			{
+				inserted = primaryBlock->insert(record);
+			}
+			if (inserted)
+			{
 				splitBlock->remove(record);
-				primaryBlock->insert(record);
 				delete record;
 			}
 		}
@@ -65,7 +74,8 @@ public:
 		int splitAddressPointer, int groupSize, int level,
 		std::function<int(T*)> hash,
 		std::function<std::unique_ptr<HashBlock<T>>(int)> nextOverflowedBlock,
-		std::function<void(int, HashBlock<T>*)> writeOverflowBlock
+		std::function<void(int, HashBlock<T>*)> writeOverflowBlock,
+		std::function<void(int)> addEmptyAddress
 	)
 	{
 		int newAddress = splitAddressPointer + (groupSize * static_cast<int>(std::pow(2, level)));
@@ -76,15 +86,63 @@ public:
 		std::vector<uint8_t> splitBlockBuffer(splitBlock->getSize());
 		this->loadBlock(splitAddressPointer, splitBlockBuffer.data(), splitBlock.get());
 
-		rearrange(splitAddressPointer, splitBlock.get(), newBlock.get(), hash);
+		int newBlockLastPtr = -1;
+		bool dummy;
+		rearrange(splitAddressPointer, splitBlock.get(), newBlock.get(), hash, dummy);
 
-		int overflowPtr = dynamic_cast<HashBlock<T>*>(splitBlock.get())->nextBlock();
+		HashBlock<T>* prevBlock = dynamic_cast<HashBlock<T>*>(splitBlock.get());
+		int overflowPtr = prevBlock->nextBlock();
+		int prevAddress = splitAddressPointer;
 		while (overflowPtr != -1)
 		{
+			bool skip = false, redirect = false;
 			std::unique_ptr<HashBlock<T>> overflowBlock = nextOverflowedBlock(overflowPtr);
-			rearrange(splitAddressPointer, overflowBlock.get(), newBlock.get(), hash, splitBlock.get());
+			rearrange(splitAddressPointer, overflowBlock.get(), newBlock.get(), hash, redirect, splitBlock.get());
+
+			int next = overflowBlock->nextBlock();
+			if (overflowBlock->isEmpty())
+			{
+				skip = true;
+				prevBlock->nextBlock(overflowBlock->nextBlock());
+				overflowBlock->nextBlock(-1);
+
+				if (prevBlock != splitBlock.get())
+				{
+					writeOverflowBlock(prevAddress, prevBlock);
+				}
+				addEmptyAddress(overflowPtr);
+			}
+			else if (redirect)
+			{
+				if (newBlockLastPtr == -1)
+				{
+					dynamic_cast<HashBlock<T>*>(newBlock.get())->nextBlock(overflowPtr);
+				}
+				else
+				{
+					auto newBlockLast = nextOverflowedBlock(newBlockLastPtr);
+					newBlockLast->nextBlock(overflowPtr);
+					writeOverflowBlock(newBlockLastPtr, newBlockLast.get());
+				}
+				newBlockLastPtr = overflowPtr;
+			}
+
 			writeOverflowBlock(overflowPtr, overflowBlock.get());
-			overflowPtr = overflowBlock->nextBlock();
+			prevAddress = overflowPtr;
+			overflowPtr = next;
+			if (prevBlock != splitBlock.get() && !skip)
+			{
+				delete prevBlock;
+			}
+			if (!skip)
+			{
+				prevBlock = overflowBlock.release();
+			}
+
+		}
+		if (prevBlock != splitBlock.get())
+		{
+			delete prevBlock;
 		}
 		this->writeBlock(splitAddressPointer, splitBlockBuffer.data(), splitBlock.get());
 		this->writeBlock(newAddress, newBlockBuffer.data(), newBlock.get());
@@ -96,15 +154,26 @@ public:
 		HashBlock<T>* hashBlock = dynamic_cast<HashBlock<T>*>(block.get());
 		std::vector<uint8_t> buffer(hashBlock->getSize());
 		
+		bool inserted = false;
 		this->loadBlock(address, buffer.data(), hashBlock);
-		bool inserted = hashBlock->insert(record);
-		if (!inserted && hashBlock->nextBlock() == -1)
+
+		if (block->isFull() && hashBlock->nextBlock() != -1)
 		{
-			hashBlock->nextBlock(possibleNextBlock);
+			newBlock = false;
+			nextBlock = hashBlock->nextBlock();
+			return inserted;
+		}
+		else if (block->isFull() && hashBlock->nextBlock() == -1)
+		{
 			newBlock = true;
+			hashBlock->nextBlock(possibleNextBlock);
+			nextBlock = hashBlock->nextBlock();
+		}
+		else if (!block->isFull())
+		{
+			inserted = hashBlock->insert(record);
 		}
 		this->writeBlock(address, buffer.data(), hashBlock);
-		nextBlock = hashBlock->nextBlock();
 
 		return inserted;
 	}

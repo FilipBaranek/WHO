@@ -8,11 +8,14 @@
 class HashFileTester
 {
 private:
-	static constexpr const int REPLICATIONS = 100;
-	static constexpr const int CHECKPOINT = 50'000;
+	static constexpr const int REPLICATIONS = 10'000;
+	static constexpr const int CHECKPOINT = 1'000;
 
 	std::random_device m_rd;
-	std::mt19937 m_gen{ m_rd() };
+
+	int seed;
+
+	std::mt19937 m_gen;
 
 	std::vector<Person*> m_data;
 	HashFile<Person> m_hashFile;
@@ -20,9 +23,9 @@ private:
 public:
 	HashFileTester(int primaryFileClusterSize, int overflowFileClusterSize, int pregeneratedDataCount = 0);
 
-	void insert();
+	void insert(int operation);
 
-	void find();
+	void find(int operation);
 
 	void remove();
 

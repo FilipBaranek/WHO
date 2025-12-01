@@ -59,9 +59,11 @@ int main()
         //testFile();
         testHashFile();
 
+        //POZRIET CI JE SPRAVNY TRUNCATE
+
+
         //Application app(APPLICATIONTYPE::DISK);
         //app.run();
-
 
         //Person* dummy = RecordFactory::createInstance<Person>();
         //Person* person1 = new Person("zi", "27", "27", std::chrono::year_month_day{});

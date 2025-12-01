@@ -55,7 +55,7 @@ public:
 			this->m_file.open(this->m_filePath + this->FILE_SUFFIX, std::ios::in | std::ios::out | std::ios::binary);
 		}
 
-		return sizeBefore - newSize;
+		return sizeBefore - this->size();
 	}
 
 	std::unique_ptr<HashBlock<T>> blockAt(int address)
@@ -76,6 +76,16 @@ public:
 		this->writeBlock(address, buffer.data(), block);
 	}
 
+	void addEmptyAddress(int address)
+	{
+		auto iterator = this->m_emptyAddresses.begin();
+		while (iterator != this->m_emptyAddresses.end() && *iterator < address + 1)
+		{
+			++iterator;
+		}
+		this->m_emptyAddresses.insert(iterator, address);
+	}
+
 	int nextAddress()
 	{
 		int address;
@@ -91,7 +101,7 @@ public:
 		return address;
 	}
 
-	void insert(int address, T* record, bool newBlock)
+	void insert(int address, T* record, bool& newBlock)
 	{
 		auto block = getBlock();
 		HashBlock<T>* hashBlock = dynamic_cast<HashBlock<T>*>(block.get());
@@ -110,6 +120,7 @@ public:
 
 			if (hashBlock->isFull())
 			{
+				newBlock = true;
 				int newAddress = nextAddress();
 				hashBlock->nextBlock(newAddress);
 				this->writeBlock(addressToInsert, buffer.data(), hashBlock);

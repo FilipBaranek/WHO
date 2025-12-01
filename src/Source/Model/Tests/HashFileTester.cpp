@@ -1,7 +1,7 @@
 #include "../../../Headers/Model/Tests/HashFileTester.h"
 
 HashFileTester::HashFileTester(int primaryFileClusterSize, int overflowFileClusterSize, int pregeneratedDataCount) :
-	m_hashFile(primaryFileClusterSize, overflowFileClusterSize)
+	m_hashFile(primaryFileClusterSize, overflowFileClusterSize), seed(m_rd()), m_gen(seed)
 {
 	m_hashFile.open();
 
@@ -13,15 +13,21 @@ HashFileTester::HashFileTester(int primaryFileClusterSize, int overflowFileClust
 	}
 }
 
-void HashFileTester::insert()
+void HashFileTester::insert(int operation)
 {
 	Person* person = RandomDataGenerator::generatePerson(m_gen);
+
+	if (person->birthNumber() == "9602240505")
+	{
+		std::cout << "INCORRECT INSERT\n";
+	}
 
 	m_hashFile.insert(person);
 	
 	Person* foundPerson = m_hashFile.find(person);
 	if (foundPerson == nullptr || !foundPerson->is(person) || !foundPerson->equals(person))
 	{
+		std::cout << "OPERATION N: " << operation << "\nSEED: " << seed << "\n";
 		throw std::runtime_error("Incorrect inserting");
 	}
 
@@ -30,15 +36,21 @@ void HashFileTester::insert()
 	delete foundPerson;
 }
 
-void HashFileTester::find()
+void HashFileTester::find(int operation)
 {
 	std::uniform_int_distribution<unsigned int> names(0, m_data.size() - 1);
+
+	if (operation == 95)
+	{
+		std::cout << "";
+	}
 
 	Person* person = m_data[names(m_gen)];
 	Person* foundPerson = m_hashFile.find(person);
 
 	if (foundPerson == nullptr || !foundPerson->is(person) || !foundPerson->equals(person))
 	{
+		std::cout << "OPERATION N: " << operation << "\nSEED: " << seed << "\n";
 		throw std::runtime_error("Incorrect find operation");
 	}
 
@@ -62,18 +74,24 @@ void HashFileTester::runTests()
 			std::cout << "Operation " << i - 1 << "/" << REPLICATIONS << "\n";
 		}
 
+		//if (i == 15)
+		//{
+		//	std::cout << "aaa\n";
+		//}
+
+		std::cout << "Operation " << i - 1 << "/" << REPLICATIONS << "\n";
 		int operation = probability(m_gen);
 
 		if (operation == 0)
 		{
-			insert();
+			insert(i);
 			++inserts;
 		}
 		else if (operation == 1)
 		{
 			if (m_data.size() > 0)
 			{
-				find();
+				find(i);
 			}
 		}
 		else if (operation == 2)
@@ -83,7 +101,6 @@ void HashFileTester::runTests()
 				remove();
 			}
 		}
-
 		m_hashFile.printOut();
 	}
 

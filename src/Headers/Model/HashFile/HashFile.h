@@ -14,7 +14,7 @@ class HashFile
 private:
 	static constexpr const char* PRIMARY_FILE_PATH = "../../../data/HashFile/primary";
 	static constexpr const char* OVERFLOW_FILE_PATH = "../../../data/HashFile/overflow";
-	static constexpr const int GROUP_SIZE = 2;
+	static constexpr const int GROUP_SIZE = 4;
 	static constexpr const float MAX_DENSITY = 0.8;
 	static constexpr const float MIN_DENSITY = 0.64;
 
@@ -30,16 +30,11 @@ private:
 	int address(T* record)
 	{
 		uint32_t hashValue = record->hash();
-		int addr = hashValue % (GROUP_SIZE * (static_cast<int>(std::pow(2, m_level))));
+		int addr = hashValue % (GROUP_SIZE * (1 << m_level));
 
 		if (addr < m_splitPointer)
 		{
-			addr = hashValue % (GROUP_SIZE * (static_cast<int>(std::pow(2, m_level + 1))));
-		}
-
-		if (addr < 0)
-		{
-			std::cout << "INCORRECT ADDRESS\n";
+			addr = hashValue % (GROUP_SIZE * (1 << (m_level + 1)));
 		}
 
 		return addr;
@@ -72,10 +67,15 @@ public:
 		bool newBlock = false;
 
 		bool inserted = m_primaryFile.insert(addr, record, nextBlock, newBlock, possibleOverflowAddress);
-		if (inserted)
+		if (!inserted)
 		{
-			++m_recordCount;
+			m_overFlowFile.insert(nextBlock, record, newBlock);
+			if (newBlock)
+			{
+				m_capacity += m_overFlowFile.blockingFactor();
+			}
 		}
+		++m_recordCount;
 
 		double density = static_cast<double>(m_recordCount) / static_cast<double>(m_capacity);
 		while (m_capacity > 0 && density > MAX_DENSITY)
@@ -88,6 +88,8 @@ public:
 					return m_overFlowFile.blockAt(address);
 				}, [this](int address, HashBlock<T>* block) {
 					return m_overFlowFile.writeAt(address, block);
+				}, [this](int address) {
+					return m_overFlowFile.addEmptyAddress(address);
 			});
 
 			int removedBlocks = m_overFlowFile.truncate();
@@ -102,13 +104,6 @@ public:
 			m_capacity += m_primaryFile.blockingFactor();
 
 			density = static_cast<double>(m_recordCount) / static_cast<double>(m_capacity);
-		}
-		
-		if (!inserted)
-		{
-			m_overFlowFile.insert(nextBlock, record, newBlock);
-			m_capacity += m_overFlowFile.blockingFactor();
-			++m_recordCount;
 		}
 	}
 
