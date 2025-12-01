@@ -76,8 +76,13 @@ public:
 		this->writeBlock(address, buffer.data(), block);
 	}
 
-	void addEmptyAddress(int address)
+	void addEmptyAddress(int address = -1)
 	{
+		if (address == -1)
+		{
+			address = nextAddress();
+		}
+
 		auto iterator = this->m_emptyAddresses.begin();
 		while (iterator != this->m_emptyAddresses.end() && *iterator < address + 1)
 		{
@@ -99,6 +104,14 @@ public:
 			address = this->size();
 		}
 		return address;
+	}
+
+	void split(std::pair<HashBlock<T>*, HashBlock<T>*>& splitBlocks, std::function<int(T*)> hash)
+	{
+
+
+
+		
 	}
 
 	void insert(int address, T* record, bool& newBlock)
@@ -136,5 +149,19 @@ public:
 		{
 			this->writeBlock(addressToInsert, buffer.data(), hashBlock);
 		}
+	}
+
+	T* find(int address, T* key)
+	{
+		int overflowPtr = address;
+		T* record = nullptr;
+
+		while (record == nullptr && overflowPtr != -1)
+		{
+			std::unique_ptr<HashBlock<T>> overflowBlock = blockAt(overflowPtr);
+			record = overflowBlock->find(key);
+			overflowPtr = overflowBlock->nextBlock();
+		}
+		return record;
 	}
 };

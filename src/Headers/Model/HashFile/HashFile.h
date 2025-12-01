@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include <utility>
 #include "Hash.h"
 #include "PrimaryHeapFile.h"
 #include "OverFlowHeapFile.h"
@@ -80,17 +81,19 @@ public:
 		double density = static_cast<double>(m_recordCount) / static_cast<double>(m_capacity);
 		while (m_capacity > 0 && density > MAX_DENSITY)
 		{
-			m_primaryFile.split(m_splitPointer, GROUP_SIZE, m_level,
-				[this](T* record) {
-					int hashValue = record->hash();
-					return hashValue % (GROUP_SIZE * (static_cast<int>(std::pow(2, m_level + 1))));
-				}, [this](int address) {
-					return m_overFlowFile.blockAt(address);
-				}, [this](int address, HashBlock<T>* block) {
-					return m_overFlowFile.writeAt(address, block);
-				}, [this](int address) {
-					return m_overFlowFile.addEmptyAddress(address);
-			});
+			auto hash = [this](T* record) {
+				int hashValue = record->hash();
+				return hashValue % (GROUP_SIZE * (static_cast<int>(std::pow(2, m_level + 1))));
+			};
+			int newSplitAddress = m_splitPointer + (GROUP_SIZE * static_cast<int>(std::pow(2, m_level)));
+			
+			auto splitBlocks = m_primaryFile.split(m_splitPointer, newSplitAddress, hash);
+			m_overFlowFile.split(splitBlocks, hash);
+
+			m_primaryFile.writeAt(m_splitPointer, splitBlocks.first);
+			m_primaryFile.writeAt(newSplitAddress, splitBlocks.second);
+			delete splitBlocks.first;
+			delete splitBlocks.second;
 
 			int removedBlocks = m_overFlowFile.truncate();
 			m_capacity -= removedBlocks * m_overFlowFile.blockingFactor();
@@ -110,10 +113,13 @@ public:
 	T* find(T* key)
 	{
 		int addr = address(key);
-		return m_primaryFile.find(addr, key,
-			[this](int address) {
-				return m_overFlowFile.blockAt(address);
-		});
+		T* record = m_primaryFile.find(addr, key);
+
+		if (record == nullptr)
+		{
+			record = m_overFlowFile.find(addr, key);
+		}
+		return record;
 	}
 
 	void printOut()

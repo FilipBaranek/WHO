@@ -17,17 +17,17 @@ void HashFileTester::insert(int operation)
 {
 	Person* person = RandomDataGenerator::generatePerson(m_gen);
 
-	if (operation == 334)
+	if (operation == 384)
 	{
-		Person peter("9702082012", "peter", "Horvat", {});
+		Person peter("7312213995", "peter", "Horvat", {});
 		m_hashFile.find(&peter);
 	}
 
 	m_hashFile.insert(person);
 
-	if (operation == 334)
+	if (operation == 384)
 	{
-		Person peter("9702082012", "peter", "Horvat", {});
+		Person peter("7312213995", "peter", "Horvat", {});
 		m_hashFile.find(&peter);
 	}
 	
@@ -59,14 +59,9 @@ void HashFileTester::find(int operation)
 	delete foundPerson;
 }
 
-void HashFileTester::remove()
-{
-	//TODO//
-}
-
 void HashFileTester::runTests()
 {
-	std::uniform_int_distribution<unsigned int> probability(0, 2);
+	std::uniform_int_distribution<unsigned int> probability(0, 1);
 	int inserts = 0, deletes = 0;
 
 	for (int i{}; i < REPLICATIONS; ++i)
@@ -88,13 +83,6 @@ void HashFileTester::runTests()
 			if (m_data.size() > 0)
 			{
 				find(i);
-			}
-		}
-		else if (operation == 2)
-		{
-			if (m_data.size() > 0)
-			{
-				remove();
 			}
 		}
 		//m_hashFile.printOut();
