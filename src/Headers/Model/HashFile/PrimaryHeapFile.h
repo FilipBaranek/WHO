@@ -1,6 +1,5 @@
 #pragma once
 #include <vector>
-#include <utility>
 #include <memory>
 #include <functional>
 #include "HashBlock.h"
@@ -41,37 +40,23 @@ public:
 		}
 	}
 
+	std::unique_ptr<HashBlock<T>> blockAt(int address)
+	{
+		auto block = getBlock();
+		Block<T>* rawBlockPtr = block.release();
+		HashBlock<T>* rawHashBlockPtr = dynamic_cast<HashBlock<T>*>(rawBlockPtr);
+		std::unique_ptr<HashBlock<T>> hashBlock(rawHashBlockPtr);
+
+		std::vector<uint8_t> buffer(hashBlock->getSize());
+		this->loadBlock(address, buffer.data(), hashBlock.get());
+
+		return hashBlock;
+	}
+
 	void writeAt(int address, HashBlock<T>* block)
 	{
 		std::vector<uint8_t> buffer(block->getSize());
 		this->writeBlock(address, buffer.data(), block);
-	}
-
-	std::pair<HashBlock<T>*, HashBlock<T>*> split(int splitAddressPointer, int newAddress, std::function<int(T*)> hash)
-	{
-		auto newBlock = addBlock(newAddress);
-		auto splitBlock = getBlock();
-		std::vector<uint8_t> splitBlockBuffer(splitBlock->getSize());
-		this->loadBlock(splitAddressPointer, splitBlockBuffer.data(), splitBlock.get());
-
-		T** records = splitBlock->objects();
-		for (int i = splitBlock->validBlocks() - 1; i >= 0; --i)
-		{
-			T* record = records[i];
-			if (hash(record) != splitAddressPointer)
-			{
-				if (newBlock->insert(record))
-				{
-					splitBlock->remove(record);
-					delete record;
-				}
-			}
-		}
-
-		return std::make_pair(
-			dynamic_cast<HashBlock<T>*>(splitBlock.release()),
-			dynamic_cast<HashBlock<T>*>(newBlock.release())
-		);
 	}
 
 	bool insert(int address, T* record, int& nextBlock, bool& newBlock, int& possibleNextBlock)

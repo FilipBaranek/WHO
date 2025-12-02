@@ -58,12 +58,23 @@ public:
 		return sizeBefore - this->size();
 	}
 
+	std::unique_ptr<HashBlock<T>> block()
+	{
+		auto block = getBlock();
+		Block<T>* rawBlockPtr = block.release();
+		HashBlock<T>* rawHashBlockPtr = dynamic_cast<HashBlock<T>*>(rawBlockPtr);
+		std::unique_ptr<HashBlock<T>> hashBlock(rawHashBlockPtr);
+
+		return hashBlock;
+	}
+
 	std::unique_ptr<HashBlock<T>> blockAt(int address)
 	{
 		auto block = getBlock();
 		Block<T>* rawBlockPtr = block.release();
 		HashBlock<T>* rawHashBlockPtr = dynamic_cast<HashBlock<T>*>(rawBlockPtr);
 		std::unique_ptr<HashBlock<T>> hashBlock(rawHashBlockPtr);
+
 		std::vector<uint8_t> buffer(hashBlock->getSize());
 		this->loadBlock(address, buffer.data(), hashBlock.get());
 		
@@ -76,13 +87,8 @@ public:
 		this->writeBlock(address, buffer.data(), block);
 	}
 
-	void addEmptyAddress(int address = -1)
+	void addEmptyAddress(int address)
 	{
-		if (address == -1)
-		{
-			address = nextAddress();
-		}
-
 		auto iterator = this->m_emptyAddresses.begin();
 		while (iterator != this->m_emptyAddresses.end() && *iterator < address + 1)
 		{
@@ -106,12 +112,36 @@ public:
 		return address;
 	}
 
-	void split(std::pair<HashBlock<T>*, HashBlock<T>*>& splitBlocks, std::function<int(T*)> hash)
+	void loadSequence(
+		int startingAddress, std::vector<std::unique_ptr<T>>& recordsToOldBlock,
+		std::vector<std::unique_ptr<T>>& recordsToNewBlock,
+		std::vector<int>& addresses, std::function<bool(T*)> hasNewAddress
+	)
 	{
+		int address = startingAddress;
+		while (address != -1)
+		{
+			addresses.push_back(address);
 
+			auto block = getBlock();
+			std::vector<uint8_t> buffer(block->getSize());
+			this->loadBlock(address, buffer.data(), block.get());
+			
+			T** records = block->objects();
+			for (int i = block->validBlocks() - 1; i >= 0; --i)
+			{
+				if (hasNewAddress(records[i]))
+				{
+					recordsToNewBlock.push_back(std::unique_ptr<T>(block->remove(records[i])));
+				}
+				else
+				{
+					recordsToOldBlock.push_back(std::unique_ptr<T>(block->remove(records[i])));
+				}
+			}
 
-
-		
+			address = dynamic_cast<HashBlock<T>*>(block.get())->nextBlock();
+		}
 	}
 
 	void insert(int address, T* record, bool& newBlock)

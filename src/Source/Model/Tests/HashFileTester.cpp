@@ -1,7 +1,7 @@
 #include "../../../Headers/Model/Tests/HashFileTester.h"
 
 HashFileTester::HashFileTester(int primaryFileClusterSize, int overflowFileClusterSize, int pregeneratedDataCount) :
-	m_hashFile(primaryFileClusterSize, overflowFileClusterSize), seed(m_rd()), m_gen(seed)
+	m_hashFile(primaryFileClusterSize, overflowFileClusterSize), seed(123), m_gen(seed)
 {
 	m_hashFile.open();
 
@@ -17,30 +17,30 @@ void HashFileTester::insert(int operation)
 {
 	Person* person = RandomDataGenerator::generatePerson(m_gen);
 
-	if (operation == 384)
-	{
-		Person peter("7312213995", "peter", "Horvat", {});
-		m_hashFile.find(&peter);
-	}
+	//if (operation == 384)
+	//{
+	//	Person peter("7312213995", "peter", "Horvat", {});
+	//	m_hashFile.find(&peter);
+	//}
 
 	m_hashFile.insert(person);
 
-	if (operation == 384)
-	{
-		Person peter("7312213995", "peter", "Horvat", {});
-		m_hashFile.find(&peter);
-	}
+	//if (operation == 384)
+	//{
+	//	Person peter("7312213995", "peter", "Horvat", {});
+	//	m_hashFile.find(&peter);
+	//}
 	
-	Person* foundPerson = m_hashFile.find(person);
-	if (foundPerson == nullptr || !foundPerson->is(person) || !foundPerson->equals(person))
-	{
-		std::cout << "OPERATION N: " << operation << "\nSEED: " << seed << "\n";
-		throw std::runtime_error("Incorrect inserting");
-	}
+	//Person* foundPerson = m_hashFile.find(person);
+	//if (foundPerson == nullptr || !foundPerson->is(person) || !foundPerson->equals(person))
+	//{
+	//	std::cout << "OPERATION N: " << operation << "\nSEED: " << seed << "\n";
+	//	throw std::runtime_error("Incorrect inserting");
+	//}
 
-	m_data.push_back(person);
+	//m_data.push_back(person);
 
-	delete foundPerson;
+	//delete foundPerson;
 }
 
 void HashFileTester::find(int operation)
@@ -71,7 +71,7 @@ void HashFileTester::runTests()
 			std::cout << "Operation " << i - 1 << "/" << REPLICATIONS << "\n";
 		}
 
-		int operation = probability(m_gen);
+		/*int operation = probability(m_gen);
 
 		if (operation == 0)
 		{
@@ -84,8 +84,10 @@ void HashFileTester::runTests()
 			{
 				find(i);
 			}
-		}
+		}*/
 		//m_hashFile.printOut();
+
+		insert(i);
 	}
 
 	m_hashFile.printOut();

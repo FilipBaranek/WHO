@@ -126,5 +126,10 @@ int main()
         //delete dummy;
     }
 
+
+
+    //WRITE AT A BLOCKAT METODY SA OPAKUJU - PRELOZIT DO HEAPFILU
+
+
     return 0;
 }

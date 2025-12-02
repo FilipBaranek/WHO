@@ -1,6 +1,5 @@
 #pragma once
 #include <iostream>
-#include <utility>
 #include "Hash.h"
 #include "PrimaryHeapFile.h"
 #include "OverFlowHeapFile.h"
@@ -39,6 +38,46 @@ private:
 		}
 
 		return addr;
+	}
+
+	void split()
+	{
+		int newSplitAddress = m_splitPointer + (GROUP_SIZE * static_cast<int>(std::pow(2, m_level)));
+		auto hasNewAddress = [this](T* record) {
+			int hashValue = record->hash();
+			return m_splitPointer != hashValue % (GROUP_SIZE * (static_cast<int>(std::pow(2, m_level + 1))));
+		};
+
+		std::vector<int> addresses;
+		std::vector<std::unique_ptr<T>> recordsToOldBlock;
+		std::vector<std::unique_ptr<T>> recordsToNewBlock;
+
+		std::unique_ptr<HashBlock<T>> oldBlock = m_primaryFile.blockAt(m_splitPointer);
+		std::unique_ptr<HashBlock<T>> newBlock = m_primaryFile.blockAt(newSplitAddress);
+		
+		//Rearrange oldBlock
+		T** oldBlockRecords = oldBlock->objects();
+		for (int i = oldBlock->validBlocks() - 1; i >= 0; --i)
+		{
+			if (hasNewAddress(oldBlockRecords[i]))
+			{
+				newBlock->insert(oldBlockRecords[i]);
+				delete oldBlock->remove(oldBlockRecords[i]);
+			}
+		}
+
+		//Rearrange overflowed sequence
+		m_overFlowFile.loadSequence(oldBlock->nextBlock(), recordsToOldBlock, recordsToNewBlock, addresses, hasNewAddress);
+		std::unique_ptr<HashBlock<T>> prevOldBlock = nullptr, prevNewBlock = nullptr;
+		int prevOldBlockAddress = -1, prevNewBlockAddress = -1;
+		int recordToOldIndex = 0, recordToNewIndex = 0;
+
+		//
+		//KOREKTNE NAVKLADAT
+		//
+
+		m_primaryFile.writeAt(m_splitPointer, oldBlock.get());
+		m_primaryFile.writeAt(newSplitAddress, newBlock.get());
 	}
 
 public:
@@ -81,19 +120,7 @@ public:
 		double density = static_cast<double>(m_recordCount) / static_cast<double>(m_capacity);
 		while (m_capacity > 0 && density > MAX_DENSITY)
 		{
-			auto hash = [this](T* record) {
-				int hashValue = record->hash();
-				return hashValue % (GROUP_SIZE * (static_cast<int>(std::pow(2, m_level + 1))));
-			};
-			int newSplitAddress = m_splitPointer + (GROUP_SIZE * static_cast<int>(std::pow(2, m_level)));
-			
-			auto splitBlocks = m_primaryFile.split(m_splitPointer, newSplitAddress, hash);
-			m_overFlowFile.split(splitBlocks, hash);
-
-			m_primaryFile.writeAt(m_splitPointer, splitBlocks.first);
-			m_primaryFile.writeAt(newSplitAddress, splitBlocks.second);
-			delete splitBlocks.first;
-			delete splitBlocks.second;
+			split();
 
 			int removedBlocks = m_overFlowFile.truncate();
 			m_capacity -= removedBlocks * m_overFlowFile.blockingFactor();
