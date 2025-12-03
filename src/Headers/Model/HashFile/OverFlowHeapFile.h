@@ -14,6 +14,17 @@ private:
 		return std::make_unique<HashBlock<T>>(this->m_clusterSize, this->m_objectSize);
 	}
 
+protected:
+	void readHeader() override
+	{
+
+	}
+
+	void writeHeader() override
+	{
+
+	}
+
 public:
 	OverflowHeapFile(std::string filePath, int clusterSize) : 
 		HeapFile<T>(filePath, clusterSize)

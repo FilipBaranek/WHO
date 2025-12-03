@@ -196,7 +196,7 @@ public:
 		return (2 * sizeof(int)) + (m_partiallyEmptyAddresses.size() * sizeof(int)) + (m_emptyAddresses.size() * sizeof(int));
 	}
 
-	void writeHeader()
+	virtual void writeHeader()
 	{
 		std::fstream headerFile(m_filePath + HEADER_SUFFIX, std::ios::out | std::ios::binary | std::ios::trunc);
 		if (!headerFile.is_open())
@@ -224,7 +224,7 @@ public:
 		headerFile.close();
 	}
 
-	void readHeader()
+	virtual void readHeader()
 	{
 		std::fstream headerFile(m_filePath + HEADER_SUFFIX, std::ios::in | std::ios::binary);
 		if (!headerFile.is_open())

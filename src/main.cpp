@@ -45,7 +45,7 @@ void testHashFile()
 {
     Person* dummy = RecordFactory::createInstance<Person>();
 
-    HashFileTester tester(dummy->getSize() * 8, dummy->getSize() * 2);
+    HashFileTester tester(dummy->getSize() * 8, dummy->getSize() * 3);
     tester.runTests();
 
     delete dummy;

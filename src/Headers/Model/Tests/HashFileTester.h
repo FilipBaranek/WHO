@@ -8,7 +8,7 @@
 class HashFileTester
 {
 private:
-	static constexpr const int REPLICATIONS = 100'000;
+	static constexpr const int REPLICATIONS = 500'000;
 	static constexpr const int CHECKPOINT = 1'000;
 
 	std::random_device m_rd;

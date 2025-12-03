@@ -29,7 +29,7 @@ private:
 private:
 	int address(T* record)
 	{
-		uint32_t hashValue = record->hash();
+		size_t hashValue = record->hash();
 		int addr = hashValue % (GROUP_SIZE * (static_cast<int>(std::pow(2, m_level))));
 
 		if (addr < m_splitPointer)
@@ -44,7 +44,7 @@ private:
 	{
 		int newSplitAddress = m_splitPointer + (GROUP_SIZE * static_cast<int>(std::pow(2, m_level)));
 		auto hasNewAddress = [this](T* record) {
-			int hashValue = record->hash();
+			size_t hashValue = record->hash();
 			return m_splitPointer != hashValue % (GROUP_SIZE * (static_cast<int>(std::pow(2, m_level + 1))));
 		};
 

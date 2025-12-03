@@ -26,6 +26,17 @@ private:
 		return std::move(block);
 	}
 
+protected:
+	void readHeader() override
+	{
+
+	}
+
+	void writeHeader() override
+	{
+
+	}
+
 public:
 	PrimaryHeapFile(std::string filePath, int clusterSize, int groupSize) : 
 		HeapFile<T>(filePath, clusterSize), m_groupSize(groupSize)
