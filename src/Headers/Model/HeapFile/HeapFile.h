@@ -106,12 +106,23 @@ protected:
 	}
 #endif
 
+public:
+	HeapFile(std::string filePath, int clusterSize)
+	{
+		m_clusterSize = clusterSize;
+		m_filePath = filePath;
+
+		T* dummy = RecordFactory::createInstance<T>();
+		m_objectSize = dummy->getSize();
+		delete dummy;
+	}
+
 	void truncate()
 	{
 		int lastBlock = size() - 1;
 		int sizeBefore = lastBlock;
 
-		if (lastBlock == m_emptyAddresses.back())
+		if (m_emptyAddresses.size() > 0 && lastBlock == m_emptyAddresses.back())
 		{
 			while (lastBlock >= 0 && m_emptyAddresses.size() > 0 && lastBlock == m_emptyAddresses.back())
 			{
@@ -133,17 +144,6 @@ protected:
 #endif
 			m_file.open(m_filePath + FILE_SUFFIX, std::ios::in | std::ios::out | std::ios::binary);
 		}
-	}
-
-public:
-	HeapFile(std::string filePath, int clusterSize)
-	{
-		m_clusterSize = clusterSize;
-		m_filePath = filePath;
-
-		T* dummy = RecordFactory::createInstance<T>();
-		m_objectSize = dummy->getSize();
-		delete dummy;
 	}
 
 	virtual void open()
@@ -378,6 +378,10 @@ public:
 
 		for (int i{}; i < fileSize; ++i)
 		{
+			if (std::find_if(m_emptyAddresses.begin(), m_emptyAddresses.end(), [&i](int address){ return i == address; }) != m_emptyAddresses.end())
+			{
+				continue;
+			}
 			auto block = getBlock();
 			std::vector<uint8_t> buffer(block->getSize());
 

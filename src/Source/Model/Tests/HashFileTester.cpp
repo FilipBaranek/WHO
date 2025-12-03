@@ -1,7 +1,7 @@
 #include "../../../Headers/Model/Tests/HashFileTester.h"
 
 HashFileTester::HashFileTester(int primaryFileClusterSize, int overflowFileClusterSize, int pregeneratedDataCount) :
-	m_hashFile(primaryFileClusterSize, overflowFileClusterSize), seed(123), m_gen(seed)
+	m_hashFile(primaryFileClusterSize, overflowFileClusterSize), seed(-851880657), m_gen(seed)
 {
 	m_hashFile.open();
 
@@ -17,30 +17,18 @@ void HashFileTester::insert(int operation)
 {
 	Person* person = RandomDataGenerator::generatePerson(m_gen);
 
-	//if (operation == 384)
-	//{
-	//	Person peter("7312213995", "peter", "Horvat", {});
-	//	m_hashFile.find(&peter);
-	//}
-
 	m_hashFile.insert(person);
-
-	//if (operation == 384)
-	//{
-	//	Person peter("7312213995", "peter", "Horvat", {});
-	//	m_hashFile.find(&peter);
-	//}
+	Person* foundPerson = m_hashFile.find(person);
 	
-	//Person* foundPerson = m_hashFile.find(person);
-	//if (foundPerson == nullptr || !foundPerson->is(person) || !foundPerson->equals(person))
-	//{
-	//	std::cout << "OPERATION N: " << operation << "\nSEED: " << seed << "\n";
-	//	throw std::runtime_error("Incorrect inserting");
-	//}
+	if (foundPerson == nullptr || !foundPerson->is(person) || !foundPerson->equals(person))
+	{
+		std::cout << "OPERATION N: " << operation << "\nSEED: " << seed << "\n";
+		throw std::runtime_error("Incorrect inserting");
+	}
 
-	//m_data.push_back(person);
+	m_data.push_back(person);
 
-	//delete foundPerson;
+	delete foundPerson;
 }
 
 void HashFileTester::find(int operation)
@@ -64,30 +52,35 @@ void HashFileTester::runTests()
 	std::uniform_int_distribution<unsigned int> probability(0, 1);
 	int inserts = 0, deletes = 0;
 
-	for (int i{}; i < REPLICATIONS; ++i)
+	std::cout << seed << "\n\n\n";
+
+	while (true)
 	{
-		if (i % CHECKPOINT - 1 == 0)
+		for (int i{}; i < REPLICATIONS; ++i)
 		{
-			std::cout << "Operation " << i - 1 << "/" << REPLICATIONS << "\n";
-		}
-
-		/*int operation = probability(m_gen);
-
-		if (operation == 0)
-		{
-			insert(i);
-			++inserts;
-		}
-		else if (operation == 1)
-		{
-			if (m_data.size() > 0)
+			if (i % CHECKPOINT - 1 == 0)
 			{
-				find(i);
+				std::cout << "Operation " << i - 1 << "/" << REPLICATIONS << "\n";
 			}
-		}*/
-		//m_hashFile.printOut();
 
-		insert(i);
+			//std::cout << i << "\n";
+
+			int operation = probability(m_gen);
+
+			if (operation == 0)
+			{
+				insert(i);
+				++inserts;
+			}
+			else if (operation == 1)
+			{
+				if (m_data.size() > 0)
+				{
+					find(i);
+				}
+			}
+			//m_hashFile.printOut();
+		}
 	}
 
 	m_hashFile.printOut();

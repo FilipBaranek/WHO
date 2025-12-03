@@ -14,7 +14,7 @@ class HashFile
 private:
 	static constexpr const char* PRIMARY_FILE_PATH = "../../../data/HashFile/primary";
 	static constexpr const char* OVERFLOW_FILE_PATH = "../../../data/HashFile/overflow";
-	static constexpr const int GROUP_SIZE = 4;
+	static constexpr const int GROUP_SIZE = 2;
 	static constexpr const float MAX_DENSITY = 0.8;
 	static constexpr const float MIN_DENSITY = 0.64;
 
@@ -30,17 +30,17 @@ private:
 	int address(T* record)
 	{
 		uint32_t hashValue = record->hash();
-		int addr = hashValue % (GROUP_SIZE * (1 << m_level));
+		int addr = hashValue % (GROUP_SIZE * (static_cast<int>(std::pow(2, m_level))));
 
 		if (addr < m_splitPointer)
 		{
-			addr = hashValue % (GROUP_SIZE * (1 << (m_level + 1)));
+			addr = hashValue % (GROUP_SIZE * (static_cast<int>(std::pow(2, m_level + 1))));
 		}
 
 		return addr;
 	}
 
-	void split()
+	int split()
 	{
 		int newSplitAddress = m_splitPointer + (GROUP_SIZE * static_cast<int>(std::pow(2, m_level)));
 		auto hasNewAddress = [this](T* record) {
@@ -48,12 +48,11 @@ private:
 			return m_splitPointer != hashValue % (GROUP_SIZE * (static_cast<int>(std::pow(2, m_level + 1))));
 		};
 
-		std::vector<int> addresses;
 		std::vector<std::unique_ptr<T>> recordsToOldBlock;
 		std::vector<std::unique_ptr<T>> recordsToNewBlock;
 
 		std::unique_ptr<HashBlock<T>> oldBlock = m_primaryFile.blockAt(m_splitPointer);
-		std::unique_ptr<HashBlock<T>> newBlock = m_primaryFile.blockAt(newSplitAddress);
+		std::unique_ptr<HashBlock<T>> newBlock = m_primaryFile.block();
 		
 		//Rearrange oldBlock
 		T** oldBlockRecords = oldBlock->objects();
@@ -67,17 +66,98 @@ private:
 		}
 
 		//Rearrange overflowed sequence
-		m_overFlowFile.loadSequence(oldBlock->nextBlock(), recordsToOldBlock, recordsToNewBlock, addresses, hasNewAddress);
+		int emptiedBlocks = m_overFlowFile.loadSequence(oldBlock->nextBlock(), recordsToOldBlock, recordsToNewBlock, hasNewAddress);
 		std::unique_ptr<HashBlock<T>> prevOldBlock = nullptr, prevNewBlock = nullptr;
+		std::unique_ptr<HashBlock<T>> currentBlock = m_overFlowFile.block();
 		int prevOldBlockAddress = -1, prevNewBlockAddress = -1;
 		int recordToOldIndex = 0, recordToNewIndex = 0;
+		oldBlock->nextBlock(-1);
 
-		//
-		//KOREKTNE NAVKLADAT
-		//
+		int spaceInOldBlock = oldBlock->blockingFactor() - oldBlock->validBlocks();
+		for (int i{}; i < spaceInOldBlock && recordsToOldBlock.size() > 0; ++i)
+		{
+			oldBlock->insert(recordsToOldBlock.back().get());
+			recordsToOldBlock.pop_back();
+		}
+		int spaceInNewBlock = newBlock->blockingFactor() - newBlock->validBlocks();
+		for (int i{}; i < spaceInNewBlock && recordsToNewBlock.size() > 0; ++i)
+		{
+			newBlock->insert(recordsToNewBlock.back().get());
+			recordsToNewBlock.pop_back();
+		}
+
+		int oldBlockCount = recordsToOldBlock.size() / currentBlock->blockingFactor();
+		int newBlockCount = recordsToNewBlock.size() / currentBlock->blockingFactor();
+		if (recordsToOldBlock.size() > 0 && recordsToOldBlock.size() % currentBlock->blockingFactor() != 0)
+		{
+			++oldBlockCount;
+		}
+		if (recordsToNewBlock.size() > 0 && recordsToNewBlock.size() % currentBlock->blockingFactor() != 0)
+		{
+			++newBlockCount;
+		}
+
+		int address = -1;
+		for (int i{}; i < oldBlockCount; ++i)
+		{
+			address = m_overFlowFile.nextAddress();
+			currentBlock = std::move(m_overFlowFile.block());
+			for (int j{}; j < currentBlock->blockingFactor() && recordToOldIndex < recordsToOldBlock.size(); ++j)
+			{
+				currentBlock->insert(recordsToOldBlock[recordToOldIndex].get());
+				++recordToOldIndex;
+			}
+			if (prevOldBlock.get() == nullptr)
+			{
+				oldBlock->nextBlock(address);
+			}
+			else
+			{
+				prevOldBlock->nextBlock(address);
+				m_overFlowFile.writeAt(prevOldBlockAddress, prevOldBlock.get());
+			}
+			prevOldBlockAddress = address;
+			prevOldBlock = std::move(currentBlock);
+		}
+		if (prevOldBlock.get() != nullptr)
+		{
+			prevOldBlock->nextBlock(-1);
+			m_overFlowFile.writeAt(prevOldBlockAddress, prevOldBlock.get());
+		}
+
+		address = -1;
+		for (int i{}; i < newBlockCount; ++i)
+		{
+			address = m_overFlowFile.nextAddress();
+			currentBlock = std::move(m_overFlowFile.block());
+			for (int j{}; j < currentBlock->blockingFactor() && recordToNewIndex < recordsToNewBlock.size(); ++j)
+			{
+				currentBlock->insert(recordsToNewBlock[recordToNewIndex].get());
+				++recordToNewIndex;
+			}
+			if (prevNewBlock.get() == nullptr)
+			{
+				newBlock->nextBlock(address);
+			}
+			else
+			{
+				prevNewBlock->nextBlock(address);
+				m_overFlowFile.writeAt(prevNewBlockAddress, prevNewBlock.get());
+			}
+			prevNewBlockAddress = address;
+			prevNewBlock = std::move(currentBlock);
+		}
+		if (prevNewBlock.get() != nullptr)
+		{
+			prevNewBlock->nextBlock(-1);
+			m_overFlowFile.writeAt(prevNewBlockAddress, prevNewBlock.get());
+		}
 
 		m_primaryFile.writeAt(m_splitPointer, oldBlock.get());
 		m_primaryFile.writeAt(newSplitAddress, newBlock.get());
+
+		int trimmedBlocks = emptiedBlocks - (oldBlockCount + newBlockCount);
+		return trimmedBlocks > 0 ? trimmedBlocks : 0;
 	}
 
 public:
@@ -120,10 +200,10 @@ public:
 		double density = static_cast<double>(m_recordCount) / static_cast<double>(m_capacity);
 		while (m_capacity > 0 && density > MAX_DENSITY)
 		{
-			split();
+			int trimmedBlocks = split();
+			m_capacity -= trimmedBlocks * m_overFlowFile.blockingFactor();
 
-			int removedBlocks = m_overFlowFile.truncate();
-			m_capacity -= removedBlocks * m_overFlowFile.blockingFactor();
+			m_overFlowFile.truncate();
 
 			++m_splitPointer;
 			if (m_splitPointer >= GROUP_SIZE * (static_cast<int>(std::pow(2, m_level))))

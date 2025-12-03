@@ -40,6 +40,16 @@ public:
 		}
 	}
 
+	std::unique_ptr<HashBlock<T>> block()
+	{
+		auto block = getBlock();
+		Block<T>* rawBlockPtr = block.release();
+		HashBlock<T>* rawHashBlockPtr = dynamic_cast<HashBlock<T>*>(rawBlockPtr);
+		std::unique_ptr<HashBlock<T>> hashBlock(rawHashBlockPtr);
+
+		return hashBlock;
+	}
+
 	std::unique_ptr<HashBlock<T>> blockAt(int address)
 	{
 		auto block = getBlock();

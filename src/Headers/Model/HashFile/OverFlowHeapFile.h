@@ -19,45 +19,6 @@ public:
 		HeapFile<T>(filePath, clusterSize)
 	{}
 
-	int truncate()
-	{
-		int lastBlock = this->size() - 1;
-		auto block = getBlock();
-		std::vector<uint8_t> buffer(block->getSize());
-		this->loadBlock(lastBlock, buffer.data(), block.get());
-
-		int sizeBefore = lastBlock + 1;
-		int64_t newSize = sizeBefore;
-
-		if (lastBlock > 0 && block->isEmpty())
-		{
-			std::string fileName = this->m_filePath + this->FILE_SUFFIX;
-			newSize = lastBlock;
-
-			while (lastBlock >= 0 && block->isEmpty())
-			{
-				--newSize;
-				--lastBlock;
-				block->clear();
-				this->loadBlock(lastBlock, buffer.data(), block.get());
-			}
-
-			newSize = (newSize + 1) * block->getSize();
-
-			this->m_file.close();
-#ifdef _WIN32
-			this->truncateWindowsFile(fileName, newSize, sizeBefore);
-#elif __linux__
-			this->truncateLinuxFile(fileName, newSize);
-#else
-			throw std::runtime_error("Unsupported OS");
-#endif
-			this->m_file.open(this->m_filePath + this->FILE_SUFFIX, std::ios::in | std::ios::out | std::ios::binary);
-		}
-
-		return sizeBefore - this->size();
-	}
-
 	std::unique_ptr<HashBlock<T>> block()
 	{
 		auto block = getBlock();
@@ -112,17 +73,15 @@ public:
 		return address;
 	}
 
-	void loadSequence(
+	int loadSequence(
 		int startingAddress, std::vector<std::unique_ptr<T>>& recordsToOldBlock,
-		std::vector<std::unique_ptr<T>>& recordsToNewBlock,
-		std::vector<int>& addresses, std::function<bool(T*)> hasNewAddress
+		std::vector<std::unique_ptr<T>>& recordsToNewBlock, std::function<bool(T*)> hasNewAddress
 	)
 	{
+		int blockCount = 0;
 		int address = startingAddress;
 		while (address != -1)
 		{
-			addresses.push_back(address);
-
 			auto block = getBlock();
 			std::vector<uint8_t> buffer(block->getSize());
 			this->loadBlock(address, buffer.data(), block.get());
@@ -140,8 +99,11 @@ public:
 				}
 			}
 
+			addEmptyAddress(address);
 			address = dynamic_cast<HashBlock<T>*>(block.get())->nextBlock();
+			++blockCount;
 		}
+		return blockCount;
 	}
 
 	void insert(int address, T* record, bool& newBlock)
