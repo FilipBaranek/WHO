@@ -99,15 +99,6 @@ IRecord* Person::fromBytes(uint8_t* byteBuffer)
 
 size_t Person::hash()
 {
-	//return Hash::hash<std::string>(m_birthNumber);
-
-	//int hash = 0;
-	//for (char c : m_birthNumber)
-	//{
-	//	hash += static_cast<uint8_t>(c);
-	//}
-	//return hash % 100;
-
 	return std::hash<std::string>{}(m_birthNumber);
 }
 

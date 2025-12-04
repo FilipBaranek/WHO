@@ -93,7 +93,7 @@ add_executable (
     "Source/Model/PCRDatabase/DiskDatabase.cpp"
     "Headers/Model/HashFile/HashFile.h"
     "Headers/Model/HashFile/HashBlock.h"
-    "Headers/Model/HashFile/Hash.h"
+    
     "Headers/Model/HashFile/PrimaryHeapFile.h"
     "Headers/Model/HashFile/OverFlowHeapFile.h"
     "Headers/Model/Tests/HashFileTester.h"

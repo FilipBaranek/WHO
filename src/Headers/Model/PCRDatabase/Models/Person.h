@@ -8,7 +8,6 @@
 #include "../ModelWrappers/TestWrapper.h"
 #include "../../Structures/AVL/AVLTree.h"
 #include "../../HeapFile/Helpers/ByteConverter.h"
-#include "../../HashFile/Hash.h"
 
 class Person : public IRecord
 {

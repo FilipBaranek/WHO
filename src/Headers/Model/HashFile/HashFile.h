@@ -1,6 +1,5 @@
 #pragma once
 #include <iostream>
-#include "Hash.h"
 #include "PrimaryHeapFile.h"
 #include "OverFlowHeapFile.h"
 #include "../Factories/RecordFactory.h"
@@ -40,6 +39,29 @@ private:
 		return addr;
 	}
 
+	void rearrangeOldBlock(HashBlock<T>* oldBlock, HashBlock<T>* newBlock, std::function<bool(T*)> hasNewAddress)
+	{
+		T** oldBlockRecords = oldBlock->objects();
+		for (int i = oldBlock->validBlocks() - 1; i >= 0; --i)
+		{
+			if (hasNewAddress(oldBlockRecords[i]))
+			{
+				newBlock->insert(oldBlockRecords[i]);
+				delete oldBlock->remove(oldBlockRecords[i]);
+			}
+		}
+	}
+
+	void insertInto(HashBlock<T>* block, std::vector<std::unique_ptr<T>>& records)
+	{
+		int space = block->blockingFactor() - block->validBlocks();
+		for (int i{}; i < space && records.size() > 0; ++i)
+		{
+			block->insert(records.back().get());
+			records.pop_back();
+		}
+	}
+
 	int split()
 	{
 		int newSplitAddress = m_splitPointer + (GROUP_SIZE * static_cast<int>(std::pow(2, m_level)));
@@ -55,15 +77,7 @@ private:
 		std::unique_ptr<HashBlock<T>> newBlock = m_primaryFile.block();
 		
 		//Rearrange oldBlock
-		T** oldBlockRecords = oldBlock->objects();
-		for (int i = oldBlock->validBlocks() - 1; i >= 0; --i)
-		{
-			if (hasNewAddress(oldBlockRecords[i]))
-			{
-				newBlock->insert(oldBlockRecords[i]);
-				delete oldBlock->remove(oldBlockRecords[i]);
-			}
-		}
+		rearrangeOldBlock(oldBlock.get(), newBlock.get(), hasNewAddress);
 
 		//Rearrange overflowed sequence
 		int emptiedBlocks = m_overFlowFile.loadSequence(oldBlock->nextBlock(), recordsToOldBlock, recordsToNewBlock, hasNewAddress);
@@ -73,18 +87,9 @@ private:
 		int recordToOldIndex = 0, recordToNewIndex = 0;
 		oldBlock->nextBlock(-1);
 
-		int spaceInOldBlock = oldBlock->blockingFactor() - oldBlock->validBlocks();
-		for (int i{}; i < spaceInOldBlock && recordsToOldBlock.size() > 0; ++i)
-		{
-			oldBlock->insert(recordsToOldBlock.back().get());
-			recordsToOldBlock.pop_back();
-		}
-		int spaceInNewBlock = newBlock->blockingFactor() - newBlock->validBlocks();
-		for (int i{}; i < spaceInNewBlock && recordsToNewBlock.size() > 0; ++i)
-		{
-			newBlock->insert(recordsToNewBlock.back().get());
-			recordsToNewBlock.pop_back();
-		}
+		insertInto(oldBlock.get(), recordsToOldBlock);
+		insertInto(newBlock.get(), recordsToNewBlock);
+
 
 		int oldBlockCount = recordsToOldBlock.size() / currentBlock->blockingFactor();
 		int newBlockCount = recordsToNewBlock.size() / currentBlock->blockingFactor();
