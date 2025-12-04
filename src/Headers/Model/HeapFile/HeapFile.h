@@ -160,7 +160,7 @@ public:
 		}
 	}
 
-	void close()
+	virtual void close()
 	{
 		if (!m_file.is_open())
 		{
@@ -191,7 +191,7 @@ public:
 		return size;
 	}
 
-	int headerSize()
+	virtual int headerSize()
 	{
 		return (2 * sizeof(int)) + (m_partiallyEmptyAddresses.size() * sizeof(int)) + (m_emptyAddresses.size() * sizeof(int));
 	}
@@ -201,7 +201,7 @@ public:
 		std::fstream headerFile(m_filePath + HEADER_SUFFIX, std::ios::out | std::ios::binary | std::ios::trunc);
 		if (!headerFile.is_open())
 		{
-			throw std::runtime_error("Failed to open binary header file");
+			throw std::runtime_error("Failed to open header file");
 		}
 
 		int dataSize = headerSize();
@@ -229,7 +229,7 @@ public:
 		std::fstream headerFile(m_filePath + HEADER_SUFFIX, std::ios::in | std::ios::binary);
 		if (!headerFile.is_open())
 		{
-			throw std::runtime_error("Failed to open binary header file");
+			throw std::runtime_error("Failed to open header file");
 		}
 
 		int size;

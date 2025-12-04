@@ -14,15 +14,59 @@ private:
 		return std::make_unique<HashBlock<T>>(this->m_clusterSize, this->m_objectSize);
 	}
 
+	int headerSize() override
+	{
+		return sizeof(int) + (this->m_emptyAddresses.size() * sizeof(int));
+	}
+
 protected:
 	void readHeader() override
 	{
+		std::fstream headerFile(this->m_filePath + this->HEADER_SUFFIX, std::ios::in | std::ios::binary);
+		if (!headerFile.is_open())
+		{
+			throw std::runtime_error("Failed to open header file");
+		}
 
+		int size;
+		uint8_t* addressIndex;
+		uint8_t sizeBuffer[sizeof(int)];
+
+		headerFile.read(reinterpret_cast<char*>(sizeBuffer), sizeof(int));
+		size = ByteConverter::fromByteToPrimitive<int>(sizeBuffer);
+
+		std::vector<uint8_t> emptyAddressesBuffer(size * sizeof(int));
+		addressIndex = emptyAddressesBuffer.data();
+		headerFile.read(reinterpret_cast<char*>(emptyAddressesBuffer.data()), size * sizeof(int));
+		for (int i{}; i < size; ++i)
+		{
+			this->m_emptyAddresses.push_back(ByteConverter::fromByteToPrimitive<int>(addressIndex));
+			addressIndex += sizeof(int);
+		}
+
+		headerFile.close();
 	}
 
 	void writeHeader() override
 	{
+		std::fstream headerFile(this->m_filePath + this->HEADER_SUFFIX, std::ios::out | std::ios::binary | std::ios::trunc);
+		if (!headerFile.is_open())
+		{
+			throw std::runtime_error("Failed to open header file");
+		}
 
+		int dataSize = headerSize();
+		std::vector<uint8_t> buffer(dataSize);
+		uint8_t* index = buffer.data();
+
+		index = ByteConverter::toByteFromPrimitive<int>(static_cast<int>(this->m_emptyAddresses.size()), index);
+		for (int address : this->m_emptyAddresses)
+		{
+			index = ByteConverter::toByteFromPrimitive<int>(address, index);
+		}
+
+		headerFile.write(reinterpret_cast<char*>(buffer.data()), dataSize);
+		headerFile.close();
 	}
 
 public:

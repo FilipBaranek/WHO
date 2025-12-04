@@ -61,12 +61,6 @@ void HashFileTester::runTests()
 			std::cout << "Operation " << i - 1 << "/" << REPLICATIONS << "\n";
 		}
 
-		//std::cout << i << "\n";
-		if (i == 11)
-		{
-			std::cout << "";
-		}
-
 		int operation = probability(m_gen);
 
 		if (operation == 0)
@@ -81,7 +75,6 @@ void HashFileTester::runTests()
 				find(i);
 			}
 		}
-		//m_hashFile.printOut();
 	}
 
 	m_hashFile.printOut();

@@ -26,6 +26,11 @@ private:
 		return std::move(block);
 	}
 
+	int headerSize() override
+	{
+
+	}
+
 protected:
 	void readHeader() override
 	{
@@ -49,6 +54,11 @@ public:
 		{
 			addBlock(i);
 		}
+	}
+
+	void close() override
+	{
+
 	}
 
 	std::unique_ptr<HashBlock<T>> block()

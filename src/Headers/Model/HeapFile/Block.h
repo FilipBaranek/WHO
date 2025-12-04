@@ -164,7 +164,7 @@ public:
 		return new Block<T>(clusterSize, objectSize);
 	}
 
-	void clear()
+	virtual void clear()
 	{
 		for (int i{}; i < m_validBlockCount; ++i)
 		{

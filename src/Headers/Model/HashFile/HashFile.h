@@ -62,6 +62,48 @@ private:
 		}
 	}
 
+	int rearrangeOverflowedBlocks(HashBlock<T>* primaryBlock, std::vector<std::unique_ptr<T>>& records)
+	{
+		std::unique_ptr<HashBlock<T>> currentBlock = m_overFlowFile.block(), prevBlock = nullptr;
+		int blockCount = records.size() / currentBlock->blockingFactor();
+		int recordIndex = 0;
+
+		if (records.size() > 0 && records.size() % currentBlock->blockingFactor() != 0)
+		{
+			++blockCount;
+		}
+
+		int address = -1, prevAddress = -1;
+		for (int i{}; i < blockCount; ++i)
+		{
+			address = m_overFlowFile.nextAddress();
+			currentBlock = std::move(m_overFlowFile.block());
+			for (int j{}; j < currentBlock->blockingFactor() && recordIndex < records.size(); ++j)
+			{
+				currentBlock->insert(records[recordIndex].get());
+				++recordIndex;
+			}
+			if (prevBlock.get() == nullptr)
+			{
+				primaryBlock->nextBlock(address);
+			}
+			else
+			{
+				prevBlock->nextBlock(address);
+				m_overFlowFile.writeAt(prevAddress, prevBlock.get());
+			}
+			prevAddress = address;
+			prevBlock = std::move(currentBlock);
+		}
+		if (prevBlock.get() != nullptr)
+		{
+			prevBlock->nextBlock(-1);
+			m_overFlowFile.writeAt(prevAddress, prevBlock.get());
+		}
+
+		return blockCount;
+	}
+
 	int split()
 	{
 		int newSplitAddress = m_splitPointer + (GROUP_SIZE * static_cast<int>(std::pow(2, m_level)));
@@ -81,87 +123,25 @@ private:
 
 		//Rearrange overflowed sequence
 		int emptiedBlocks = m_overFlowFile.loadSequence(oldBlock->nextBlock(), recordsToOldBlock, recordsToNewBlock, hasNewAddress);
+		
 		std::unique_ptr<HashBlock<T>> prevOldBlock = nullptr, prevNewBlock = nullptr;
 		std::unique_ptr<HashBlock<T>> currentBlock = m_overFlowFile.block();
 		int prevOldBlockAddress = -1, prevNewBlockAddress = -1;
 		int recordToOldIndex = 0, recordToNewIndex = 0;
+		
 		oldBlock->nextBlock(-1);
 
 		insertInto(oldBlock.get(), recordsToOldBlock);
 		insertInto(newBlock.get(), recordsToNewBlock);
 
-
-		int oldBlockCount = recordsToOldBlock.size() / currentBlock->blockingFactor();
-		int newBlockCount = recordsToNewBlock.size() / currentBlock->blockingFactor();
-		if (recordsToOldBlock.size() > 0 && recordsToOldBlock.size() % currentBlock->blockingFactor() != 0)
-		{
-			++oldBlockCount;
-		}
-		if (recordsToNewBlock.size() > 0 && recordsToNewBlock.size() % currentBlock->blockingFactor() != 0)
-		{
-			++newBlockCount;
-		}
-
-		int address = -1;
-		for (int i{}; i < oldBlockCount; ++i)
-		{
-			address = m_overFlowFile.nextAddress();
-			currentBlock = std::move(m_overFlowFile.block());
-			for (int j{}; j < currentBlock->blockingFactor() && recordToOldIndex < recordsToOldBlock.size(); ++j)
-			{
-				currentBlock->insert(recordsToOldBlock[recordToOldIndex].get());
-				++recordToOldIndex;
-			}
-			if (prevOldBlock.get() == nullptr)
-			{
-				oldBlock->nextBlock(address);
-			}
-			else
-			{
-				prevOldBlock->nextBlock(address);
-				m_overFlowFile.writeAt(prevOldBlockAddress, prevOldBlock.get());
-			}
-			prevOldBlockAddress = address;
-			prevOldBlock = std::move(currentBlock);
-		}
-		if (prevOldBlock.get() != nullptr)
-		{
-			prevOldBlock->nextBlock(-1);
-			m_overFlowFile.writeAt(prevOldBlockAddress, prevOldBlock.get());
-		}
-
-		address = -1;
-		for (int i{}; i < newBlockCount; ++i)
-		{
-			address = m_overFlowFile.nextAddress();
-			currentBlock = std::move(m_overFlowFile.block());
-			for (int j{}; j < currentBlock->blockingFactor() && recordToNewIndex < recordsToNewBlock.size(); ++j)
-			{
-				currentBlock->insert(recordsToNewBlock[recordToNewIndex].get());
-				++recordToNewIndex;
-			}
-			if (prevNewBlock.get() == nullptr)
-			{
-				newBlock->nextBlock(address);
-			}
-			else
-			{
-				prevNewBlock->nextBlock(address);
-				m_overFlowFile.writeAt(prevNewBlockAddress, prevNewBlock.get());
-			}
-			prevNewBlockAddress = address;
-			prevNewBlock = std::move(currentBlock);
-		}
-		if (prevNewBlock.get() != nullptr)
-		{
-			prevNewBlock->nextBlock(-1);
-			m_overFlowFile.writeAt(prevNewBlockAddress, prevNewBlock.get());
-		}
+		int blockCount = 0;
+		blockCount += rearrangeOverflowedBlocks(oldBlock.get(), recordsToOldBlock);
+		blockCount += rearrangeOverflowedBlocks(newBlock.get(), recordsToNewBlock);
 
 		m_primaryFile.writeAt(m_splitPointer, oldBlock.get());
 		m_primaryFile.writeAt(newSplitAddress, newBlock.get());
 
-		int trimmedBlocks = emptiedBlocks - (oldBlockCount + newBlockCount);
+		int trimmedBlocks = emptiedBlocks - blockCount;
 		return trimmedBlocks > 0 ? trimmedBlocks : 0;
 	}
 
@@ -181,7 +161,7 @@ public:
 	void close()
 	{
 		m_primaryFile.close();
-		m_overFlowFile.close();
+		m_overFlowFile.close(m_level, m_splitPointer, m_capacity, m_recordCount);
 	}
 
 	void insert(T* record)

@@ -18,6 +18,12 @@ public:
 
 	inline int getSize() override { return sizeof(m_nextBlockAddress) + Block<T>::getSize(); }
 
+	void clear() override
+	{
+		m_nextBlockAddress = -1;
+		Block<T>::clear();
+	}
+
 	void toBytes(uint8_t* outputBuffer) override
 	{
 		uint8_t* index = outputBuffer;
