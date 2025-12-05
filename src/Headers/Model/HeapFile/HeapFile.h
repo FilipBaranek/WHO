@@ -14,6 +14,7 @@
 #include <fstream>
 #include "Block.h"
 #include "Helpers/ByteConverter.h"
+#include "../HashFile/HashBlock.h"
 #include "../Factories/RecordFactory.h"
 
 template<typename T>
@@ -51,6 +52,34 @@ protected:
 	virtual std::unique_ptr<Block<T>> getBlock()
 	{
 		return std::make_unique<Block<T>>(m_clusterSize, m_objectSize);
+	}
+
+	void readAddresses(std::fstream& headerFile, std::list<int>& addresses)
+	{
+		int size;
+		uint8_t* addressIndex;
+		uint8_t sizeBuffer[sizeof(int)];
+
+		headerFile.read(reinterpret_cast<char*>(sizeBuffer), sizeof(int));
+		size = ByteConverter::fromByteToPrimitive<int>(sizeBuffer);
+
+		std::vector<uint8_t> addressesBuffer(size * sizeof(int));
+		addressIndex = addressesBuffer.data();
+		headerFile.read(reinterpret_cast<char*>(addressesBuffer.data()), size * sizeof(int));
+		for (int i{}; i < size; ++i)
+		{
+			addresses.push_back(ByteConverter::fromByteToPrimitive<int>(addressIndex));
+			addressIndex += sizeof(int);
+		}
+	}
+
+	void writeAddresses(uint8_t* index, std::list<int>& addresses)
+	{
+		index = ByteConverter::toByteFromPrimitive<int>(static_cast<int>(addresses.size()), index);
+		for (int address : addresses)
+		{
+			index = ByteConverter::toByteFromPrimitive<int>(address, index);
+		}
 	}
 
 #ifdef _WIN32
@@ -146,7 +175,7 @@ public:
 		}
 	}
 
-	virtual void open()
+	void open()
 	{
 		m_file.open(m_filePath + FILE_SUFFIX, std::ios::in | std::ios::out | std::ios::binary);
 		if (!m_file.is_open())
@@ -160,7 +189,7 @@ public:
 		}
 	}
 
-	virtual void close()
+	void close()
 	{
 		if (!m_file.is_open())
 		{
@@ -207,18 +236,9 @@ public:
 		int dataSize = headerSize();
 		std::vector<uint8_t> buffer(dataSize);
 		uint8_t* index = buffer.data();
-
-		index = ByteConverter::toByteFromPrimitive<int>(static_cast<int>(m_partiallyEmptyAddresses.size()), index);
-		for (int address : m_partiallyEmptyAddresses)
-		{
-			index = ByteConverter::toByteFromPrimitive<int>(address, index);
-		}
 		
-		index = ByteConverter::toByteFromPrimitive<int>(static_cast<int>(m_emptyAddresses.size()), index);
-		for (int address : m_emptyAddresses)
-		{
-			index = ByteConverter::toByteFromPrimitive<int>(address, index);
-		}
+		writeAddresses(index, m_partiallyEmptyAddresses);
+		writeAddresses(index, m_emptyAddresses);
 
 		headerFile.write(reinterpret_cast<char*>(buffer.data()), dataSize);
 		headerFile.close();
@@ -232,35 +252,35 @@ public:
 			throw std::runtime_error("Failed to open header file");
 		}
 
-		int size;
-		uint8_t* addressIndex;
-		uint8_t sizeBuffer[sizeof(int)];
-		
-		headerFile.read(reinterpret_cast<char*>(sizeBuffer), sizeof(int));
-		size = ByteConverter::fromByteToPrimitive<int>(sizeBuffer);
-
-		std::vector<uint8_t> partiallyEmptyAddressBuffer(size * sizeof(int));
-		addressIndex = partiallyEmptyAddressBuffer.data();
-		headerFile.read(reinterpret_cast<char*>(partiallyEmptyAddressBuffer.data()), size * sizeof(int));
-		for (int i{}; i < size; ++i)
-		{
-			m_partiallyEmptyAddresses.push_back(ByteConverter::fromByteToPrimitive<int>(addressIndex));
-			addressIndex += sizeof(int);
-		}
-
-		headerFile.read(reinterpret_cast<char*>(sizeBuffer), sizeof(int));
-		size = ByteConverter::fromByteToPrimitive<int>(sizeBuffer);
-
-		std::vector<uint8_t> emptyAddressesBuffer(size * sizeof(int));
-		addressIndex = emptyAddressesBuffer.data();
-		headerFile.read(reinterpret_cast<char*>(emptyAddressesBuffer.data()), size * sizeof(int));
-		for (int i{}; i < size; ++i)
-		{
-			m_emptyAddresses.push_back(ByteConverter::fromByteToPrimitive<int>(addressIndex));
-			addressIndex += sizeof(int);
-		}
+		readAddresses(headerFile, m_partiallyEmptyAddresses);
+		readAddresses(headerFile, m_emptyAddresses);
 
 		headerFile.close();
+	}
+
+	std::unique_ptr<HashBlock<T>> block()
+	{
+		auto newBlock = getBlock();
+		Block<T>* rawBlockPtr = newBlock.release();
+		HashBlock<T>* rawHashBlockPtr = dynamic_cast<HashBlock<T>*>(rawBlockPtr);
+		std::unique_ptr<HashBlock<T>> hashBlock(rawHashBlockPtr);
+
+		return hashBlock;
+	}
+
+	std::unique_ptr<HashBlock<T>> blockAt(int address)
+	{
+		std::unique_ptr<HashBlock<T>> hashBlock = block();
+		std::vector<uint8_t> buffer(hashBlock->getSize());
+		loadBlock(address, buffer.data(), hashBlock.get());
+
+		return hashBlock;
+	}
+
+	void writeAt(int address, HashBlock<T>* block)
+	{
+		std::vector<uint8_t> buffer(block->getSize());
+		writeBlock(address, buffer.data(), block);
 	}
 
 	int insert(T* object)

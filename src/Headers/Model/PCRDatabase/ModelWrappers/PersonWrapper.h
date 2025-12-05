@@ -15,10 +15,16 @@ private:
 
 public:
 	PersonWrapper(Person* person) : m_person(person) {};
+
 	inline Person* getData() { return m_person; }
+	
 	inline AVLTree<TestByDateWrapper*>& tests() { return m_tests; }
+	
 	int compare(IComparable* other) const override;
+	
 	std::string writeLine() override;
+	
 	static IStorable* loadLine(std::string line);
+	
 	~PersonWrapper() = default;
 };

@@ -28,18 +28,53 @@ private:
 
 	int headerSize() override
 	{
-
+		return 4 * sizeof(int);
 	}
 
 protected:
-	void readHeader() override
+	void readHeader(std::vector<int*>& hashAttributesOutput)
 	{
+		std::fstream headerFile(this->m_filePath + this->HEADER_SUFFIX, std::ios::in | std::ios::binary);
+		if (!headerFile.is_open())
+		{
+			throw std::runtime_error("Failed to open header file");
+		}
 
+		int size = headerSize();
+		hashAttributesOutput.reserve(size);
+		
+		std::vector<uint8_t> buffer(size);
+		uint8_t* index = buffer.data();
+
+		headerFile.read(reinterpret_cast<char*>(buffer.data()), size);
+		for (int i{}; i < hashAttributesOutput.size(); ++i)
+		{
+			*hashAttributesOutput[i] = ByteConverter::fromByteToPrimitive<int>(index);
+			index += sizeof(int);
+		}
+
+		headerFile.close();
 	}
 
-	void writeHeader() override
+	void writeHeader(std::vector<int>& hashAttributes)
 	{
+		std::fstream headerFile(this->m_filePath + this->HEADER_SUFFIX, std::ios::out | std::ios::binary | std::ios::trunc);
+		if (!headerFile.is_open())
+		{
+			throw std::runtime_error("Failed to open header file");
+		}
 
+		int size = headerSize();
+		std::vector<uint8_t> buffer(size);
+		uint8_t* index = buffer.data();
+
+		for (int attribute : hashAttributes)
+		{
+			index = ByteConverter::toByteFromPrimitive<int>(attribute, index);
+		}
+
+		headerFile.write(reinterpret_cast<char*>(buffer.data()), size);
+		headerFile.close();
 	}
 
 public:
@@ -47,47 +82,25 @@ public:
 		HeapFile<T>(filePath, clusterSize), m_groupSize(groupSize)
 	{}
 
-	void open() override
+	void open(std::vector<int*>& hashAttributesOutput)
 	{
-		HeapFile<T>::open();
-		for (int i{}; i < m_groupSize; ++i)
+		if (this->size() == 0)
 		{
-			addBlock(i);
+			HeapFile<T>::open();
+			for (int i{}; i < m_groupSize; ++i)
+			{
+				addBlock(i);
+			}
+		}
+		else
+		{
+			readHeader(hashAttributesOutput);
 		}
 	}
 
-	void close() override
+	void close(std::vector<int>& hashAttributes)
 	{
-
-	}
-
-	std::unique_ptr<HashBlock<T>> block()
-	{
-		auto block = getBlock();
-		Block<T>* rawBlockPtr = block.release();
-		HashBlock<T>* rawHashBlockPtr = dynamic_cast<HashBlock<T>*>(rawBlockPtr);
-		std::unique_ptr<HashBlock<T>> hashBlock(rawHashBlockPtr);
-
-		return hashBlock;
-	}
-
-	std::unique_ptr<HashBlock<T>> blockAt(int address)
-	{
-		auto block = getBlock();
-		Block<T>* rawBlockPtr = block.release();
-		HashBlock<T>* rawHashBlockPtr = dynamic_cast<HashBlock<T>*>(rawBlockPtr);
-		std::unique_ptr<HashBlock<T>> hashBlock(rawHashBlockPtr);
-
-		std::vector<uint8_t> buffer(hashBlock->getSize());
-		this->loadBlock(address, buffer.data(), hashBlock.get());
-
-		return hashBlock;
-	}
-
-	void writeAt(int address, HashBlock<T>* block)
-	{
-		std::vector<uint8_t> buffer(block->getSize());
-		this->writeBlock(address, buffer.data(), block);
+		writeHeader(hashAttributes);
 	}
 
 	bool insert(int address, T* record, int& nextBlock, bool& newBlock, int& possibleNextBlock)

@@ -1,19 +1,21 @@
 #include "../../../Headers/Model/PCRDatabase/DiskDatabase.h"
 
-DiskDatabase::DiskDatabase() : m_people(FILE_PATH, PEOPLE_CLUSTERS_SIZE) //, m_tests(FILE_PATH, TESTS_CLUSTERS_SIZE)
+DiskDatabase::DiskDatabase() //:
+	//m_people(PEOPLE_FILE_PATH, PEOPLE_PRIMARY_CLUSTERS_SIZE, PEOPLE_OVERFLOW_CLUSTERS_SIZE),
+	//m_tests(TESTS_FILE_PATH, TESTS_PRIMARY_CLUSTERS_SIZE, TESTS_OVERFLOW_CLUSTERS_SIZE)
 {
-	m_people.open();
+	//m_people.open();
 	//m_tests.open();
 }
 
 void DiskDatabase::generateRandomPeople(int peopleCount)
 {
-	for (int i{}; i < peopleCount; ++i)
+	/*for (int i{}; i < peopleCount; ++i)
 	{
 		Person* newPerson = RandomDataGenerator::generatePerson(m_gen);
 		m_people.insert(newPerson);
 		delete newPerson;
-	}
+	}*/
 }
 
 bool DiskDatabase::generateRandomTests(int testCount)
@@ -21,24 +23,20 @@ bool DiskDatabase::generateRandomTests(int testCount)
 	return false;
 }
 
-bool DiskDatabase::insert(Person* person)
+void DiskDatabase::insert(Person* person)
 {
-	if (m_people.insert(person) != -1)
-	{
-		delete person;
-		return true;
-	}
-	return false;
+	//m_people.insert(person);
 }
 
 std::pair<std::string, int> DiskDatabase::printAllData()
 {
 	//TODO TESTY
 
-	return std::make_pair(m_people.printFile() + m_people.printAddresses(), m_people.size());
+	//return std::make_pair(m_people.printOut(), m_people.size());
+	return std::make_pair("", 0);
 }
 
 void DiskDatabase::clear()
 {
-	m_people.clear();
+	//m_people.clear();
 }

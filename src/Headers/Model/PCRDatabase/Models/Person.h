@@ -3,13 +3,12 @@
 #include <sstream>
 #include <chrono>
 #include <iostream>
-#include "../../Interfaces/IRecord.h"
 #include "../../HeapFile/Helpers/BinaryString.h"
 #include "../ModelWrappers/TestWrapper.h"
 #include "../../Structures/AVL/AVLTree.h"
 #include "../../HeapFile/Helpers/ByteConverter.h"
 
-class Person : public IRecord
+class Person
 {
 private:
 	static constexpr const int MAX_FIRST_NAME_SIZE = 15;
@@ -42,28 +41,16 @@ public:
 	inline std::string lastName() { return m_lastName; }
 	
 	inline std::chrono::year_month_day birthDay() { return m_birthDay; }
+
+	std::string toString();
 	
 	std::string toCsvFormat();
-	
-	std::string toString() override;
 
-	IRecord* clone() override;
-	
-	bool equals(IRecord* other) override;
+	BinaryString& binBirthNumber() { return m_birthNumberBin; }
 
-	bool is(IRecord* other) override;
-	
-	int getSize() override;
-	
-	bool toBytes(uint8_t* bytesOutput) override;
-	
-	IRecord* fromBytes(uint8_t* byteBuffer) override;
+	BinaryString& binFirstName() { return m_firstNameBin; }
 
-	size_t hash() override;
-
-	static Person* dummyInstance();
-
-	static Person* createInstance(uint8_t* byteBuffer);
+	BinaryString& binLastName() { return m_lastNameBin; }
 
 	~Person() = default;
 };

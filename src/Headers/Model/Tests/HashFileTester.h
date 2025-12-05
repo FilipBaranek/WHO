@@ -2,7 +2,7 @@
 #include <vector>
 #include <exception>
 #include "../HashFile/HashFile.h"
-#include "../PCRDatabase/Models/Person.h"
+#include "../PCRDatabase/ModelWrappers/PersonHashWrapper.h"
 #include "../PCRDatabase/Generator/RandomDataGenerator.h"
 
 class HashFileTester
@@ -17,11 +17,11 @@ private:
 
 	std::mt19937 m_gen;
 
-	std::vector<Person*> m_data;
-	HashFile<Person> m_hashFile;
+	std::vector<PersonHashWrapper*> m_data;
+	HashFile<PersonHashWrapper> m_hashFile;
 
 public:
-	HashFileTester(int primaryFileClusterSize, int overflowFileClusterSize, int pregeneratedDataCount = 0);
+	HashFileTester(std::string filePath, int primaryFileClusterSize, int overflowFileClusterSize, int pregeneratedDataCount = 0);
 
 	void insert(int operation);
 

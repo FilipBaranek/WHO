@@ -78,7 +78,7 @@ void RandomDataGenerator::generateLocation(std::mt19937& generator, unsigned int
     region = (district * MAX_REGION_CODE) / MAX_DISTRICT_CODE;
 }
 
-Person* RandomDataGenerator::generatePerson(std::mt19937& gen)
+PersonHashWrapper* RandomDataGenerator::generatePerson(std::mt19937& gen)
 {
     std::uniform_int_distribution<unsigned int> names(0, NAMES_COUNT - 1);
 
@@ -87,7 +87,7 @@ Person* RandomDataGenerator::generatePerson(std::mt19937& gen)
     std::string lastName(s_lastNames[names(gen)]);
     std::string birthNumber = generateBirthNumber(gen, birthDay);
 
-    return new Person(birthNumber, name, lastName, birthDay);
+    return new PersonHashWrapper(new Person(birthNumber, name, lastName, birthDay));
 }
 
 PersonWrapper* RandomDataGenerator::generatePeople(std::vector<PersonWrapper*>& peopleDuplicityList, AVLTree<PersonWrapper*>& people)
@@ -95,7 +95,8 @@ PersonWrapper* RandomDataGenerator::generatePeople(std::vector<PersonWrapper*>& 
     std::random_device rd;
     std::mt19937 gen(rd());
 
-    Person* person = generatePerson(gen);
+    PersonHashWrapper* personHashWrapper = generatePerson(gen);
+    Person* person = personHashWrapper->getData();
     PersonWrapper key(person);
 
     while (people.find(&key) != nullptr)
@@ -103,6 +104,8 @@ PersonWrapper* RandomDataGenerator::generatePeople(std::vector<PersonWrapper*>& 
         auto birthDay = person->birthDay();
         person->setBirthNumber(generateBirthNumber(gen, birthDay));
     }
+
+    delete personHashWrapper;
 
    return new PersonWrapper(person);
 }

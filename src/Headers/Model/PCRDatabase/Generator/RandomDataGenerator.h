@@ -4,13 +4,14 @@
 #include <chrono>
 #include <random>
 #include <utility>
-#include "../../Structures/AVL/AVLTree.h"
 #include "../Models/PCRTest.h"
 #include "../Models/Person.h"
 #include "../ModelWrappers/PersonWrapper.h"
 #include "../ModelWrappers/LocationWrapper.h"
 #include "../ModelWrappers/TestWrapper.h"
 #include "../ModelWrappers/TestByDateWrapper.h"
+#include "../ModelWrappers/PersonHashWrapper.h"
+#include "../../Structures/AVL/AVLTree.h"
 
 
 class RandomDataGenerator
@@ -49,7 +50,7 @@ private:
 	static void generateLocation(std::mt19937& generator, unsigned int& workplace, unsigned int& district, unsigned int& region);
 
 public:
-	static Person* generatePerson(std::mt19937& gen);
+	static PersonHashWrapper* generatePerson(std::mt19937& gen);
 
 	static PersonWrapper* generatePeople(std::vector<PersonWrapper*>& peopleDuplicityList, AVLTree<PersonWrapper*>& people);
 	

@@ -40,10 +40,9 @@ void InsertCommand::execute(std::string& output, std::string& recordCount)
 		}
 		else
 		{
-			if (dynamic_cast<DiskDatabase*>(m_database)->insert(m_person))
-			{
-				inserted = true;
-			}
+			dynamic_cast<DiskDatabase*>(m_database)->insert(m_person);
+			delete m_person;
+			inserted = true;
 		}
 		if (inserted)
 		{

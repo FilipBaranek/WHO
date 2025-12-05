@@ -1,8 +1,8 @@
 #pragma once
 #include <iostream>
+#include <sstream>
 #include "PrimaryHeapFile.h"
 #include "OverFlowHeapFile.h"
-#include "../Factories/RecordFactory.h"
 
 
 template<typename T>
@@ -11,9 +11,7 @@ class HashFile
 	static_assert(std::is_base_of_v<IRecord, T>, "T must inherit from IRecord");
 
 private:
-	static constexpr const char* PRIMARY_FILE_PATH = "../../../data/HashFile/primary";
-	static constexpr const char* OVERFLOW_FILE_PATH = "../../../data/HashFile/overflow";
-	static constexpr const int GROUP_SIZE = 2;
+	static constexpr const int GROUP_SIZE = 4;
 	static constexpr const float MAX_DENSITY = 0.8;
 	static constexpr const float MIN_DENSITY = 0.64;
 
@@ -52,7 +50,7 @@ private:
 		}
 	}
 
-	void insertInto(HashBlock<T>* block, std::vector<std::unique_ptr<T>>& records)
+	void tryInsertInto(HashBlock<T>* block, std::vector<std::unique_ptr<T>>& records)
 	{
 		int space = block->blockingFactor() - block->validBlocks();
 		for (int i{}; i < space && records.size() > 0; ++i)
@@ -131,8 +129,8 @@ private:
 		
 		oldBlock->nextBlock(-1);
 
-		insertInto(oldBlock.get(), recordsToOldBlock);
-		insertInto(newBlock.get(), recordsToNewBlock);
+		tryInsertInto(oldBlock.get(), recordsToOldBlock);
+		tryInsertInto(newBlock.get(), recordsToNewBlock);
 
 		int blockCount = 0;
 		blockCount += rearrangeOverflowedBlocks(oldBlock.get(), recordsToOldBlock);
@@ -146,22 +144,32 @@ private:
 	}
 
 public:
-	HashFile(int clusterSize, int secondClusterSize = clusterSize) :
-		m_primaryFile(PRIMARY_FILE_PATH, clusterSize, GROUP_SIZE), m_overFlowFile(OVERFLOW_FILE_PATH, secondClusterSize),
+	HashFile(std::string filePath, int clusterSize, int secondClusterSize = clusterSize) :
+		m_primaryFile(filePath + "primary", clusterSize, GROUP_SIZE),
+		m_overFlowFile(filePath + "overflow", secondClusterSize),
 		m_level{}, m_splitPointer{}, m_capacity{}, m_recordCount{}
 	{}
 
 	void open()
 	{
-		m_primaryFile.open();
+		std::vector<int*> attributes = { &m_level, &m_splitPointer, &m_capacity, &m_recordCount };
+
+		if (m_primaryFile.size() == 0)
+		{
+			m_capacity = GROUP_SIZE * m_primaryFile.blockingFactor();
+		}
+
+		m_primaryFile.open(attributes);
 		m_overFlowFile.open();
-		m_capacity = GROUP_SIZE * m_primaryFile.blockingFactor();
+
 	}
 
 	void close()
 	{
-		m_primaryFile.close();
-		m_overFlowFile.close(m_level, m_splitPointer, m_capacity, m_recordCount);
+		std::vector<int> attributes = { m_level, m_splitPointer, m_capacity, m_recordCount };
+
+		m_primaryFile.close(attributes);
+		m_overFlowFile.close();
 	}
 
 	void insert(T* record)
@@ -214,12 +222,20 @@ public:
 		return record;
 	}
 
-	void printOut()
+	int size()
 	{
-		std::cout << "PRIMARY FILE:\n";
-		std::cout << m_primaryFile.printFile();
-		std::cout << "\nOVERFLOW FILE:\n";
-		std::cout << m_overFlowFile.printFile();
+		return (m_primaryFile.size() * m_primaryFile.blockingFactor()) + (m_overFlowFile.size() * m_overFlowFile.blockingFactor());
+	}
+
+	std::string printOut()
+	{
+		std::ostringstream oss;
+		oss << "PRIMARY FILE:\n";
+		oss << m_primaryFile.printFile();
+		oss << "\nOVERFLOW FILE:\n";
+		oss << m_overFlowFile.printFile();
+
+		return oss.str();
 	}
 
 	void clear()

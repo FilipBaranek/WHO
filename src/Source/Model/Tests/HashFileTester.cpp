@@ -1,13 +1,13 @@
 #include "../../../Headers/Model/Tests/HashFileTester.h"
 
-HashFileTester::HashFileTester(int primaryFileClusterSize, int overflowFileClusterSize, int pregeneratedDataCount) :
-	m_hashFile(primaryFileClusterSize, overflowFileClusterSize), seed(m_rd()), m_gen(seed)
+HashFileTester::HashFileTester(std::string filePath, int primaryFileClusterSize, int overflowFileClusterSize, int pregeneratedDataCount) :
+	m_hashFile(filePath, primaryFileClusterSize, overflowFileClusterSize), seed(m_rd()), m_gen(seed)
 {
 	m_hashFile.open();
 
 	for (int i{}; i < pregeneratedDataCount; ++i)
 	{
-		Person* randomPerson = RandomDataGenerator::generatePerson(m_gen);
+		PersonHashWrapper* randomPerson = RandomDataGenerator::generatePerson(m_gen);
 		m_data.push_back(randomPerson);
 		m_hashFile.insert(randomPerson);
 	}
@@ -15,10 +15,10 @@ HashFileTester::HashFileTester(int primaryFileClusterSize, int overflowFileClust
 
 void HashFileTester::insert(int operation)
 {
-	Person* person = RandomDataGenerator::generatePerson(m_gen);
+	PersonHashWrapper* person = RandomDataGenerator::generatePerson(m_gen);
 
 	m_hashFile.insert(person);
-	Person* foundPerson = m_hashFile.find(person);
+	PersonHashWrapper* foundPerson = m_hashFile.find(person);
 	
 	if (foundPerson == nullptr || !foundPerson->is(person))
 	{
@@ -35,8 +35,8 @@ void HashFileTester::find(int operation)
 {
 	std::uniform_int_distribution<unsigned int> names(0, m_data.size() - 1);
 
-	Person* person = m_data[names(m_gen)];
-	Person* foundPerson = m_hashFile.find(person);
+	PersonHashWrapper* person = m_data[names(m_gen)];
+	PersonHashWrapper* foundPerson = m_hashFile.find(person);
 
 	if (foundPerson == nullptr || !foundPerson->is(person))
 	{

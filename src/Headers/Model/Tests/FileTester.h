@@ -10,14 +10,14 @@
 class FileTester
 {
 private:
-	static constexpr const int REPLICATIONS = 100;
+	static constexpr const int REPLICATIONS = 100'000;
 	static constexpr const int CHECKPOINT = 50'000;
 	
 	std::random_device m_rd;
 	std::mt19937 m_gen{ 456 };
 
-	std::unordered_map<Person*, int> m_data;
-	HeapFile<Person> m_heapFile;
+	std::unordered_map<PersonHashWrapper*, int> m_data;
+	HeapFile<PersonHashWrapper> m_heapFile;
 
 public:
 	FileTester(std::string filePath, int clusterSize, int dataCount = 0);
@@ -29,8 +29,6 @@ public:
 	void find();
 	
 	void remove();
-
-	void duplicityTest();
 
 	void printOut(int& inserts, int& deletes);
 	

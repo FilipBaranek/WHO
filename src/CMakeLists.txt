@@ -97,7 +97,7 @@ add_executable (
     "Headers/Model/HashFile/PrimaryHeapFile.h"
     "Headers/Model/HashFile/OverFlowHeapFile.h"
     "Headers/Model/Tests/HashFileTester.h"
- "Source/Model/Tests/HashFileTester.cpp")
+ "Source/Model/Tests/HashFileTester.cpp" "Headers/Model/PCRDatabase/ModelWrappers/PersonHashWrapper.h" "Source/Model/PCRDatabase/ModelWrappers/PersonHashWrapper.cpp")
 
 target_include_directories(BST PRIVATE ${glm_SOURCE_DIR})
 

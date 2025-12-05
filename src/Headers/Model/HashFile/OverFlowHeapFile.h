@@ -28,21 +28,7 @@ protected:
 			throw std::runtime_error("Failed to open header file");
 		}
 
-		int size;
-		uint8_t* addressIndex;
-		uint8_t sizeBuffer[sizeof(int)];
-
-		headerFile.read(reinterpret_cast<char*>(sizeBuffer), sizeof(int));
-		size = ByteConverter::fromByteToPrimitive<int>(sizeBuffer);
-
-		std::vector<uint8_t> emptyAddressesBuffer(size * sizeof(int));
-		addressIndex = emptyAddressesBuffer.data();
-		headerFile.read(reinterpret_cast<char*>(emptyAddressesBuffer.data()), size * sizeof(int));
-		for (int i{}; i < size; ++i)
-		{
-			this->m_emptyAddresses.push_back(ByteConverter::fromByteToPrimitive<int>(addressIndex));
-			addressIndex += sizeof(int);
-		}
+		this->readAddresses(headerFile, this->m_emptyAddresses);
 
 		headerFile.close();
 	}
@@ -59,11 +45,7 @@ protected:
 		std::vector<uint8_t> buffer(dataSize);
 		uint8_t* index = buffer.data();
 
-		index = ByteConverter::toByteFromPrimitive<int>(static_cast<int>(this->m_emptyAddresses.size()), index);
-		for (int address : this->m_emptyAddresses)
-		{
-			index = ByteConverter::toByteFromPrimitive<int>(address, index);
-		}
+		this->writeAddresses(index, this->m_emptyAddresses);
 
 		headerFile.write(reinterpret_cast<char*>(buffer.data()), dataSize);
 		headerFile.close();
@@ -73,35 +55,6 @@ public:
 	OverflowHeapFile(std::string filePath, int clusterSize) : 
 		HeapFile<T>(filePath, clusterSize)
 	{}
-
-	std::unique_ptr<HashBlock<T>> block()
-	{
-		auto block = getBlock();
-		Block<T>* rawBlockPtr = block.release();
-		HashBlock<T>* rawHashBlockPtr = dynamic_cast<HashBlock<T>*>(rawBlockPtr);
-		std::unique_ptr<HashBlock<T>> hashBlock(rawHashBlockPtr);
-
-		return hashBlock;
-	}
-
-	std::unique_ptr<HashBlock<T>> blockAt(int address)
-	{
-		auto block = getBlock();
-		Block<T>* rawBlockPtr = block.release();
-		HashBlock<T>* rawHashBlockPtr = dynamic_cast<HashBlock<T>*>(rawBlockPtr);
-		std::unique_ptr<HashBlock<T>> hashBlock(rawHashBlockPtr);
-
-		std::vector<uint8_t> buffer(hashBlock->getSize());
-		this->loadBlock(address, buffer.data(), hashBlock.get());
-		
-		return hashBlock;
-	}
-
-	void writeAt(int address, HashBlock<T>* block)
-	{
-		std::vector<uint8_t> buffer(block->getSize());
-		this->writeBlock(address, buffer.data(), block);
-	}
 
 	void addEmptyAddress(int address)
 	{
@@ -205,7 +158,7 @@ public:
 
 		while (record == nullptr && overflowPtr != -1)
 		{
-			std::unique_ptr<HashBlock<T>> overflowBlock = blockAt(overflowPtr);
+			std::unique_ptr<HashBlock<T>> overflowBlock = this->blockAt(overflowPtr);
 			record = overflowBlock->find(key);
 			overflowPtr = overflowBlock->nextBlock();
 		}

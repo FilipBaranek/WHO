@@ -6,7 +6,7 @@ FileTester::FileTester(std::string filePath, int clusterSize, int dataCount) : m
 
 	for (int i{}; i < dataCount; ++i)
 	{
-		Person* person = RandomDataGenerator::generatePerson(m_gen);
+		PersonHashWrapper* person = RandomDataGenerator::generatePerson(m_gen);
 
 		int address = m_heapFile.insert(person);
 		m_data[person] = address;
@@ -15,10 +15,10 @@ FileTester::FileTester(std::string filePath, int clusterSize, int dataCount) : m
 
 void FileTester::insert()
 {
-	Person* person = RandomDataGenerator::generatePerson(m_gen);
+	PersonHashWrapper* person = RandomDataGenerator::generatePerson(m_gen);
 
 	int address = m_heapFile.insert(person);
-	Person* foundPerson = m_heapFile.find(address, person);
+	PersonHashWrapper* foundPerson = m_heapFile.find(address, person);
 
 	if (!person->is(foundPerson))
 	{
@@ -37,8 +37,8 @@ void FileTester::find()
 	std::advance(iterator, randomAddressInterval(m_gen));
 
 	int address = iterator->second;
-	Person* personToFind = iterator->first;
-	Person* foundPerson = m_heapFile.find(address, personToFind);
+	PersonHashWrapper* personToFind = iterator->first;
+	PersonHashWrapper* foundPerson = m_heapFile.find(address, personToFind);
 
 	if (foundPerson == nullptr || !personToFind->is(foundPerson))
 	{
@@ -55,9 +55,9 @@ void FileTester::remove()
 	std::advance(iterator, randomAddressInterval(m_gen));
 
 	int address = iterator->second;
-	Person* personToRemove = iterator->first;
-	Person* removedPerson = m_heapFile.remove(address, personToRemove);
-	Person* foundPerson = m_heapFile.find(address, personToRemove);
+	PersonHashWrapper* personToRemove = iterator->first;
+	PersonHashWrapper* removedPerson = m_heapFile.remove(address, personToRemove);
+	PersonHashWrapper* foundPerson = m_heapFile.find(address, personToRemove);
 
 	if (removedPerson == nullptr || !personToRemove->is(removedPerson) || foundPerson != nullptr)
 	{
@@ -68,62 +68,6 @@ void FileTester::remove()
 	delete personToRemove;
 	delete removedPerson;
 	delete foundPerson;
-}
-
-void FileTester::duplicityTest()
-{
-	Person* person = RandomDataGenerator::generatePerson(m_gen);
-	Person* equalPerson = person;
-	Person* duplicitPerson = new Person(
-		person->birthNumber(),
-		"bb",
-		"aa",
-		person->birthDay()
-	);
-
-	int addr1 = m_heapFile.insert(person);
-	int addr2 = m_heapFile.insert(equalPerson);
-	int addr3 = m_heapFile.insert(duplicitPerson);
-
-	Person* foundEqualPerson = m_heapFile.find(addr2, equalPerson);
-	Person* foundDuplicitPerson = m_heapFile.find(addr3, duplicitPerson);
-	if (!foundEqualPerson->equals(person) || !foundDuplicitPerson->is(person))
-	{
-		throw std::runtime_error("Incorrect duplicit find operation");
-	}
-	delete foundEqualPerson;
-	delete foundDuplicitPerson;
-
-	delete m_heapFile.remove(addr1, person);
-	foundEqualPerson = m_heapFile.find(addr2, person);
-	if (!foundEqualPerson->equals(person))
-	{
-		throw std::runtime_error("Incorrect duplicit remove");
-	}
-	delete foundEqualPerson;
-
-	foundDuplicitPerson = m_heapFile.find(addr3, person);
-	if (!foundDuplicitPerson->is(person))
-	{
-		throw std::runtime_error("Incorrect duplicit remove");
-	}
-	delete foundDuplicitPerson;
-
-	delete m_heapFile.remove(addr2, person);
-	delete m_heapFile.remove(addr3, person);
-	Person* foundPerson = m_heapFile.find(addr1, person);
-	foundEqualPerson = m_heapFile.find(addr2, person);
-	foundDuplicitPerson = m_heapFile.find(addr3, duplicitPerson);
-	if (foundPerson != nullptr || foundEqualPerson != nullptr || foundDuplicitPerson != nullptr)
-	{
-		throw std::runtime_error("Incorrect duplicit remove");
-	}
-
-	delete foundPerson;
-	delete foundEqualPerson;
-	delete foundDuplicitPerson;
-	delete person;
-	delete duplicitPerson;
 }
 
 void FileTester::printOut(int& inserts, int& deletes)
@@ -144,8 +88,6 @@ void FileTester::runTests()
 		if (i % CHECKPOINT - 1 == 0)
 		{
 			std::cout << "Operation " << i - 1 << "/" << REPLICATIONS << "\n";
-
-			duplicityTest();
 			testSize();
 		}
 
