@@ -54,11 +54,11 @@ int main()
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 
     {
-        testFile();
-        testHashFile();
+        //testFile();
+        //testHashFile();
 
-        //Application app(APPLICATIONTYPE::DISK);
-        //app.run();
+        Application app(APPLICATIONTYPE::DISK);
+        app.run();
     }
 
     return 0;

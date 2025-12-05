@@ -7,7 +7,14 @@ std::string PersonHashWrapper::toString()
 
 IRecord* PersonHashWrapper::clone()
 {
-	return new PersonHashWrapper(new Person(m_person->birthNumber(), m_person->firstName(), m_person->lastName(), m_person->birthDay()));
+	PersonHashWrapper* person = new PersonHashWrapper(new Person(m_person->birthNumber(), m_person->firstName(), m_person->lastName(), m_person->birthDay()));
+	
+	for (int i{}; i < m_tests.size(); ++i)
+	{
+		person->tests().push_back(m_tests[i]);
+	}
+
+	return person;
 }
 
 bool PersonHashWrapper::equals(IRecord* other)
