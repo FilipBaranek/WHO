@@ -152,6 +152,24 @@ public:
 		return record;
 	}
 
+	bool execute(int& address, T* key, std::function<void(T*)> callback)
+	{
+		auto block = getBlock();
+		std::vector<uint8_t> buffer(block->getSize());
+		this->loadBlock(address, buffer.data(), block.get());
+
+		bool executed = block->execute(key, callback);
+		if (!executed)
+		{
+			address = dynamic_cast<HashBlock<T>*>(block.get())->nextBlock();
+		}
+		else
+		{
+			this->writeBlock(address, buffer.data(), block.get());
+		}
+		return executed;
+	}
+
 	~PrimaryHeapFile()
 	{
 		this->m_callBaseDestructor = false;

@@ -7,8 +7,28 @@ ReducedOperationsWindow::ReducedOperationsWindow(Presenter* presenter) : Window(
         []() {}
     };
     m_operations[1] = {
+        [this]() { displayPersonInputs(); },
+        [this]() { findPerson(); }
+    };
+    m_operations[2] = {
+        [this]() { displayTestInputs(); },
+        [this]() { findTest(); }
+    };
+    m_operations[3] = {
+        []() {},
+        []() {}
+    };
+    m_operations[4] = {
+        []() {},
+        []() {}
+    };
+    m_operations[5] = {
         [this]() {},
         [this]() { printAllData(); }
+    };
+    m_operations[6] = {
+        []() {},
+        []() {}
     };
 }
 
@@ -18,7 +38,39 @@ void ReducedOperationsWindow::printAllData()
     m_presenter->printAllData();
 }
 
+void ReducedOperationsWindow::findTest()
+{
+    m_presenter->findTest(m_numBuffer);
+}
+
+void ReducedOperationsWindow::findPerson()
+{
+    dynamic_cast<DiskPresenter*>(m_presenter)->findPerson(m_stringBuffer);
+}
+
 //=========Render=============
+void ReducedOperationsWindow::displayTestInputs()
+{
+    ImGui::Dummy(ImVec2(20.0f, 60.0f));
+
+    ImGui::Text("Test ID:");
+    ImGui::InputInt("##testId", &m_numBuffer, 0, 0);
+}
+
+void ReducedOperationsWindow::displayPersonInputs()
+{
+    ImGui::Dummy(ImVec2(20.0f, 60.0f));
+
+    char birthBuf[20];
+    strncpy_s(birthBuf, sizeof(birthBuf), m_stringBuffer.c_str(), _TRUNCATE);
+
+    ImGui::Text("Birth Number:");
+    if (ImGui::InputText("##birthNumber", birthBuf, IM_ARRAYSIZE(birthBuf)))
+    {
+        m_stringBuffer = birthBuf;
+    }
+}
+
 void ReducedOperationsWindow::renderWindow()
 {
     ImGuiViewport* viewport = ImGui::GetMainViewport();
@@ -37,7 +89,12 @@ void ReducedOperationsWindow::renderWindow()
 
     static const char* items[] = {
         "Select...",
-        "Vypisat vsetky udaje"
+        "(2) Najst osobu",
+        "(3) Najst test",
+        "(7) Editovat osobu",
+        "(8) Editovat test",
+        "Vypisat vsetky udaje",
+        "Vymazat databazu"
     };
 
     if (ImGui::BeginCombo("Select Operation", items[m_currentItem]))

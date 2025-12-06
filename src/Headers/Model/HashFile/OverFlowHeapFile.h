@@ -165,6 +165,28 @@ public:
 		return record;
 	}
 
+	bool execute(int address, T* key, std::function<void(T*)> callback)
+	{
+		int overflowPtr = address;
+		bool executed = false;
+		std::vector<uint8_t> buffer;
+
+		while (!executed && overflowPtr != -1)
+		{
+			std::unique_ptr<HashBlock<T>> overflowBlock = this->blockAt(overflowPtr);
+			executed = overflowBlock->execute(key, callback);
+
+			if (executed)
+			{
+				buffer.reserve(overflowBlock->getSize());
+				this->writeBlock(overflowPtr, buffer.data(), overflowBlock.get());
+			}
+
+			overflowPtr = overflowBlock->nextBlock();
+		}
+		return executed;
+	}
+
 	~OverflowHeapFile()
 	{
 		this->m_callBaseDestructor = true;

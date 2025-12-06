@@ -115,11 +115,10 @@ TestHashWrapper* RandomDataGenerator::generateTest(std::mt19937& gen)
     std::uniform_real_distribution<double> valueInterval(10.0, 40.0);
     std::uniform_int_distribution<unsigned int> randomPersonInterval(0, s_people.size() - 1);
 
-    PersonHashWrapper* person = s_people[randomPersonInterval(gen)];
+    Person* person = s_people[randomPersonInterval(gen)]->getData();
     bool result = static_cast<bool>(resultInterval(gen));
     std::string note(s_notes[noteInterval(gen)]);
     unsigned int id = s_testId;
-    person->tests().push_back(id);
     ++s_testId;
 
     return new TestHashWrapper(new ReducedPCRTest(
@@ -127,8 +126,8 @@ TestHashWrapper* RandomDataGenerator::generateTest(std::mt19937& gen)
         result,
         result ? valueInterval(gen) : 0,
         note,
-        generateTime(gen, person->getData()->birthDay())
-    ), person->getData()->birthNumber());
+        generateTime(gen, person->birthDay())
+    ), person->birthNumber());
 }
 
 PersonWrapper* RandomDataGenerator::generatePeople(std::vector<PersonWrapper*>& peopleDuplicityList, AVLTree<PersonWrapper*>& people)

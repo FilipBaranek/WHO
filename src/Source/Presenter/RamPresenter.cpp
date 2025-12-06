@@ -187,13 +187,13 @@ void RamPresenter::findAllTestsAtWorkplace(int workplaceId, time_point<system_cl
 }
 
 //(18)
-void RamPresenter::findTest(unsigned int testId)
-{
-	execute([=, this](std::string& output, std::string& recordCount) {
-		m_findTestCommand.setParams(testId);
-		m_findTestCommand.execute(output, recordCount);
-		});
-}
+//void RamPresenter::findTest(unsigned int testId)
+//{
+//	execute([=, this](std::string& output, std::string& recordCount) {
+//		m_findTestCommand.setParams(testId);
+//		m_findTestCommand.execute(output, recordCount);
+//		});
+//}
 
 //(19)
 void RamPresenter::insert(std::string birthNumber, std::string firstName, std::string lastName, year_month_day birthDay)

@@ -17,6 +17,24 @@ DiskDatabase::DiskDatabase() :
 	}
 }
 
+bool DiskDatabase::updatePersonTests(std::string birthBumber, unsigned int testId)
+{
+	std::string dummyStr = "";
+	Person* dummy = new Person(
+		birthBumber,
+		dummyStr,
+		dummyStr,
+		std::chrono::year_month_day{}
+	);
+	PersonHashWrapper dummyKey(dummy);
+
+	bool updated = m_people.execute(&dummyKey, [&testId](PersonHashWrapper* foundPerson) {
+		foundPerson->tests().push_back(testId);
+	});
+
+	return updated;
+}
+
 void DiskDatabase::generateRandomPeople(int peopleCount)
 {
 	for (int i{}; i < peopleCount; ++i)
@@ -37,21 +55,115 @@ bool DiskDatabase::generateRandomTests(int testCount)
 		{
 			TestHashWrapper* newTest = RandomDataGenerator::generateTest(m_gen);
 			m_tests.insert(newTest);
+			updatePersonTests(newTest->person(), newTest->getData()->testId());
 			delete newTest;
 		}
 		return true;
 	}
 }
 
-void DiskDatabase::insert(PersonHashWrapper* person)
-{
-	m_people.insert(person);
-}
-
+//(1)
 void DiskDatabase::insert(TestHashWrapper* test)
 {
 	m_tests.insert(test);
+	updatePersonTests(test->person(), test->getData()->testId());
+
 	delete test;
+}
+
+//(2)
+std::pair<std::string, int> DiskDatabase::findPerson(std::string birthNumber)
+{
+	int dummyNum = 0;
+	std::string dummyStr = "";
+	Person* dummyPerson = new Person(
+		birthNumber,
+		dummyStr,
+		dummyStr,
+		std::chrono::year_month_day{}
+	);
+	PersonHashWrapper dummyPersonKey(dummyPerson);
+
+	PersonHashWrapper* foundPerson = m_people.find(&dummyPersonKey);
+	std::string strOutput = "";
+
+	if (foundPerson != nullptr)
+	{
+		strOutput += foundPerson->toString() + "\n\nTests:\n";
+		for (auto testId : foundPerson->tests())
+		{
+			ReducedPCRTest* dummyTest = new ReducedPCRTest(
+				testId,
+				dummyNum,
+				dummyNum,
+				dummyStr,
+				std::chrono::system_clock::now()
+			);
+			TestHashWrapper dummyTestKey(dummyTest, birthNumber);
+
+			TestHashWrapper* foundTest = m_tests.find(&dummyTestKey);
+
+			if (foundTest != nullptr)
+			{
+				strOutput += foundTest->toString();
+				delete foundTest;
+			}
+		}
+	}
+	else
+	{
+		strOutput = "Person wasn't found";
+	}
+	
+	auto output = std::make_pair(strOutput, foundPerson->tests().size() + 1);
+	
+	delete foundPerson;
+	return output;
+}
+
+//(3)
+std::string DiskDatabase::findTest(const unsigned int testId)
+{
+	int dummyNum = 0;
+	std::string dummyStr = "";
+	ReducedPCRTest* dummyTest = new ReducedPCRTest(
+		testId,
+		dummyNum,
+		dummyNum,
+		dummyStr,
+		std::chrono::system_clock::now()
+	);
+	TestHashWrapper dummyTestKey(dummyTest);
+
+	TestHashWrapper* foundTest = m_tests.find(&dummyTestKey);
+	std::string strOutput = "";
+
+	if (foundTest != nullptr)
+	{
+		Person* dummyPerson = new Person(
+			foundTest->person(),
+			dummyStr,
+			dummyStr,
+			std::chrono::year_month_day{}
+		);
+		PersonHashWrapper dummyPersonKey(dummyPerson);
+
+		PersonHashWrapper* foundPerson = m_people.find(&dummyPersonKey);
+
+		strOutput += foundPerson->toString() + "\n" + foundTest->toString();
+	}
+	else
+	{
+		strOutput = "Test wasn't found";
+	}
+
+	return strOutput;
+}
+
+//(4)
+void DiskDatabase::insert(PersonHashWrapper* person)
+{
+	m_people.insert(person);
 }
 
 std::pair<std::string, int> DiskDatabase::printAllData()
@@ -61,7 +173,8 @@ std::pair<std::string, int> DiskDatabase::printAllData()
 
 void DiskDatabase::clear()
 {
-	//
+	m_people.clear();
+	m_tests.clear();
 }
 
 DiskDatabase::~DiskDatabase()

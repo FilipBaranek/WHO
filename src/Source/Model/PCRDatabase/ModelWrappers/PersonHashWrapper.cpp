@@ -61,7 +61,7 @@ bool PersonHashWrapper::toBytes(uint8_t* bytesOutput)
 	index = ByteConverter::toByteFromPrimitive(y, index);
 	index = ByteConverter::toByteFromPrimitive(m, index);
 	index = ByteConverter::toByteFromPrimitive(d, index);
-	index = ByteConverter::toByteFromPrimitive(m_tests.size(), index);
+	index = ByteConverter::toByteFromPrimitive(static_cast<int>(m_tests.size()), index);
 
 	for (int i{}; i < m_tests.size(); ++i)
 	{

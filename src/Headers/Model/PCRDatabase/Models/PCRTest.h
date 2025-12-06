@@ -20,7 +20,7 @@ public:
 	PCRTest(unsigned int testId, unsigned int workplaceId, unsigned int districtId, unsigned int regionId, bool result, double testValue,
 			std::string note, std::chrono::time_point<std::chrono::system_clock> testDate, std::string birthNumber) :
 			ReducedPCRTest(testId, result, testValue, note, testDate),
-			m_workplaceId(workplaceId), m_districtId(districtId), m_regionId(regionId), m_birthNumber(m_birthNumber)
+			m_workplaceId(workplaceId), m_districtId(districtId), m_regionId(regionId), m_birthNumber(birthNumber)
 	{};
 
 	inline void setTestId(unsigned int id) { this->m_testId = id; }

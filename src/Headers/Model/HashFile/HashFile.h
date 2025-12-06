@@ -218,7 +218,21 @@ public:
 		{
 			record = m_overFlowFile.find(addr, key);
 		}
+
 		return record;
+	}
+
+	bool execute(T* key, std::function<void(T*)> callback)
+	{
+		int addr = address(key);
+		bool executed = m_primaryFile.execute(addr, key, callback);
+
+		if (!executed)
+		{
+			executed = m_overFlowFile.execute(addr, key, callback);
+		}
+
+		return executed;
 	}
 
 	inline int size() { return m_recordCount; }

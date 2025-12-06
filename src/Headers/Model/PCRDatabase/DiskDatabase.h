@@ -21,6 +21,9 @@ private:
 	HashFile<PersonHashWrapper> m_people;
 	HashFile<TestHashWrapper> m_tests;
 
+private:
+	bool updatePersonTests(std::string birthBumber, unsigned int testId);
+
 public:
 	DiskDatabase();
 
@@ -30,6 +33,12 @@ public:
 
 	//(1)
 	void insert(TestHashWrapper* test);
+
+	//(2)
+	std::pair<std::string, int> findPerson(std::string birthNumber);
+
+	//(3)
+	std::string findTest(const unsigned int testId) override;
 
 	//(4)
 	void insert(PersonHashWrapper* person);

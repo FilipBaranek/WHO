@@ -105,7 +105,7 @@ public:
 	std::pair<std::string, int> findAllTestsAtWorkplace(int workplaceId, time_point<system_clock> from, time_point<system_clock> to);
 
 	//(18)
-	std::string findTest(const unsigned int testId);
+	std::string findTest(const unsigned int testId) override;
 
 	//(19)
 	bool insert(PersonWrapper* person);

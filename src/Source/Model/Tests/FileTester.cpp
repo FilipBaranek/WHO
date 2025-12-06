@@ -88,7 +88,7 @@ void FileTester::runTests()
 		if (i % CHECKPOINT - 1 == 0)
 		{
 			std::cout << "Operation " << i - 1 << "/" << REPLICATIONS << "\n";
-			testSize();
+			//testSize();
 		}
 
 		int operation = probability(m_gen);

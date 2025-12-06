@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <string>
 #include <sstream>
+#include <functional>
 #include "Helpers/ByteConverter.h"
 #include "../Interfaces/IRecord.h"
 #include "../Factories/RecordFactory.h"
@@ -49,51 +50,47 @@ public:
 
 	T* find(T* object)
 	{
-		T* foundObject = nullptr;
 		for (int i{}; i < m_validBlockCount; ++i)
 		{
-			if (m_data[i]->equals(object))
+			if (m_data[i]->is(object))
 			{
-				foundObject = m_data[i];
-				break;
-			}
-			else if (m_data[i]->is(object))
-			{
-				foundObject = m_data[i];
+				return dynamic_cast<T*>(m_data[i]->clone());
 			}
 		}
-		return foundObject != nullptr ? dynamic_cast<T*>(foundObject->clone()) : nullptr;
+		return nullptr;
 	}
 
 	T* remove(T* object)
 	{
-		int index = -1;
 		for (int i{}; i < m_validBlockCount; ++i)
 		{
-			if (m_data[i]->equals(object))
+			if (m_data[i]->is(object))
 			{
-				index = i;
-				break;
-			}
-			else if (m_data[i]->is(object))
-			{
-				index = i;
-			}
-		}
+				if (i != m_validBlockCount - 1)
+				{
+					std::swap(m_data[i], m_data[m_validBlockCount - 1]);
+				}
+				T* removedObject = m_data[m_validBlockCount - 1];
+				m_data[m_validBlockCount - 1] = nullptr;
+				--m_validBlockCount;
 
-		if (index != -1)
-		{
-			if (index != m_validBlockCount - 1)
-			{
-				std::swap(m_data[index], m_data[m_validBlockCount - 1]);
+				return removedObject;
 			}
-			T* removedObject = m_data[m_validBlockCount - 1];
-			m_data[m_validBlockCount - 1] = nullptr;
-			--m_validBlockCount;
-
-			return removedObject;
 		}
 		return nullptr;
+	}
+
+	bool execute(T* object, std::function<void(T*)> callback)
+	{
+		for (int i{}; i < m_validBlockCount; ++i)
+		{
+			if (m_data[i]->is(object))
+			{
+				callback(m_data[i]);
+				return true;
+			}
+		}
+		return false;
 	}
 
 	virtual void toBytes(uint8_t* outputBuffer)

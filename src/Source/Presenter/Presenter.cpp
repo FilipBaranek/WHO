@@ -48,6 +48,14 @@ void Presenter::generateTests(int count)
 		});
 }
 
+void Presenter::findTest(unsigned int testId)
+{
+	execute([=, this](std::string& output, std::string& recordCount) {
+		m_findTestCommand.setParams(testId);
+		m_findTestCommand.execute(output, recordCount);
+	});
+}
+
 void Presenter::printAllData()
 {
 	execute([=, this](std::string& output, std::string& recordCount) {

@@ -21,6 +21,8 @@ public:
 	
 	virtual std::pair<std::string, int> printAllData() = 0;
 
+	virtual std::string findTest(const unsigned int testId) = 0;
+
 	virtual void clear() = 0;
 	
 	virtual ~Database() = default;

@@ -21,6 +21,14 @@ void DiskPresenter::insert(
 	});
 }
 
+void DiskPresenter::findPerson(std::string birthNumber)
+{
+	execute([=, this](std::string& output, std::string& recordCount) {
+		m_findPersonCommand.setParams(birthNumber);
+		m_findPersonCommand.execute(output, recordCount);
+	});
+}
+
 void DiskPresenter::insert(std::string birthNumber, std::string firstName, std::string lastName, year_month_day birthDay)
 {
 	execute([=, this](std::string& output, std::string& recordCount) {
