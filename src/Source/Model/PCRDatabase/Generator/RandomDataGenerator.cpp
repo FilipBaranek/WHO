@@ -2,7 +2,7 @@
 
 
 int RandomDataGenerator::s_personId = 0;
-int RandomDataGenerator::s_testId = 0;
+unsigned int RandomDataGenerator::s_testId = 0;
 
 std::chrono::year_month_day RandomDataGenerator::generateRandomDate(std::mt19937& generator)
 {

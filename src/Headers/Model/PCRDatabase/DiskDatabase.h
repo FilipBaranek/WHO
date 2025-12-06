@@ -38,5 +38,5 @@ public:
 
 	void clear() override;
 
-	~DiskDatabase() = default;
+	~DiskDatabase();
 };

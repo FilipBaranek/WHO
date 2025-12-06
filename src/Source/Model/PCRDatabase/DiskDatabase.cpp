@@ -38,7 +38,7 @@ bool DiskDatabase::generateRandomTests(int testCount)
 void DiskDatabase::insert(PersonHashWrapper* person)
 {
 	m_people.insert(person);
-	delete person;
+	m_peopleList.push_back(person);
 }
 
 void DiskDatabase::insert(TestHashWrapper* test)
@@ -60,7 +60,9 @@ void DiskDatabase::clear()
 	{
 		delete person;
 	}
+}
 
-	m_people.close();
-	m_tests.close();
+DiskDatabase::~DiskDatabase()
+{
+	clear();
 }

@@ -45,7 +45,7 @@ private:
 	static constexpr const double MAX_TEST_VALUE = 40.0;
 	static constexpr const unsigned int NOTE_COUNT = 4;
 	static constexpr std::string_view s_notes[] = { "", "Karantena", "Elektronic.", "Zopakovat" };
-	static int s_testId;
+	static unsigned int s_testId;
 
 	static std::chrono::year_month_day generateRandomDate(std::mt19937& generator);
 	static std::chrono::time_point<std::chrono::system_clock> generateTime(std::mt19937& generator, const std::chrono::year_month_day& birthDate);
