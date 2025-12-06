@@ -1,5 +1,9 @@
 #include "../../../../Headers/Model/PCRDatabase/Generator/RandomDataGenerator.h"
 
+
+int RandomDataGenerator::s_personId = 0;
+int RandomDataGenerator::s_testId = 0;
+
 std::chrono::year_month_day RandomDataGenerator::generateRandomDate(std::mt19937& generator)
 {
     using namespace std::chrono;
@@ -85,9 +89,31 @@ PersonHashWrapper* RandomDataGenerator::generatePerson(std::mt19937& gen)
     auto birthDay = generateRandomDate(gen);
     std::string name(s_names[names(gen)]);
     std::string lastName(s_lastNames[names(gen)]);
-    std::string birthNumber = generateBirthNumber(gen, birthDay);
+    std::string birthNumber = std::to_string(s_personId);
+    ++s_personId;
 
     return new PersonHashWrapper(new Person(birthNumber, name, lastName, birthDay));
+}
+
+TestHashWrapper* RandomDataGenerator::generateTest(std::mt19937& gen, std::vector<PersonHashWrapper*>& people)
+{
+    std::uniform_int_distribution<unsigned int> noteInterval(0, NOTE_COUNT - 1);
+    std::uniform_int_distribution<unsigned int> resultInterval(0, 1);
+    std::uniform_real_distribution<double> valueInterval(10.0, 40.0);
+    std::uniform_int_distribution<unsigned int> randomPersonInterval(0, people.size() - 1);
+
+    Person* person = people[randomPersonInterval(gen)]->getData();
+    bool result = static_cast<bool>(resultInterval(gen));
+    std::string note(s_notes[noteInterval(gen)]);
+    ++s_testId;
+
+    return new TestHashWrapper(new ReducedPCRTest(
+        s_testId - 1,
+        result,
+        result ? valueInterval(gen) : 0,
+        note,
+        generateTime(gen, person->birthDay())
+    ), person->birthNumber());
 }
 
 PersonWrapper* RandomDataGenerator::generatePeople(std::vector<PersonWrapper*>& peopleDuplicityList, AVLTree<PersonWrapper*>& people)

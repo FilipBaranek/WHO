@@ -31,7 +31,7 @@ void InsertCommand::execute(std::string& output, std::string& recordCount)
 	if (m_person != nullptr)
 	{
 		bool inserted = false;
-		if (m_wrap)
+		if (m_ram)
 		{
 			if (dynamic_cast<RamDatabase*>(m_database)->insert(new PersonWrapper(m_person)))
 			{
@@ -40,8 +40,7 @@ void InsertCommand::execute(std::string& output, std::string& recordCount)
 		}
 		else
 		{
-			dynamic_cast<DiskDatabase*>(m_database)->insert(m_person);
-			delete m_person;
+			dynamic_cast<DiskDatabase*>(m_database)->insert(new PersonHashWrapper(m_person));
 			inserted = true;
 		}
 		if (inserted)
@@ -58,7 +57,7 @@ void InsertCommand::execute(std::string& output, std::string& recordCount)
 	else
 	{
 		bool inserted = false;
-		if (m_wrap)
+		if (m_ram)
 		{
 			if (dynamic_cast<RamDatabase*>(m_database)->insert(new TestWrapper(m_test)))
 			{
@@ -67,7 +66,17 @@ void InsertCommand::execute(std::string& output, std::string& recordCount)
 		}
 		else
 		{
-			//TODO
+			ReducedPCRTest* test = new ReducedPCRTest(
+				m_test->testId(),
+				m_test->result(),
+				m_test->testValue(),
+				m_test->note(),
+				m_test->testDate()
+			);
+			dynamic_cast<DiskDatabase*>(m_database)->insert(new TestHashWrapper(test, m_test->birthNumber()));
+			delete m_test;
+
+			inserted = true;
 		}
 		if (inserted)
 		{
@@ -81,7 +90,7 @@ void InsertCommand::execute(std::string& output, std::string& recordCount)
 		}
 	}
 	
-	m_wrap = false;
+	m_ram = false;
 	m_person = nullptr;
 	m_test = nullptr;
 }

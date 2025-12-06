@@ -224,7 +224,7 @@ public:
 
 	int size()
 	{
-		return (m_primaryFile.size() * m_primaryFile.blockingFactor()) + (m_overFlowFile.size() * m_overFlowFile.blockingFactor());
+		return m_recordCount;
 	}
 
 	std::string printOut()
@@ -234,6 +234,7 @@ public:
 		oss << m_primaryFile.printFile();
 		oss << "\nOVERFLOW FILE:\n";
 		oss << m_overFlowFile.printFile();
+		oss << "\n\n";
 
 		return oss.str();
 	}

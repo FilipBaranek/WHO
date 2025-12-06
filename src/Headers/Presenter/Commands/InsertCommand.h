@@ -1,20 +1,22 @@
 #pragma once
 #include <string>
 #include "Command.h"
+#include "../../../Headers/Model/PCRDatabase/ModelWrappers/PersonHashWrapper.h"
+#include "../../../Headers/Model/PCRDatabase/ModelWrappers/TestHashWrapper.h"
 #include "../../../Headers/Model/PCRDatabase/ModelWrappers/PersonWrapper.h"
 #include "../../../Headers/Model/PCRDatabase/ModelWrappers/TestByDateWrapper.h"
 
 class InsertCommand : public Command
 {
 private:
-	bool m_wrap;
+	bool m_ram;
 	Person* m_person;
 	PCRTest* m_test;
 
 public:
-	InsertCommand(Database* database) : Command(database), m_wrap(false), m_person(nullptr), m_test(nullptr) {}
+	InsertCommand(Database* database) : Command(database), m_ram(false), m_person(nullptr), m_test(nullptr) {}
 
-	void wrapObject() { m_wrap = true; }
+	void wrapObject() { m_ram = true; }
 
 	void setParams(std::string birthNumber, std::string firstName, std::string lastName, std::chrono::year_month_day birthDay);
 	

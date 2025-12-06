@@ -407,7 +407,7 @@ public:
 
 			loadBlock(i, buffer.data(), block.get());
 
-			oss << "Block[" << i << "]\n" << block->toString() << "\n";
+			oss << "\nBlock[" << i << "]\n" << block->toString() << "\n\n\n";
 		}
 
 		return oss.str();

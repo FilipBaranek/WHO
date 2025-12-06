@@ -11,6 +11,7 @@
 #include "../ModelWrappers/TestWrapper.h"
 #include "../ModelWrappers/TestByDateWrapper.h"
 #include "../ModelWrappers/PersonHashWrapper.h"
+#include "../ModelWrappers/TestHashWrapper.h"
 #include "../../Structures/AVL/AVLTree.h"
 
 
@@ -34,6 +35,7 @@ private:
 	static constexpr const unsigned int NAMES_COUNT = 5;
 	static constexpr std::string_view s_names[] = { "Peter", "Jana", "Martin", "Lucia", "Tomas" };
 	static constexpr std::string_view s_lastNames[] = { "Novak", "Horvath", "Kovac", "Bielik", "Simko" };
+	static int s_personId;
 
 	//Test
 	static constexpr const unsigned int MAX_TEST_CODE = 1'000'000;
@@ -43,6 +45,7 @@ private:
 	static constexpr const double MAX_TEST_VALUE = 40.0;
 	static constexpr const unsigned int NOTE_COUNT = 4;
 	static constexpr std::string_view s_notes[] = { "", "Karantena", "Elektronic.", "Zopakovat" };
+	static int s_testId;
 
 	static std::chrono::year_month_day generateRandomDate(std::mt19937& generator);
 	static std::chrono::time_point<std::chrono::system_clock> generateTime(std::mt19937& generator, const std::chrono::year_month_day& birthDate);
@@ -51,6 +54,8 @@ private:
 
 public:
 	static PersonHashWrapper* generatePerson(std::mt19937& gen);
+
+	static TestHashWrapper* generateTest(std::mt19937& gen, std::vector<PersonHashWrapper*>& people);
 
 	static PersonWrapper* generatePeople(std::vector<PersonWrapper*>& peopleDuplicityList, AVLTree<PersonWrapper*>& people);
 	
