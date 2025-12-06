@@ -149,7 +149,7 @@ public:
 	std::string toString()
 	{
 		std::ostringstream oss;
-		oss << "Valid data:";
+		oss << "Valid data:\n";
 		for (int i{}; i < m_validBlockCount; ++i)
 		{
 			oss << m_data[i]->toString();

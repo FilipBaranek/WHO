@@ -6,15 +6,22 @@ DiskDatabase::DiskDatabase() :
 {
 	m_people.open();
 	m_tests.open();
+
+	if (m_people.size() > 0)
+	{
+		RandomDataGenerator::initPersonId(m_people.size() + 1);
+	}
+	if (m_tests.size() > 0)
+	{
+		RandomDataGenerator::initTestId(m_tests.size() + 1);
+	}
 }
 
 void DiskDatabase::generateRandomPeople(int peopleCount)
 {
 	for (int i{}; i < peopleCount; ++i)
 	{
-		PersonHashWrapper* newPerson = RandomDataGenerator::generatePerson(m_gen);
-		m_peopleList.push_back(newPerson);
-		m_people.insert(newPerson);
+		m_people.insert(RandomDataGenerator::generatePerson(m_gen));
 	}
 }
 
@@ -28,17 +35,17 @@ bool DiskDatabase::generateRandomTests(int testCount)
 	{
 		for (int i{}; i < testCount; ++i)
 		{
-			TestHashWrapper* newTest = RandomDataGenerator::generateTest(m_gen, m_peopleList);
+			TestHashWrapper* newTest = RandomDataGenerator::generateTest(m_gen);
 			m_tests.insert(newTest);
 			delete newTest;
 		}
+		return true;
 	}
 }
 
 void DiskDatabase::insert(PersonHashWrapper* person)
 {
 	m_people.insert(person);
-	m_peopleList.push_back(person);
 }
 
 void DiskDatabase::insert(TestHashWrapper* test)
@@ -49,20 +56,15 @@ void DiskDatabase::insert(TestHashWrapper* test)
 
 std::pair<std::string, int> DiskDatabase::printAllData()
 {
-	//NEED TO REFACTOR
-
 	return std::make_pair(m_people.printOut() + m_tests.printOut(), m_people.size() + m_tests.size());
 }
 
 void DiskDatabase::clear()
 {
-	for (auto& person : m_peopleList)
-	{
-		delete person;
-	}
+	//
 }
 
 DiskDatabase::~DiskDatabase()
 {
-	clear();
+	RandomDataGenerator::clearGeneratedPeople();
 }

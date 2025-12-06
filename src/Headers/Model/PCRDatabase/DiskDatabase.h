@@ -18,8 +18,6 @@ private:
 	std::random_device m_rd;
 	std::mt19937 m_gen{ m_rd() };
 
-	std::vector<PersonHashWrapper*> m_peopleList;
-
 	HashFile<PersonHashWrapper> m_people;
 	HashFile<TestHashWrapper> m_tests;
 
@@ -30,9 +28,11 @@ public:
 
 	bool generateRandomTests(int testCount) override;
 
-	void insert(PersonHashWrapper* person);
-
+	//(1)
 	void insert(TestHashWrapper* test);
+
+	//(4)
+	void insert(PersonHashWrapper* person);
 
 	std::pair<std::string, int> printAllData() override;
 

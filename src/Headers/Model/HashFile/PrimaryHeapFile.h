@@ -41,7 +41,6 @@ protected:
 		}
 
 		int size = headerSize();
-		hashAttributesOutput.reserve(size);
 		
 		std::vector<uint8_t> buffer(size);
 		uint8_t* index = buffer.data();
@@ -74,6 +73,7 @@ protected:
 		}
 
 		headerFile.write(reinterpret_cast<char*>(buffer.data()), size);
+		headerFile.flush();
 		headerFile.close();
 	}
 
@@ -84,9 +84,14 @@ public:
 
 	void open(std::vector<int*>& hashAttributesOutput)
 	{
+		this->m_file.open(this->m_filePath + this->FILE_SUFFIX, std::ios::in | std::ios::out | std::ios::binary);
+		if (!this->m_file.is_open())
+		{
+			throw std::runtime_error("Failed to open binary file");
+		}
+
 		if (this->size() == 0)
 		{
-			HeapFile<T>::open();
 			for (int i{}; i < m_groupSize; ++i)
 			{
 				addBlock(i);
@@ -145,5 +150,10 @@ public:
 			address = dynamic_cast<HashBlock<T>*>(block.get())->nextBlock();
 		}
 		return record;
+	}
+
+	~PrimaryHeapFile()
+	{
+		this->m_callBaseDestructor = false;
 	}
 };

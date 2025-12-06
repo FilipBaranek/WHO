@@ -42,7 +42,7 @@ int TestHashWrapper::getSize()
 
 bool TestHashWrapper::toBytes(uint8_t* bytesOutput)
 {
-	if (m_pcrTest->binNote().size() > m_pcrTest->binNote().m_capacity || m_binPerson.size() > BIRTH_NUMBER_MAX_SIZE)
+	if (m_pcrTest->note().size() > m_pcrTest->binNote().m_capacity || m_person.size() > BIRTH_NUMBER_MAX_SIZE)
 	{
 		return false;
 	}

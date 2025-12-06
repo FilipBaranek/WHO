@@ -164,4 +164,9 @@ public:
 		}
 		return record;
 	}
+
+	~OverflowHeapFile()
+	{
+		this->m_callBaseDestructor = true;
+	}
 };

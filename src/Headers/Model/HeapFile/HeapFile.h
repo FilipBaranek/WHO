@@ -32,6 +32,7 @@ protected:
 	std::list<int> m_emptyAddresses;
 	int m_clusterSize;
 	int m_objectSize;
+	bool m_callBaseDestructor;
 
 protected:
 	void loadBlock(int& address, uint8_t* buffer, Block<T>* block)
@@ -140,6 +141,7 @@ public:
 	{
 		m_clusterSize = clusterSize;
 		m_filePath = filePath;
+		m_callBaseDestructor = true;
 
 		T* dummy = RecordFactory::createInstance<T>();
 		m_objectSize = dummy->getSize();
@@ -407,7 +409,7 @@ public:
 
 			loadBlock(i, buffer.data(), block.get());
 
-			oss << "\nBlock[" << i << "]\n" << block->toString() << "\n\n\n";
+			oss << "\nBlock[" << i << "]\n" << block->toString() << "\n";
 		}
 
 		return oss.str();
@@ -464,11 +466,14 @@ public:
 		m_partiallyEmptyAddresses.clear();
 	}
 
-	~HeapFile()
+	virtual ~HeapFile()
 	{
-		if (m_file.is_open())
+		if (m_callBaseDestructor)
 		{
-			close();
+			if (m_file.is_open())
+			{
+				close();
+			}
 		}
 	}
 };

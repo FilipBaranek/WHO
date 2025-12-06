@@ -17,6 +17,6 @@ std::string ReducedPCRTest::toString()
 
 	std::ostringstream oss;
 	oss << "[" << m_testId << "]\n" << "Result: " << (m_result ? "Pozitivny" : "Negativny")
-		<< "\nTest value: " << m_testValue << "\nDate: " << std::put_time(&tm, "%Y-%m-%d %H:%M:%S") << "\nNote: " << m_note << "\n";
+		<< "\nTest value: " << m_testValue << "\nDate: " << std::put_time(&tm, "%Y-%m-%d %H:%M:%S") << "\nNote: " << m_note << "\n\n";
 	return oss.str();
 }

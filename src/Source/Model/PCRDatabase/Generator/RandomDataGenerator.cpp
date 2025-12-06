@@ -1,8 +1,9 @@
 #include "../../../../Headers/Model/PCRDatabase/Generator/RandomDataGenerator.h"
 
 
-int RandomDataGenerator::s_personId = 0;
-unsigned int RandomDataGenerator::s_testId = 0;
+int RandomDataGenerator::s_personId = 1;
+unsigned int RandomDataGenerator::s_testId = 1;
+std::vector<PersonHashWrapper*> RandomDataGenerator::s_people{};
 
 std::chrono::year_month_day RandomDataGenerator::generateRandomDate(std::mt19937& generator)
 {
@@ -82,6 +83,15 @@ void RandomDataGenerator::generateLocation(std::mt19937& generator, unsigned int
     region = (district * MAX_REGION_CODE) / MAX_DISTRICT_CODE;
 }
 
+void RandomDataGenerator::clearGeneratedPeople()
+{
+    for (auto& person : s_people)
+    {
+        delete person;
+    }
+    s_people.clear();
+}
+
 PersonHashWrapper* RandomDataGenerator::generatePerson(std::mt19937& gen)
 {
     std::uniform_int_distribution<unsigned int> names(0, NAMES_COUNT - 1);
@@ -92,28 +102,33 @@ PersonHashWrapper* RandomDataGenerator::generatePerson(std::mt19937& gen)
     std::string birthNumber = std::to_string(s_personId);
     ++s_personId;
 
-    return new PersonHashWrapper(new Person(birthNumber, name, lastName, birthDay));
+    PersonHashWrapper* person = new PersonHashWrapper(new Person(birthNumber, name, lastName, birthDay));
+    s_people.push_back(person);
+
+    return person;
 }
 
-TestHashWrapper* RandomDataGenerator::generateTest(std::mt19937& gen, std::vector<PersonHashWrapper*>& people)
+TestHashWrapper* RandomDataGenerator::generateTest(std::mt19937& gen)
 {
     std::uniform_int_distribution<unsigned int> noteInterval(0, NOTE_COUNT - 1);
     std::uniform_int_distribution<unsigned int> resultInterval(0, 1);
     std::uniform_real_distribution<double> valueInterval(10.0, 40.0);
-    std::uniform_int_distribution<unsigned int> randomPersonInterval(0, people.size() - 1);
+    std::uniform_int_distribution<unsigned int> randomPersonInterval(0, s_people.size() - 1);
 
-    Person* person = people[randomPersonInterval(gen)]->getData();
+    PersonHashWrapper* person = s_people[randomPersonInterval(gen)];
     bool result = static_cast<bool>(resultInterval(gen));
     std::string note(s_notes[noteInterval(gen)]);
+    unsigned int id = s_testId;
+    person->tests().push_back(id);
     ++s_testId;
 
     return new TestHashWrapper(new ReducedPCRTest(
-        s_testId - 1,
+        id,
         result,
         result ? valueInterval(gen) : 0,
         note,
-        generateTime(gen, person->birthDay())
-    ), person->birthNumber());
+        generateTime(gen, person->getData()->birthDay())
+    ), person->getData()->birthNumber());
 }
 
 PersonWrapper* RandomDataGenerator::generatePeople(std::vector<PersonWrapper*>& peopleDuplicityList, AVLTree<PersonWrapper*>& people)

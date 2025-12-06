@@ -154,14 +154,13 @@ public:
 	{
 		std::vector<int*> attributes = { &m_level, &m_splitPointer, &m_capacity, &m_recordCount };
 
-		if (m_primaryFile.size() == 0)
-		{
-			m_capacity = GROUP_SIZE * m_primaryFile.blockingFactor();
-		}
-
 		m_primaryFile.open(attributes);
 		m_overFlowFile.open();
 
+		if (m_capacity == 0)
+		{
+			m_capacity = GROUP_SIZE * m_primaryFile.blockingFactor();
+		}
 	}
 
 	void close()
@@ -222,10 +221,7 @@ public:
 		return record;
 	}
 
-	int size()
-	{
-		return m_recordCount;
-	}
+	inline int size() { return m_recordCount; }
 
 	std::string printOut()
 	{

@@ -25,8 +25,6 @@ public:
 		m_noteBin{NODE_MAX_LENGTH, static_cast<int>(m_note.size()), m_note}
 	{};
 
-	inline void setTestId(unsigned int id) { m_testId = id; }
-
 	inline unsigned int testId() { return m_testId; }
 
 	inline bool result() { return m_result; }
