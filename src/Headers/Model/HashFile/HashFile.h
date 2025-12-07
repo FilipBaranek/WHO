@@ -11,13 +11,13 @@ class HashFile
 	static_assert(std::is_base_of_v<IRecord, T>, "T must inherit from IRecord");
 
 private:
-	static constexpr const int GROUP_SIZE = 4;
 	static constexpr const float MAX_DENSITY = 0.8;
 	static constexpr const float MIN_DENSITY = 0.64;
 
 	PrimaryHeapFile<T> m_primaryFile;
 	OverflowHeapFile<T> m_overFlowFile;
 
+	int m_groupSize;
 	int m_level;
 	int m_splitPointer;
 	int m_capacity;
@@ -27,11 +27,11 @@ private:
 	int address(T* record)
 	{
 		size_t hashValue = record->hash();
-		int addr = hashValue % (GROUP_SIZE * (static_cast<int>(std::pow(2, m_level))));
+		int addr = hashValue % (m_groupSize * (static_cast<int>(std::pow(2, m_level))));
 
 		if (addr < m_splitPointer)
 		{
-			addr = hashValue % (GROUP_SIZE * (static_cast<int>(std::pow(2, m_level + 1))));
+			addr = hashValue % (m_groupSize * (static_cast<int>(std::pow(2, m_level + 1))));
 		}
 
 		return addr;
@@ -102,10 +102,10 @@ private:
 
 	void split()
 	{
-		int newSplitAddress = m_splitPointer + (GROUP_SIZE * static_cast<int>(std::pow(2, m_level)));
+		int newSplitAddress = m_splitPointer + (m_groupSize * static_cast<int>(std::pow(2, m_level)));
 		auto hasNewAddress = [this](T* record) {
 			size_t hashValue = record->hash();
-			return m_splitPointer != hashValue % (GROUP_SIZE * (static_cast<int>(std::pow(2, m_level + 1))));
+			return m_splitPointer != hashValue % (m_groupSize * (static_cast<int>(std::pow(2, m_level + 1))));
 		};
 
 		std::vector<std::unique_ptr<T>> recordsToOldBlock;
@@ -139,10 +139,10 @@ private:
 	}
 
 public:
-	HashFile(std::string filePath, int clusterSize, int secondClusterSize = clusterSize) :
-		m_primaryFile(filePath + "primary", clusterSize, GROUP_SIZE),
-		m_overFlowFile(filePath + "overflow", secondClusterSize),
-		m_level{}, m_splitPointer{}, m_capacity{}, m_recordCount{}
+	HashFile(std::string filePath, int initialGroupSize, int clusterSize, int secondClusterSize) :
+		m_groupSize(initialGroupSize), m_level{}, m_splitPointer{}, m_capacity{}, m_recordCount{},
+		m_primaryFile(filePath + "primary", clusterSize, initialGroupSize),
+		m_overFlowFile(filePath + "overflow", secondClusterSize)
 	{}
 
 	void open()
@@ -154,7 +154,7 @@ public:
 
 		if (m_capacity == 0)
 		{
-			m_capacity = GROUP_SIZE * m_primaryFile.blockingFactor();
+			m_capacity = m_groupSize * m_primaryFile.blockingFactor();
 		}
 	}
 
@@ -188,7 +188,7 @@ public:
 			m_overFlowFile.truncate();
 
 			++m_splitPointer;
-			if (m_splitPointer >= GROUP_SIZE * (static_cast<int>(std::pow(2, m_level))))
+			if (m_splitPointer >= m_groupSize * (static_cast<int>(std::pow(2, m_level))))
 			{
 				m_splitPointer = 0;
 				++m_level;
@@ -246,7 +246,7 @@ public:
 	
 		m_level = 0;
 		m_splitPointer = 0;
-		m_capacity = GROUP_SIZE * m_primaryFile.blockingFactor();
+		m_capacity = m_groupSize * m_primaryFile.blockingFactor();
 		m_recordCount = 0;
 	}
 

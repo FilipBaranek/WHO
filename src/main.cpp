@@ -43,7 +43,7 @@ void testHashFile()
 {
     PersonHashWrapper* dummy = RecordFactory::createInstance<PersonHashWrapper>();
 
-    HashFileTester tester("../../../data/HashFile/", dummy->getSize() * 8, dummy->getSize() * 3);
+    HashFileTester tester("../../../data/HashFile/", 4, dummy->getSize() * 8, dummy->getSize() * 3);
     tester.runTests();
 
     delete dummy;

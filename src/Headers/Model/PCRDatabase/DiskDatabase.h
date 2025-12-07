@@ -16,6 +16,8 @@ private:
 	static constexpr const int PEOPLE_OVERFLOW_CLUSTERS_SIZE = 300;
 	static constexpr const int TESTS_PRIMARY_CLUSTERS_SIZE = 800;
 	static constexpr const int TESTS_OVERFLOW_CLUSTERS_SIZE = 300;
+	static constexpr const int PEOPLE_GROUP_SIZE = 4;
+	static constexpr const int TESTS_GROUP_SIZE = 4;
 
 	std::random_device m_rd;
 	std::mt19937 m_gen{ 1928130314 };

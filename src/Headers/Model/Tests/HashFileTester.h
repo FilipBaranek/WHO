@@ -19,7 +19,7 @@ private:
 	HashFile<PersonHashWrapper> m_hashFile;
 
 public:
-	HashFileTester(std::string filePath, int primaryFileClusterSize, int overflowFileClusterSize, int pregeneratedDataCount = 0);
+	HashFileTester(std::string filePath, int initialGroupSize, int primaryFileClusterSize, int overflowFileClusterSize, int pregeneratedDataCount = 0);
 
 	void insert(int operation);
 

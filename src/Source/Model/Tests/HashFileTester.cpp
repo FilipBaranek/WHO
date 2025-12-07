@@ -1,7 +1,7 @@
 #include "../../../Headers/Model/Tests/HashFileTester.h"
 
-HashFileTester::HashFileTester(std::string filePath, int primaryFileClusterSize, int overflowFileClusterSize, int pregeneratedDataCount) :
-	m_hashFile(filePath, primaryFileClusterSize, overflowFileClusterSize), seed(1928130314), m_gen(seed)
+HashFileTester::HashFileTester(std::string filePath, int initialGroupSize, int primaryFileClusterSize, int overflowFileClusterSize, int pregeneratedDataCount) :
+	m_hashFile(filePath, initialGroupSize, primaryFileClusterSize, overflowFileClusterSize), seed(1928130314), m_gen(seed)
 {
 	m_hashFile.open();
 
