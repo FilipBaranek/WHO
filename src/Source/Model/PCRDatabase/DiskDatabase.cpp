@@ -29,7 +29,7 @@ bool DiskDatabase::updatePersonTests(std::string birthBumber, unsigned int testI
 	PersonHashWrapper dummyKey(dummy);
 
 	bool updated = m_people.execute(&dummyKey, [&testId](PersonHashWrapper* foundPerson) {
-		foundPerson->tests().push_back(testId);
+		foundPerson->inserTest(testId);
 	});
 
 	return updated;
@@ -39,26 +39,7 @@ void DiskDatabase::generateRandomPeople(int peopleCount)
 {
 	for (int i{}; i < peopleCount; ++i)
 	{
-		m_people.insert(RandomDataGenerator::generatePerson(m_gen));
-	}
-}
-
-bool DiskDatabase::generateRandomTests(int testCount)
-{
-	if (m_people.size() == 0)
-	{
-		return false;
-	}
-	else
-	{
-		for (int i{}; i < testCount; ++i)
-		{
-			TestHashWrapper* newTest = RandomDataGenerator::generateTest(m_gen);
-			m_tests.insert(newTest);
-			updatePersonTests(newTest->person(), newTest->getData()->testId());
-			delete newTest;
-		}
-		return true;
+		RandomDataGenerator::generatePerson(m_gen, &m_people, &m_tests);
 	}
 }
 
@@ -90,10 +71,10 @@ std::pair<std::string, int> DiskDatabase::findPerson(std::string birthNumber)
 	if (foundPerson != nullptr)
 	{
 		strOutput += foundPerson->toString() + "\n\nTests:\n";
-		for (auto testId : foundPerson->tests())
+		for (int i{}; i < foundPerson->testCount(); ++i)
 		{
 			ReducedPCRTest* dummyTest = new ReducedPCRTest(
-				testId,
+				foundPerson->tests()[i],
 				dummyNum,
 				dummyNum,
 				dummyStr,
@@ -115,7 +96,7 @@ std::pair<std::string, int> DiskDatabase::findPerson(std::string birthNumber)
 		strOutput = "Person wasn't found";
 	}
 	
-	auto output = std::make_pair(strOutput, foundPerson->tests().size() + 1);
+	auto output = std::make_pair(strOutput, foundPerson->testCount() + 1);
 	
 	delete foundPerson;
 	return output;
@@ -267,7 +248,6 @@ std::pair<std::string, int> DiskDatabase::printAllData()
 
 void DiskDatabase::clear()
 {
-	RandomDataGenerator::clearGeneratedPeople();
 	m_people.clear();
 	m_tests.clear();
 }
@@ -279,5 +259,5 @@ int DiskDatabase::size()
 
 DiskDatabase::~DiskDatabase()
 {
-	RandomDataGenerator::clearGeneratedPeople();
+	//
 }

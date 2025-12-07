@@ -17,8 +17,6 @@ public:
 	
 	virtual void generateRandomPeople(int peopleCount) = 0;
 	
-	virtual bool generateRandomTests(int testCount) = 0;
-	
 	virtual std::pair<std::string, int> printAllData() = 0;
 
 	virtual std::string findTest(const unsigned int testId) = 0;

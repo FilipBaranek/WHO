@@ -1,5 +1,5 @@
 #pragma once
-#include <vector>
+#include <array>
 #include <chrono>
 #include "../Models/Person.h"
 #include "../../Interfaces/IRecord.h"
@@ -10,14 +10,27 @@ private:
 	static constexpr const int MAX_TEST_COUNT = 6;
 
 	Person* m_person;
-	std::vector<unsigned int> m_tests;
+	int m_validTestCount;
+	std::array<unsigned int, MAX_TEST_COUNT> m_tests;
 
 public:
-	PersonHashWrapper(Person* person) : m_person(person) {};
+	PersonHashWrapper(Person* person) : m_person(person), m_tests{}, m_validTestCount(0) {};
+
+	inline void removePerson() { m_person = nullptr; }
 
 	inline Person* getData() { return m_person; }
 
-	inline std::vector<unsigned int>& tests() { return m_tests; }
+	inline void setTestCount(int testCount) { m_validTestCount = testCount; }
+
+	inline int testCount() { return m_validTestCount; }
+
+	inline void inserTest(unsigned int test)
+	{
+		m_tests[m_validTestCount] = test;
+		++m_validTestCount;
+	}
+
+	inline std::array<unsigned int, MAX_TEST_COUNT>& tests() { return m_tests; }
 
 	std::string toString() override;
 

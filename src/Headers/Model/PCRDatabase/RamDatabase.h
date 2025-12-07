@@ -49,7 +49,7 @@ public:
 
 	void generateRandomPeople(int peopleCount) override;
 
-	bool generateRandomTests(int testCount) override;
+	bool generateRandomTests(int testCount);
 
 	PersonWrapper* findPerson(std::string birthNumber);
 

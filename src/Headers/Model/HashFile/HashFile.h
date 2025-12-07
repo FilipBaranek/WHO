@@ -251,13 +251,13 @@ public:
 
 	void clear()
 	{
+		m_primaryFile.clear();
+		m_overFlowFile.clear();
+	
 		m_level = 0;
 		m_splitPointer = 0;
 		m_capacity = GROUP_SIZE * m_primaryFile.blockingFactor();
 		m_recordCount = 0;
-
-		m_primaryFile.clear();
-		m_overFlowFile.clear();
 	}
 
 	~HashFile()

@@ -9,10 +9,11 @@ IRecord* PersonHashWrapper::clone()
 {
 	PersonHashWrapper* person = new PersonHashWrapper(new Person(m_person->birthNumber(), m_person->firstName(), m_person->lastName(), m_person->birthDay()));
 	
-	for (int i{}; i < m_tests.size(); ++i)
+	for (int i{}; i < m_validTestCount; ++i)
 	{
-		person->tests().push_back(m_tests[i]);
+		person->tests()[i] = m_tests[i];
 	}
+	person->setTestCount(m_validTestCount);
 
 	return person;
 }
@@ -61,9 +62,9 @@ bool PersonHashWrapper::toBytes(uint8_t* bytesOutput)
 	index = ByteConverter::toByteFromPrimitive(y, index);
 	index = ByteConverter::toByteFromPrimitive(m, index);
 	index = ByteConverter::toByteFromPrimitive(d, index);
-	index = ByteConverter::toByteFromPrimitive(static_cast<int>(m_tests.size()), index);
+	index = ByteConverter::toByteFromPrimitive(static_cast<int>(m_validTestCount), index);
 
-	for (int i{}; i < m_tests.size(); ++i)
+	for (int i{}; i < m_validTestCount; ++i)
 	{
 		index = ByteConverter::toByteFromPrimitive(m_tests[i], index);
 	}
@@ -98,11 +99,11 @@ IRecord* PersonHashWrapper::fromBytes(uint8_t* byteBuffer)
 		year_month_day{ y, m, d }
 	));
 
-	int testCount = ByteConverter::fromByteToPrimitive<int>(index);
+	person->setTestCount(ByteConverter::fromByteToPrimitive<int>(index));
 	index += sizeof(unsigned int);
-	for (int i{}; i < testCount; ++i)
+	for (int i{}; i < person->testCount(); ++i)
 	{
-		person->tests().push_back(ByteConverter::fromByteToPrimitive<unsigned int>(index));
+		person->tests()[i] = ByteConverter::fromByteToPrimitive<unsigned int>(index);
 		index += sizeof(unsigned int);
 	}
 

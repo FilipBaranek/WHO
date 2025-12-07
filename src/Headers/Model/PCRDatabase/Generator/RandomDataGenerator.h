@@ -13,6 +13,7 @@
 #include "../ModelWrappers/PersonHashWrapper.h"
 #include "../ModelWrappers/TestHashWrapper.h"
 #include "../../Structures/AVL/AVLTree.h"
+#include "../../HashFile/HashFile.h"
 
 
 class RandomDataGenerator
@@ -31,6 +32,9 @@ private:
 	static constexpr const unsigned int MIN_AGE = 15;
 
 	//Person
+	static constexpr const unsigned int MAX_TEST_COUNT = 6;
+	static constexpr const unsigned int MIN_TEST_COUNT = 1;
+
 	static constexpr const unsigned int MAX_BIRTH_NUMBER = 10'000;
 	static constexpr const unsigned int NAMES_COUNT = 5;
 	static constexpr std::string_view s_names[] = { "Peter", "Jana", "Martin", "Lucia", "Tomas" };
@@ -47,24 +51,19 @@ private:
 	static constexpr std::string_view s_notes[] = { "", "Karantena", "Elektronic.", "Zopakovat" };
 	static unsigned int s_testId;
 
-	//Registered people
-	static std::vector<PersonHashWrapper*> s_people;
-
 	static std::chrono::year_month_day generateRandomDate(std::mt19937& generator);
 	static std::chrono::time_point<std::chrono::system_clock> generateTime(std::mt19937& generator, const std::chrono::year_month_day& birthDate);
 	static std::string generateBirthNumber(std::mt19937& generator, std::chrono::year_month_day& birthDay);
 	static void generateLocation(std::mt19937& generator, unsigned int& workplace, unsigned int& district, unsigned int& region);
 
 public:
-	static void clearGeneratedPeople();
-
 	inline static void initPersonId(int startingIndex) { s_personId = startingIndex; }
 
 	inline static void initTestId(int startingIndex) { s_testId = startingIndex; }
 
-	static PersonHashWrapper* generatePerson(std::mt19937& gen);
+	static PersonHashWrapper* generatePerson(std::mt19937& gen, HashFile<PersonHashWrapper>* people = nullptr, HashFile<TestHashWrapper>* tests = nullptr);
 
-	static TestHashWrapper* generateTest(std::mt19937& gen);
+	static TestHashWrapper* generatePersonTest(std::mt19937& gen, Person* person);
 
 	static PersonWrapper* generatePeople(std::vector<PersonWrapper*>& peopleDuplicityList, AVLTree<PersonWrapper*>& people);
 	

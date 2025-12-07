@@ -31,8 +31,6 @@ public:
 
 	void generateRandomPeople(int peopleCount) override;
 
-	bool generateRandomTests(int testCount) override;
-
 	//(1)
 	void insert(TestHashWrapper* test);
 

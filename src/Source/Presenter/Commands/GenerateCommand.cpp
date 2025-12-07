@@ -11,7 +11,7 @@ void GenerateCommand::execute(std::string& output, std::string& recordCount)
 	}
 	else
 	{
-		if (m_database->generateRandomTests(m_testCount))
+		if (dynamic_cast<RamDatabase*>(m_database)->generateRandomTests(m_testCount))
 		{
 			output = "Tests records were generated";
 			recordCount = "(" + std::to_string(m_testCount) + ") records were inserted";

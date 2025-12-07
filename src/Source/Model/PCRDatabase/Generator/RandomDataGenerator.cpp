@@ -3,7 +3,6 @@
 
 int RandomDataGenerator::s_personId = 1;
 unsigned int RandomDataGenerator::s_testId = 1;
-std::vector<PersonHashWrapper*> RandomDataGenerator::s_people{};
 
 std::chrono::year_month_day RandomDataGenerator::generateRandomDate(std::mt19937& generator)
 {
@@ -83,39 +82,53 @@ void RandomDataGenerator::generateLocation(std::mt19937& generator, unsigned int
     region = (district * MAX_REGION_CODE) / MAX_DISTRICT_CODE;
 }
 
-void RandomDataGenerator::clearGeneratedPeople()
-{
-    for (auto& person : s_people)
-    {
-        delete person;
-    }
-    s_people.clear();
-}
-
-PersonHashWrapper* RandomDataGenerator::generatePerson(std::mt19937& gen)
+PersonHashWrapper* RandomDataGenerator::generatePerson(std::mt19937& gen, HashFile<PersonHashWrapper>* people, HashFile<TestHashWrapper>* tests)
 {
     std::uniform_int_distribution<unsigned int> names(0, NAMES_COUNT - 1);
+    std::uniform_int_distribution<unsigned int> testCountInterval(MIN_TEST_COUNT, MAX_TEST_COUNT);
 
     auto birthDay = generateRandomDate(gen);
     std::string name(s_names[names(gen)]);
     std::string lastName(s_lastNames[names(gen)]);
     std::string birthNumber = std::to_string(s_personId);
+    int testCount = testCountInterval(gen);
     ++s_personId;
 
     PersonHashWrapper* person = new PersonHashWrapper(new Person(birthNumber, name, lastName, birthDay));
-    s_people.push_back(person);
 
-    return person;
+    if (tests != nullptr)
+    {
+        for (int i{}; i < testCount; ++i)
+        {
+            TestHashWrapper* test = generatePersonTest(gen, person->getData());
+            person->inserTest(test->getData()->testId());
+            tests->insert(test);
+            delete test;
+        }
+    }
+
+    if (people != nullptr)
+    {
+        people->insert(person);
+    }
+
+    if (people != nullptr && tests != nullptr)
+    {
+        delete person;
+        return nullptr;
+    }
+    else
+    {
+        return person;
+    }
 }
 
-TestHashWrapper* RandomDataGenerator::generateTest(std::mt19937& gen)
+TestHashWrapper* RandomDataGenerator::generatePersonTest(std::mt19937& gen, Person* person)
 {
     std::uniform_int_distribution<unsigned int> noteInterval(0, NOTE_COUNT - 1);
     std::uniform_int_distribution<unsigned int> resultInterval(0, 1);
     std::uniform_real_distribution<double> valueInterval(10.0, 40.0);
-    std::uniform_int_distribution<unsigned int> randomPersonInterval(0, s_people.size() - 1);
 
-    Person* person = s_people[randomPersonInterval(gen)]->getData();
     bool result = static_cast<bool>(resultInterval(gen));
     std::string note(s_notes[noteInterval(gen)]);
     unsigned int id = s_testId;
@@ -135,8 +148,21 @@ PersonWrapper* RandomDataGenerator::generatePeople(std::vector<PersonWrapper*>& 
     std::random_device rd;
     std::mt19937 gen(rd());
 
-    PersonHashWrapper* personHashWrapper = generatePerson(gen);
-    Person* person = personHashWrapper->getData();
+    std::uniform_int_distribution<unsigned int> names(0, NAMES_COUNT - 1);
+    std::uniform_int_distribution<unsigned int> testCountInterval(MIN_TEST_COUNT, MAX_TEST_COUNT);
+
+    auto birthDay = generateRandomDate(gen);
+    std::string name(s_names[names(gen)]);
+    std::string lastName(s_lastNames[names(gen)]);
+    std::string birthNumber = std::to_string(s_personId);
+    int testCount = testCountInterval(gen);
+
+    Person* person = new Person(
+        birthNumber,
+        name,
+        lastName,
+        birthDay
+    );
     PersonWrapper key(person);
 
     while (people.find(&key) != nullptr)
@@ -144,8 +170,6 @@ PersonWrapper* RandomDataGenerator::generatePeople(std::vector<PersonWrapper*>& 
         auto birthDay = person->birthDay();
         person->setBirthNumber(generateBirthNumber(gen, birthDay));
     }
-
-    delete personHashWrapper;
 
    return new PersonWrapper(person);
 }
