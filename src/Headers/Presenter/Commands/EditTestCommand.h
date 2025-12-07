@@ -18,7 +18,9 @@ private:
 	TestView* m_test;
 
 public:
-	EditTestCommand(Database* database) : Command(database), m_test(nullptr), m_testId(-1) {}
+	EditTestCommand(Database* database) :
+		Command(database), m_test(nullptr), m_testId(-1)
+	{}
 
 	inline void setParams(unsigned int testId) { m_testId = testId; }
 

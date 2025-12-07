@@ -59,5 +59,7 @@ public:
 
 	void clear() override;
 
+	int size();
+
 	~DiskDatabase();
 };

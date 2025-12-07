@@ -170,6 +170,15 @@ public:
 		return executed;
 	}
 
+	void clear() override
+	{
+		HeapFile<T>::clear();
+		for (int i{}; i < m_groupSize; ++i)
+		{
+			addBlock(i);
+		}
+	}
+
 	~PrimaryHeapFile()
 	{
 		this->m_callBaseDestructor = false;

@@ -151,6 +151,9 @@ std::string DiskDatabase::findTest(const unsigned int testId)
 		PersonHashWrapper* foundPerson = m_people.find(&dummyPersonKey);
 
 		strOutput += foundPerson->toString() + "\n" + foundTest->toString();
+
+		delete foundTest;
+		delete foundPerson;
 	}
 	else
 	{
@@ -164,6 +167,7 @@ std::string DiskDatabase::findTest(const unsigned int testId)
 void DiskDatabase::insert(PersonHashWrapper* person)
 {
 	m_people.insert(person);
+	delete person;
 }
 
 //(7)
@@ -189,7 +193,9 @@ std::pair<PersonView*, std::string> DiskDatabase::findPersonToEdit(std::string b
 			foundPerson->birthDay()
 		);
 		std::string strOutput = foundHashPerson->toString();
+		
 		delete foundHashPerson;
+
 		return std::make_pair(output, strOutput);
 	}
 	return std::make_pair(nullptr, "Person wasn't found");
@@ -261,8 +267,14 @@ std::pair<std::string, int> DiskDatabase::printAllData()
 
 void DiskDatabase::clear()
 {
+	RandomDataGenerator::clearGeneratedPeople();
 	m_people.clear();
 	m_tests.clear();
+}
+
+int DiskDatabase::size()
+{
+	return m_people.size() + m_tests.size();
 }
 
 DiskDatabase::~DiskDatabase()

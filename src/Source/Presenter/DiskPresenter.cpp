@@ -71,3 +71,10 @@ void DiskPresenter::editTest(unsigned int testId, bool result, double testValue,
 	});
 }
 
+void DiskPresenter::clear()
+{
+	execute([=, this](std::string& output, std::string& recordCount) {
+		m_clearCommand.execute(output, recordCount);
+	});
+}
+

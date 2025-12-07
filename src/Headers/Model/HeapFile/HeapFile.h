@@ -455,7 +455,7 @@ public:
 		}
 	}
 
-	void clear()
+	virtual void clear()
 	{
 		if (m_file.is_open())
 		{

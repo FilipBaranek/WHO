@@ -3,6 +3,7 @@
 #include "Commands/FindPersonCommand.h"
 #include "Commands/EditPersonCommand.h"
 #include "Commands/EditTestCommand.h"
+#include "Commands/ClearCommand.h"
 #include "../../Headers/Model/PCRDatabase/DiskDatabase.h"
 
 
@@ -15,12 +16,13 @@ private:
 	FindPersonCommand m_findPersonCommand;
 	EditPersonCommand m_editPersonCommand;
 	EditTestCommand m_editTestCommand;
+	ClearCommand m_clearCommand;
 
 public:
 	DiskPresenter() : 
 		Presenter(new DiskDatabase()), m_findPersonCommand(m_database),
 		m_editPersonCommand(m_database), m_editTestCommand(m_database),
-		m_person(nullptr), m_test(nullptr)
+		m_clearCommand(m_database), m_person(nullptr), m_test(nullptr)
 	{}
 
 	inline void removePerson()
@@ -59,6 +61,8 @@ public:
 	void findTestToEdit(unsigned int testId);
 
 	void editTest(unsigned int testId, bool result, double testValue, std::string note, time_point<system_clock> testDate);
+
+	void clear();
 
 
 	~DiskPresenter() { delete m_database; };

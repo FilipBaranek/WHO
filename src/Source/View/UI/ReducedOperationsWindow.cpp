@@ -23,12 +23,12 @@ ReducedOperationsWindow::ReducedOperationsWindow(Presenter* presenter) : Window(
         [this]() { findTestToEdit(); }
     };
     m_operations[5] = {
-        [this]() {},
+        []() {},
         [this]() { printAllData(); }
     };
     m_operations[6] = {
         []() {},
-        []() {}
+        [this]() { clearDatabase(); }
     };
 }
 
@@ -36,6 +36,11 @@ ReducedOperationsWindow::ReducedOperationsWindow(Presenter* presenter) : Window(
 void ReducedOperationsWindow::printAllData()
 {
     m_presenter->printAllData();
+}
+
+void ReducedOperationsWindow::clearDatabase()
+{
+    dynamic_cast<DiskPresenter*>(m_presenter)->clear();
 }
 
 void ReducedOperationsWindow::findTest()
@@ -240,8 +245,6 @@ void ReducedOperationsWindow::renderWindow()
                 showRunButton = true;
                 m_personIsLoaded = false;
                 m_testIsLoaded = false;
-                dynamic_cast<DiskPresenter*>(m_presenter)->removePerson();
-                dynamic_cast<DiskPresenter*>(m_presenter)->removeTest();
             }
 
             if (is_selected)
@@ -294,6 +297,7 @@ void ReducedOperationsWindow::renderWindow()
                 m_month = static_cast<unsigned int>(person->birthDay().month());
                 m_day = static_cast<unsigned int>(person->birthDay().day());
                 showRunButton = false;
+                dynamic_cast<DiskPresenter*>(m_presenter)->removePerson();
             }
         }
         else if (m_currentItem == 4 && m_testIsLoaded)
@@ -321,6 +325,7 @@ void ReducedOperationsWindow::renderWindow()
                 m_minute = hms.minutes().count();
 
                 showRunButton = false;
+                dynamic_cast<DiskPresenter*>(m_presenter)->removeTest();
             }
         }
     }
