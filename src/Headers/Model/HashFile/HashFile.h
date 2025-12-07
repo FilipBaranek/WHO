@@ -60,7 +60,7 @@ private:
 		}
 	}
 
-	int rearrangeOverflowedBlocks(HashBlock<T>* primaryBlock, std::vector<std::unique_ptr<T>>& records)
+	void rearrangeOverflowedBlocks(HashBlock<T>* primaryBlock, std::vector<std::unique_ptr<T>>& records)
 	{
 		std::unique_ptr<HashBlock<T>> currentBlock = m_overFlowFile.block(), prevBlock = nullptr;
 		int blockCount = records.size() / currentBlock->blockingFactor();
@@ -98,11 +98,9 @@ private:
 			prevBlock->nextBlock(-1);
 			m_overFlowFile.writeAt(prevAddress, prevBlock.get());
 		}
-
-		return blockCount;
 	}
 
-	int split()
+	void split()
 	{
 		int newSplitAddress = m_splitPointer + (GROUP_SIZE * static_cast<int>(std::pow(2, m_level)));
 		auto hasNewAddress = [this](T* record) {
@@ -119,7 +117,7 @@ private:
 		//Rearrange oldBlock
 		rearrangeOldBlock(oldBlock.get(), newBlock.get(), hasNewAddress);
 
-		//Rearrange overflowed sequence
+		//Rearrange overflowed sequence and write to overflow file
 		int emptiedBlocks = m_overFlowFile.loadSequence(oldBlock->nextBlock(), recordsToOldBlock, recordsToNewBlock, hasNewAddress);
 		
 		std::unique_ptr<HashBlock<T>> prevOldBlock = nullptr, prevNewBlock = nullptr;
@@ -131,16 +129,13 @@ private:
 
 		tryInsertInto(oldBlock.get(), recordsToOldBlock);
 		tryInsertInto(newBlock.get(), recordsToNewBlock);
+		
+		rearrangeOverflowedBlocks(oldBlock.get(), recordsToOldBlock);
+		rearrangeOverflowedBlocks(newBlock.get(), recordsToNewBlock);
 
-		int blockCount = 0;
-		blockCount += rearrangeOverflowedBlocks(oldBlock.get(), recordsToOldBlock);
-		blockCount += rearrangeOverflowedBlocks(newBlock.get(), recordsToNewBlock);
-
+		//Write to primary file
 		m_primaryFile.writeAt(m_splitPointer, oldBlock.get());
 		m_primaryFile.writeAt(newSplitAddress, newBlock.get());
-
-		int trimmedBlocks = emptiedBlocks - blockCount;
-		return trimmedBlocks > 0 ? trimmedBlocks : 0;
 	}
 
 public:
@@ -182,18 +177,13 @@ public:
 		if (!inserted)
 		{
 			m_overFlowFile.insert(nextBlock, record, newBlock);
-			if (newBlock)
-			{
-				m_capacity += m_overFlowFile.blockingFactor();
-			}
 		}
 		++m_recordCount;
 
 		double density = static_cast<double>(m_recordCount) / static_cast<double>(m_capacity);
 		while (m_capacity > 0 && density > MAX_DENSITY)
 		{
-			int trimmedBlocks = split();
-			m_capacity -= trimmedBlocks * m_overFlowFile.blockingFactor();
+			split();
 
 			m_overFlowFile.truncate();
 

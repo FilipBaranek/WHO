@@ -1,7 +1,7 @@
 #include "../../../Headers/Model/Tests/HashFileTester.h"
 
 HashFileTester::HashFileTester(std::string filePath, int primaryFileClusterSize, int overflowFileClusterSize, int pregeneratedDataCount) :
-	m_hashFile(filePath, primaryFileClusterSize, overflowFileClusterSize), seed(m_rd()), m_gen(seed)
+	m_hashFile(filePath, primaryFileClusterSize, overflowFileClusterSize), seed(1928130314), m_gen(seed)
 {
 	m_hashFile.open();
 
@@ -38,6 +38,7 @@ void HashFileTester::find(int operation)
 	PersonHashWrapper* person = m_data[names(m_gen)];
 	PersonHashWrapper* foundPerson = m_hashFile.find(person);
 
+
 	if (foundPerson == nullptr || !foundPerson->is(person))
 	{
 		std::cout << "OPERATION N: " << operation << "\nSEED: " << seed << "\n";
@@ -47,9 +48,35 @@ void HashFileTester::find(int operation)
 	delete foundPerson;
 }
 
+void HashFileTester::execute(int operation)
+{
+	std::uniform_int_distribution<unsigned int> names(0, m_data.size() - 1);
+
+	PersonHashWrapper* person = m_data[names(m_gen)];
+
+	std::string newValue = "NewValue";
+	bool edited = m_hashFile.execute(person, [&newValue](PersonHashWrapper* personToEdit) {
+		personToEdit->getData()->setFirstName(newValue);
+	});
+
+	PersonHashWrapper* editedPerson = m_hashFile.find(person);
+
+	if (!edited ||
+		editedPerson->getData()->birthNumber() != person->getData()->birthNumber() ||
+		editedPerson->getData()->lastName() != person->getData()->lastName() ||
+		editedPerson->getData()->birthDay() != person->getData()->birthDay() ||
+		editedPerson->getData()->firstName() != newValue)
+	{
+		std::cout << "OPERATION N: " << operation << "\nSEED: " << seed << "\n";
+		throw std::runtime_error("Incorrect edit operation");
+	}
+
+	delete editedPerson;
+}
+
 void HashFileTester::runTests()
 {
-	std::uniform_int_distribution<unsigned int> probability(0, 1);
+	std::uniform_int_distribution<unsigned int> probability(0, 2);
 	int inserts = 0, deletes = 0;
 
 	std::cout << seed << "\n\n\n";
@@ -59,6 +86,8 @@ void HashFileTester::runTests()
 		if (i % CHECKPOINT - 1 == 0)
 		{
 			std::cout << "Operation " << i - 1 << "/" << REPLICATIONS << "\n";
+			m_hashFile.close();
+			m_hashFile.open();
 		}
 
 		int operation = probability(m_gen);
@@ -75,9 +104,14 @@ void HashFileTester::runTests()
 				find(i);
 			}
 		}
+		else if (operation == 2)
+		{
+			if (m_data.size() > 0)
+			{
+				execute(i);
+			}
+		}
 	}
-
-	m_hashFile.printOut();
 }
 
 HashFileTester::~HashFileTester()

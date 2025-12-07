@@ -8,13 +8,11 @@
 class HashFileTester
 {
 private:
-	static constexpr const int REPLICATIONS = 50'000;
+	static constexpr const int REPLICATIONS = 100'000;
 	static constexpr const int CHECKPOINT = 1'000;
 
-	std::random_device m_rd;
-
 	int seed;
-
+	std::random_device m_rd;
 	std::mt19937 m_gen;
 
 	std::vector<PersonHashWrapper*> m_data;
@@ -26,6 +24,8 @@ public:
 	void insert(int operation);
 
 	void find(int operation);
+
+	void execute(int operation);
 
 	void runTests();
 

@@ -18,7 +18,7 @@ private:
 	static constexpr const int TESTS_OVERFLOW_CLUSTERS_SIZE = 300;
 
 	std::random_device m_rd;
-	std::mt19937 m_gen{ m_rd() };
+	std::mt19937 m_gen{ 1928130314 };
 
 	HashFile<PersonHashWrapper> m_people;
 	HashFile<TestHashWrapper> m_tests;

@@ -55,10 +55,10 @@ int main()
 
     {
         //testFile();
-        //testHashFile();
+        testHashFile();
 
-        Application app(APPLICATIONTYPE::DISK);
-        app.run();
+        //Application app(APPLICATIONTYPE::DISK);
+        //app.run();
     }
 
     return 0;

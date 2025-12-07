@@ -127,13 +127,17 @@ public:
 		{
 			newBlock = true;
 			hashBlock->nextBlock(possibleNextBlock);
+			this->writeBlock(address, buffer.data(), hashBlock);
 			nextBlock = hashBlock->nextBlock();
 		}
 		else if (!block->isFull())
 		{
 			inserted = hashBlock->insert(record);
+			if (inserted)
+			{
+				this->writeBlock(address, buffer.data(), hashBlock);
+			}
 		}
-		this->writeBlock(address, buffer.data(), hashBlock);
 
 		return inserted;
 	}

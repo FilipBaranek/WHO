@@ -11,7 +11,7 @@ class FileTester
 {
 private:
 	static constexpr const int REPLICATIONS = 100'000;
-	static constexpr const int CHECKPOINT = 50'000;
+	static constexpr const int CHECKPOINT = 1'000;
 	
 	std::random_device m_rd;
 	std::mt19937 m_gen{ 456 };
