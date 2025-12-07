@@ -15,12 +15,12 @@ ReducedOperationsWindow::ReducedOperationsWindow(Presenter* presenter) : Window(
         [this]() { findTest(); }
     };
     m_operations[3] = {
-        []() {},
-        []() {}
+        [this]() { displayPersonInputs(); },
+        [this]() { findPersonToEdit(); }
     };
     m_operations[4] = {
-        []() {},
-        []() {}
+        [this]() { displayTestInputs(); },
+        [this]() { findTestToEdit(); }
     };
     m_operations[5] = {
         [this]() {},
@@ -48,6 +48,16 @@ void ReducedOperationsWindow::findPerson()
     dynamic_cast<DiskPresenter*>(m_presenter)->findPerson(m_stringBuffer);
 }
 
+void ReducedOperationsWindow::findPersonToEdit()
+{
+    dynamic_cast<DiskPresenter*>(m_presenter)->findPersonToEdit(m_stringBuffer);
+}
+
+void ReducedOperationsWindow::findTestToEdit()
+{
+    dynamic_cast<DiskPresenter*>(m_presenter)->findTestToEdit(m_numBuffer);
+}
+
 //=========Render=============
 void ReducedOperationsWindow::displayTestInputs()
 {
@@ -71,6 +81,125 @@ void ReducedOperationsWindow::displayPersonInputs()
     }
 }
 
+void ReducedOperationsWindow::displayPersonEditInputs()
+{
+    strncpy_s(firstNameBuf, sizeof(firstNameBuf), m_firstName.c_str(), _TRUNCATE);
+    strncpy_s(lastNameBuf, sizeof(lastNameBuf), m_lastName.c_str(), _TRUNCATE);
+
+    ImGui::Columns(2, nullptr, false);
+
+    ImGui::Text("First Name:");
+    ImGui::InputText("##firstName", firstNameBuf, IM_ARRAYSIZE(firstNameBuf));
+    ImGui::NextColumn();
+
+    ImGui::Text("Last Name:");
+    ImGui::InputText("##lastName", lastNameBuf, IM_ARRAYSIZE(lastNameBuf));
+    ImGui::NextColumn();
+
+    ImGui::Text("Birth Date (Y / M / D):");
+
+    float inputWidth = ImGui::GetColumnWidth() / 4.0f - 5.0f;
+
+    ImGui::PushItemWidth(inputWidth);
+    ImGui::InputInt("##year", &m_year, 0, 0);
+    ImGui::SameLine();
+    ImGui::InputInt("##month", &m_month, 0, 0);
+    ImGui::SameLine();
+    ImGui::InputInt("##day", &m_day, 0, 0);
+    ImGui::PopItemWidth();
+
+    ImGui::Columns(1);
+
+    m_firstName = firstNameBuf;
+    m_lastName = lastNameBuf;
+    m_birthDay = std::chrono::year_month_day{
+        std::chrono::year{m_year},
+        std::chrono::month{static_cast<unsigned>(m_month)},
+        std::chrono::day{static_cast<unsigned>(m_day)}
+    };
+
+    float buttonWidth = 100.0f;
+    float buttonHeight = 30.0f;
+    float centerX = (ImGui::GetWindowSize().x - buttonWidth) * 0.5f;
+    float bottomY = ImGui::GetWindowSize().y - buttonHeight - 15.0f;
+
+    ImGui::SetCursorPos(ImVec2(centerX, bottomY));
+
+    if (ImGui::Button("Edit", ImVec2(buttonWidth, buttonHeight)))
+    {
+        if (m_firstName != "" && m_lastName != "" && m_year >= 0 && m_month >= 0 && m_day >= 0)
+        {
+            dynamic_cast<DiskPresenter*>(m_presenter)->editPerson(m_birthNumber, m_firstName, m_lastName, m_birthDay);
+        }
+    }
+}
+
+void ReducedOperationsWindow::displayTestEditInputs()
+{
+    char noteBuf[100];
+    strncpy_s(noteBuf, sizeof(noteBuf), m_note.c_str(), _TRUNCATE);
+
+    char birthBuf[20];
+    strncpy_s(birthBuf, sizeof(birthBuf), m_birthNumber.c_str(), _TRUNCATE);
+
+    ImGui::Text("Test Value:");
+    ImGui::InputDouble("##testValue", &m_testValue, 0, 0, "%.3f");
+    ImGui::NextColumn();
+
+    static int year = 2025, month = 1, day = 1, hour = 12, minute = 0;
+    ImGui::Text("Res  Hr  Min");
+    ImGui::PushItemWidth(ImGui::GetColumnWidth() / 3.5f - 5.0f);
+    ImGui::Checkbox("##result", &m_result);
+    ImGui::SameLine();
+    ImGui::InputInt("##hourh", &hour, 0, 0);
+    ImGui::SameLine();
+    ImGui::InputInt("##minute", &minute, 0, 0);
+    ImGui::PopItemWidth();
+    ImGui::NextColumn();
+
+    // Row 2
+    ImGui::Text("Note:");
+    if (ImGui::InputText("##note", noteBuf, IM_ARRAYSIZE(noteBuf)))
+    {
+        m_note = noteBuf;
+    }
+    ImGui::NextColumn();
+
+    ImGui::Text("Test Date (Y/M/D):");
+    ImGui::PushItemWidth(ImGui::GetColumnWidth() / 3.5f - 5.0f);
+    ImGui::InputInt("##year", &year, 0, 0);
+    ImGui::SameLine();
+    ImGui::InputInt("##month", &month, 0, 0);
+    ImGui::SameLine();
+    ImGui::InputInt("##day", &day, 0, 0);
+    ImGui::PopItemWidth();
+    ImGui::NextColumn();
+
+    std::tm tm = {};
+    tm.tm_year = year - 1900;
+    tm.tm_mon = month - 1;
+    tm.tm_mday = day;
+    tm.tm_hour = hour;
+    tm.tm_min = minute;
+    tm.tm_sec = 0;
+    m_testDate = std::chrono::system_clock::from_time_t(std::mktime(&tm));
+
+    float buttonWidth = 100.0f;
+    float buttonHeight = 30.0f;
+    float centerX = (ImGui::GetWindowSize().x - buttonWidth) * 0.5f;
+    float bottomY = ImGui::GetWindowSize().y - buttonHeight - 15.0f;
+
+    ImGui::SetCursorPos(ImVec2(centerX, bottomY));
+
+    if (ImGui::Button("Edit", ImVec2(buttonWidth, buttonHeight)))
+    {
+        if (m_testId >= 0 && m_testValue >= 0)
+        {
+            dynamic_cast<DiskPresenter*>(m_presenter)->editTest(m_testId, m_result, m_testValue, m_note, m_testDate);
+        }
+    }
+}
+
 void ReducedOperationsWindow::renderWindow()
 {
     ImGuiViewport* viewport = ImGui::GetMainViewport();
@@ -87,6 +216,7 @@ void ReducedOperationsWindow::renderWindow()
         ImGuiWindowFlags_NoSavedSettings
     );
 
+    static bool showRunButton = true;
     static const char* items[] = {
         "Select...",
         "(2) Najst osobu",
@@ -106,6 +236,12 @@ void ReducedOperationsWindow::renderWindow()
             if (ImGui::Selectable(items[n], is_selected))
             {
                 m_currentItem = n;
+
+                showRunButton = true;
+                m_personIsLoaded = false;
+                m_testIsLoaded = false;
+                dynamic_cast<DiskPresenter*>(m_presenter)->removePerson();
+                dynamic_cast<DiskPresenter*>(m_presenter)->removeTest();
             }
 
             if (is_selected)
@@ -116,7 +252,7 @@ void ReducedOperationsWindow::renderWindow()
         ImGui::EndCombo();
     }
 
-    if (m_currentItem < m_operations.size())
+    if (showRunButton && m_currentItem < m_operations.size())
     {
         m_operations[m_currentItem].display();
     }
@@ -126,13 +262,66 @@ void ReducedOperationsWindow::renderWindow()
     float centerX = (ImGui::GetWindowSize().x - buttonWidth) * 0.5f;
     float bottomY = ImGui::GetWindowSize().y - buttonHeight - 15.0f;
 
-    ImGui::SetCursorPos(ImVec2(centerX, bottomY));
-
-    if (ImGui::Button("Run", ImVec2(buttonWidth, buttonHeight)))
+    if (showRunButton)
     {
-        if (m_currentItem < m_operations.size())
+        ImGui::SetCursorPos(ImVec2(centerX, bottomY));
+
+        if (ImGui::Button("Run", ImVec2(buttonWidth, buttonHeight)))
         {
-            m_operations[m_currentItem].execute();
+            if (m_currentItem < m_operations.size())
+            {
+                m_operations[m_currentItem].execute();
+            }
+        }
+    }
+
+    if (!m_presenter->isExecuting())
+    {
+        if (m_currentItem == 3 && m_personIsLoaded)
+        {
+            displayPersonEditInputs(); 
+        }
+        else if (m_currentItem == 3 && !m_personIsLoaded)
+        {
+            auto person = dynamic_cast<DiskPresenter*>(m_presenter)->person();
+            if (person != nullptr)
+            {
+                m_personIsLoaded = true;
+                m_birthNumber = person->birthNumber();
+                m_firstName = person->firstName();
+                m_lastName = person->lastName();
+                m_year = static_cast<int>(person->birthDay().year());
+                m_month = static_cast<unsigned int>(person->birthDay().month());
+                m_day = static_cast<unsigned int>(person->birthDay().day());
+                showRunButton = false;
+            }
+        }
+        else if (m_currentItem == 4 && m_testIsLoaded)
+        {
+            displayTestEditInputs();
+        }
+        else if (m_currentItem == 4 && !m_testIsLoaded)
+        {
+            auto test = dynamic_cast<DiskPresenter*>(m_presenter)->test();
+            if (test != nullptr)
+            {
+                m_testIsLoaded = true;
+                m_testId = test->testId();
+                m_result = test->result();
+                m_testValue = test->testValue();
+                m_note = test->note();
+
+                auto dp = floor<days>(test->testDate());
+                year_month_day ymd = year_month_day{ dp };
+                hh_mm_ss hms{ test->testDate() - dp};
+                m_year = int(ymd.year());
+                m_month = unsigned(ymd.month());
+                m_day = unsigned(ymd.day());
+                m_hour = hms.hours().count();
+                m_minute = hms.minutes().count();
+
+                showRunButton = false;
+            }
         }
     }
 

@@ -166,6 +166,94 @@ void DiskDatabase::insert(PersonHashWrapper* person)
 	m_people.insert(person);
 }
 
+//(7)
+std::pair<PersonView*, std::string> DiskDatabase::findPersonToEdit(std::string birthNumber)
+{
+	std::string dummyStr = "";
+	Person* dummyPerson = new Person(
+		birthNumber,
+		dummyStr,
+		dummyStr,
+		std::chrono::year_month_day{}
+	);
+	PersonHashWrapper dummyKey(dummyPerson);
+
+	PersonHashWrapper* foundHashPerson = m_people.find(&dummyKey);
+	if (foundHashPerson != nullptr)
+	{
+		Person* foundPerson = foundHashPerson->getData();
+		PersonView* output = new PersonView(
+			foundPerson->birthNumber(),
+			foundPerson->firstName(),
+			foundPerson->lastName(),
+			foundPerson->birthDay()
+		);
+		std::string strOutput = foundHashPerson->toString();
+		delete foundHashPerson;
+		return std::make_pair(output, strOutput);
+	}
+	return std::make_pair(nullptr, "Person wasn't found");
+}
+
+bool DiskDatabase::editPerson(Person* personToEdit)
+{
+	PersonHashWrapper personHashWrapper(personToEdit);
+
+	bool executed = m_people.execute(&personHashWrapper, [&personToEdit](PersonHashWrapper* person) {
+		person->getData()->setFirstName(personToEdit->firstName());
+		person->getData()->setLastName(personToEdit->lastName());
+		person->getData()->setBirthday(personToEdit->birthDay());
+	});
+
+	return executed;
+}
+
+//(8)
+std::pair<TestView*, std::string> DiskDatabase::findTestToEdit(const unsigned int testId)
+{
+	int dummyNum = 0;
+	std::string dummyStr = "";
+	ReducedPCRTest* dummyTest = new ReducedPCRTest(
+		testId,
+		dummyNum,
+		dummyNum,
+		dummyStr,
+		std::chrono::system_clock::now()
+	);
+	TestHashWrapper dummyTestKey(dummyTest);
+
+	TestHashWrapper* foundHashTest = m_tests.find(&dummyTestKey);
+	if (foundHashTest != nullptr)
+	{
+		ReducedPCRTest* foundTest = foundHashTest->getData();
+		TestView* output = new TestView(
+			foundTest->testId(),
+			foundTest->result(),
+			foundTest->testValue(),
+			foundTest->note(),
+			foundTest->testDate()
+		);
+		std::string strOutput = foundHashTest->toString();
+		delete foundHashTest;
+		return std::make_pair(output, strOutput);
+	}
+	return std::make_pair(nullptr, "Test wasn't found");
+}
+
+bool DiskDatabase::editTest(ReducedPCRTest* testToEdit)
+{
+	TestHashWrapper testHashWrapper(testToEdit);
+
+	bool executed = m_tests.execute(&testHashWrapper, [&testToEdit](TestHashWrapper* test) {
+		test->getData()->setResult(testToEdit->result());
+		test->getData()->setTestValue(testToEdit->testValue());
+		test->getData()->setTestDate(testToEdit->testDate());
+		test->getData()->setNote(testToEdit->note());
+	});
+
+	return executed;
+}
+
 std::pair<std::string, int> DiskDatabase::printAllData()
 {
 	return std::make_pair(m_people.printOut() + m_tests.printOut(), m_people.size() + m_tests.size());

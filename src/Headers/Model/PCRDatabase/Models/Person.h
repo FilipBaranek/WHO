@@ -33,6 +33,20 @@ public:
 	{}
 	
 	inline void setBirthNumber(std::string birthNumber) { m_birthNumber = birthNumber; }
+
+	inline void setFirstName(std::string firstName)
+	{
+		m_firstName = firstName;
+		m_firstNameBin.m_validBitCount = static_cast<int>(m_firstName.size());
+	}
+
+	inline void setLastName(std::string lastName)
+	{
+		m_lastName = lastName;
+		m_lastNameBin.m_validBitCount = static_cast<int>(m_lastName.size());
+	}
+
+	inline void setBirthday(std::chrono::year_month_day birthday) { m_birthDay = birthday; }
 	
 	inline std::string birthNumber() { return m_birthNumber; }
 	

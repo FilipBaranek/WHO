@@ -4,6 +4,8 @@
 #include "ModelWrappers/TestHashWrapper.h"
 #include "Generator/RandomDataGenerator.h"
 #include "../HashFile/HashFile.h"
+#include "../../../Headers/View/Models/Person.h"
+#include "../../../Headers/View/Models/Test.h"
 
 class DiskDatabase : public Database
 {
@@ -42,6 +44,16 @@ public:
 
 	//(4)
 	void insert(PersonHashWrapper* person);
+
+	//(7)
+	std::pair<PersonView*, std::string> findPersonToEdit(std::string birthNumber);
+
+	bool editPerson(Person* personToEdit);
+
+	//(8)
+	std::pair<TestView*, std::string> findTestToEdit(const unsigned int testId);
+
+	bool editTest(ReducedPCRTest* testToEdit);
 
 	std::pair<std::string, int> printAllData() override;
 

@@ -25,6 +25,18 @@ public:
 		m_noteBin{NODE_MAX_LENGTH, static_cast<int>(m_note.size()), m_note}
 	{};
 
+	inline void setResult(bool result) { m_result = result; }
+
+	inline void setTestValue(double testValue) { m_testValue = testValue; }
+
+	inline void setTestDate(std::chrono::time_point<std::chrono::system_clock> testDate) { m_testDate = testDate; }
+
+	inline void setNote(std::string note)
+	{
+		m_note = note;
+		m_noteBin.m_validBitCount = note.size();
+	}
+
 	inline unsigned int testId() { return m_testId; }
 
 	inline bool result() { return m_result; }
