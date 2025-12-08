@@ -1,21 +1,9 @@
 #include "../../Headers/View/Application.h"
 
-Application::Application(APPLICATIONTYPE type)
+Application::Application(APPLICATIONTYPE type, std::string filePath, int peopleGroupSize,
+    int peoplePrimaryClusterSize, int peopleOverflowClusterSize,
+    int testsGroupSize, int testsPrimaryClusterSize, int testsOverflowClusterSize)
 {
-	glfwInit();
-    glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
-	m_mainWindow = glfwCreateWindow(1920, 1080, "WHO", nullptr, nullptr);
-    glfwMakeContextCurrent(m_mainWindow);
-    gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
-    ImGui::StyleColorsDark();
-
-    ImGui_ImplGlfw_InitForOpenGL(m_mainWindow, true);
-    ImGui_ImplOpenGL3_Init("#version 130");
-
     if (type == APPLICATIONTYPE::RAM)
     {
         m_presenter = new RamPresenter();
@@ -24,7 +12,15 @@ Application::Application(APPLICATIONTYPE type)
     }
     else if (type == APPLICATIONTYPE::DISK)
     {
-        m_presenter = new DiskPresenter();
+        m_presenter = new DiskPresenter(
+            filePath,
+            peopleGroupSize,
+            peoplePrimaryClusterSize,
+            peopleOverflowClusterSize,
+            testsGroupSize,
+            testsPrimaryClusterSize,
+            testsOverflowClusterSize
+        );
         m_windows.push_back(new ReducedOperationsWindow(m_presenter));
     }
     m_windows.push_back(new OutputWindow(m_presenter));
@@ -33,28 +29,34 @@ Application::Application(APPLICATIONTYPE type)
     m_windows.push_back(new GeneratorWindow(m_presenter));
 }
 
-void Application::run()
+void Application::run(bool& continueRun)
 {
-    while (!glfwWindowShouldClose(m_mainWindow)) {
-        glfwPollEvents();
+	for (auto& window : m_windows)
+	{
+		window->renderWindow();
+	}
 
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
+    ImGuiIO& io = ImGui::GetIO();
+    ImVec2 btnSize(100, 40);
 
-        for (auto& window : m_windows)
-        {
-            window->renderWindow();
-        }
+    ImGui::SetNextWindowPos(ImVec2(0, io.DisplaySize.y - btnSize.y));
 
-        ImGui::Render();
-        glViewport(0, 0, 800, 600);
-        glClearColor(0.1f, 0.1f, 0.2f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    ImGui::SetNextWindowSize(btnSize);
 
-        glfwSwapBuffers(m_mainWindow);
+    ImGui::Begin("ExitOverlay", nullptr,
+        ImGuiWindowFlags_NoDecoration |
+        ImGuiWindowFlags_NoMove |
+        ImGuiWindowFlags_NoSavedSettings |
+        ImGuiWindowFlags_NoBackground |
+        ImGuiWindowFlags_NoFocusOnAppearing |
+        ImGuiWindowFlags_NoNav);
+
+    if (ImGui::Button("EXIT", btnSize))
+    {
+        continueRun = false;
     }
+
+    ImGui::End();
 }
 
 Application::~Application()
@@ -65,10 +67,4 @@ Application::~Application()
     }
 
     delete m_presenter;
-
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
-    glfwDestroyWindow(m_mainWindow);
-    glfwTerminate();
 }

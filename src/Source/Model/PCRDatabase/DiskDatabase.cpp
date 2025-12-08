@@ -1,8 +1,9 @@
 #include "../../../Headers/Model/PCRDatabase/DiskDatabase.h"
 
-DiskDatabase::DiskDatabase() :
-	m_people(PEOPLE_FILE_PATH, PEOPLE_GROUP_SIZE, PEOPLE_PRIMARY_CLUSTERS_SIZE, PEOPLE_OVERFLOW_CLUSTERS_SIZE),
-	m_tests(TESTS_FILE_PATH, TESTS_GROUP_SIZE, TESTS_PRIMARY_CLUSTERS_SIZE, TESTS_OVERFLOW_CLUSTERS_SIZE)
+DiskDatabase::DiskDatabase(std::string filePath, int peopleGroupSize, int peoplePrimaryClusterSize, int peopleOverflowClusterSize,
+						   int testsGroupSize, int testsPrimaryClusterSize, int testsOverflowClusterSize) :
+	m_people(FILE_PATH + filePath + "/People/", peopleGroupSize, peoplePrimaryClusterSize, peopleOverflowClusterSize),
+	m_tests(FILE_PATH + filePath + "/Tests/", testsGroupSize, testsPrimaryClusterSize, testsOverflowClusterSize)
 {
 	m_people.open();
 	m_tests.open();

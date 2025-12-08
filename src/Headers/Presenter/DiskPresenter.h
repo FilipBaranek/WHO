@@ -19,8 +19,11 @@ private:
 	ClearCommand m_clearCommand;
 
 public:
-	DiskPresenter() : 
-		Presenter(new DiskDatabase()), m_findPersonCommand(m_database),
+	DiskPresenter(std::string filePath, int peopleGroupSize, int peoplePrimaryClusterSize,
+				  int peopleOverflowClusterSize, int testsGroupSize, int testsPrimaryClusterSize, int testsOverflowClusterSize) :
+		Presenter(new DiskDatabase(filePath, peopleGroupSize, peoplePrimaryClusterSize,
+				peopleOverflowClusterSize, testsGroupSize, testsPrimaryClusterSize, testsOverflowClusterSize)),
+		m_findPersonCommand(m_database),
 		m_editPersonCommand(m_database), m_editTestCommand(m_database),
 		m_clearCommand(m_database), m_person(nullptr), m_test(nullptr)
 	{}

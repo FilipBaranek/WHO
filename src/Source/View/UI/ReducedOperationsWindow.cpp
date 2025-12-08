@@ -209,7 +209,7 @@ void ReducedOperationsWindow::renderWindow()
 {
     ImGuiViewport* viewport = ImGui::GetMainViewport();
 
-    ImVec2 windowSize = ImVec2(viewport->Size.x * 0.25f, viewport->Size.y * 0.5f);
+    ImVec2 windowSize = ImVec2(viewport->Size.x * 0.25f, viewport->Size.y * 0.45f);
     ImVec2 windowPos = ImVec2(viewport->Pos.x, viewport->Size.y * 0.5f);
 
     ImGui::SetNextWindowPos(windowPos, ImGuiCond_Always);

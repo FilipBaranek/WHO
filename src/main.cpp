@@ -7,7 +7,7 @@
 #include "Headers/Model/Tests/FileTester.h""
 #include "Headers/Model/Tests/HashFileTester.h"
 #include "Headers/Model/PCRDatabase/ModelWrappers/PersonHashWrapper.h"
-#include "Headers/View/Application.h"
+#include "Headers/View/UI/SelectDatabase.h"
 
 
 void testSpeed(bool dataInOrder)
@@ -55,10 +55,10 @@ int main()
 
     {
         //testFile();
-        testHashFile();
+        //testHashFile();
 
-        //Application app(APPLICATIONTYPE::DISK);
-        //app.run();
+        SelectDatabaseWindow mainApp;
+        mainApp.run();
     }
 
     return 0;

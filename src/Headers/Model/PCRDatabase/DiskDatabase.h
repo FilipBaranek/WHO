@@ -10,14 +10,7 @@
 class DiskDatabase : public Database
 {
 private:
-	static constexpr const char* PEOPLE_FILE_PATH = "../../../data/HashFile/People/";
-	static constexpr const char* TESTS_FILE_PATH = "../../../data/HashFile/Tests/";
-	static constexpr const int PEOPLE_PRIMARY_CLUSTERS_SIZE = 800;
-	static constexpr const int PEOPLE_OVERFLOW_CLUSTERS_SIZE = 300;
-	static constexpr const int TESTS_PRIMARY_CLUSTERS_SIZE = 800;
-	static constexpr const int TESTS_OVERFLOW_CLUSTERS_SIZE = 300;
-	static constexpr const int PEOPLE_GROUP_SIZE = 4;
-	static constexpr const int TESTS_GROUP_SIZE = 4;
+	static constexpr const char* FILE_PATH = "../../../data/HashFile/";
 
 	std::random_device m_rd;
 	std::mt19937 m_gen{ 1928130314 };
@@ -29,7 +22,8 @@ private:
 	bool updatePersonTests(std::string birthBumber, unsigned int testId);
 
 public:
-	DiskDatabase();
+	DiskDatabase(std::string filePath, int peopleGroupSize, int peoplePrimaryClusterSize, int peopleOverflowClusterSize,
+				 int testsGroupSize, int testsPrimaryClusterSize, int testsOverflowClusterSize);
 
 	void generateRandomPeople(int peopleCount) override;
 
